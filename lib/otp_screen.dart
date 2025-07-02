@@ -1,35 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
-import 'otp_screen.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class OtpScreen extends StatefulWidget {
+  final String phoneNumber;
+  const OtpScreen({Key? key, required this.phoneNumber}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _phoneController = TextEditingController();
+class _OtpScreenState extends State<OtpScreen> {
+  String _otp = '';
   String? _errorText;
-  String _countryCode = '+91';
 
-  void _onContinue() {
+  void _onVerify() {
     setState(() {
-      if (_phoneController.text.isEmpty) {
-        _errorText = 'Please enter your phone number';
+      if (_otp.length != 6) {
+        _errorText = 'Please enter the 6-digit code';
       } else {
         _errorText = null;
-        String formattedCountryCode = _countryCode.trim();
-        String formattedNumber = _phoneController.text.trim();
-        if (formattedNumber.startsWith('+')) {
-          formattedNumber = formattedNumber.substring(1);
-        }
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => OtpScreen(phoneNumber: '+$formattedCountryCode $formattedNumber'),
-          ),
-        );
+        // Proceed with verification logic
       }
     });
   }
@@ -94,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 32),
                     // Title
                     const Text(
-                      'Enter your phone number',
+                      'Enter the code',
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
@@ -106,9 +96,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 8),
                     // Subtitle
-                    const Text(
-                      "We'll help you get started with Volo",
-                      style: TextStyle(
+                    Text(
+                      "We've sent a 6-digit code to\n${widget.phoneNumber}",
+                      style: const TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
                         fontSize: 14,
@@ -118,52 +108,57 @@ class _LoginScreenState extends State<LoginScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 32),
-                    // Phone input
+                    // OTP input
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24.0),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          IntlPhoneField(
-                            controller: _phoneController,
-                            initialCountryCode: 'IN',
-                            decoration: InputDecoration(
-                              labelText: 'Phone number',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: _errorText != null ? Colors.red : Colors.transparent,
-                                ),
-                              ),
-                              errorText: _errorText,
-                              errorStyle: const TextStyle(color: Colors.red),
+                          PinCodeTextField(
+                            appContext: context,
+                            length: 6,
+                            onChanged: (value) {
+                              setState(() {
+                                _otp = value;
+                                if (_otp.length == 6) _errorText = null;
+                              });
+                            },
+                            pinTheme: PinTheme(
+                              shape: PinCodeFieldShape.box,
+                              borderRadius: BorderRadius.circular(12),
+                              fieldHeight: 48,
+                              fieldWidth: 48,
+                              activeColor: _errorText != null ? Colors.red : const Color(0xFF9CA3AF),
+                              selectedColor: const Color(0xFF1F2937),
+                              inactiveColor: const Color(0xFF9CA3AF),
+                              activeFillColor: Colors.white,
+                              selectedFillColor: Colors.white,
+                              inactiveFillColor: Colors.white,
+                              borderWidth: 2,
                             ),
-                            onChanged: (phone) {
-                              setState(() {
-                                _countryCode = phone.countryCode.replaceAll('+', '');
-                                if (_phoneController.text.isNotEmpty) {
-                                  _errorText = null;
-                                }
-                              });
-                            },
-                            onCountryChanged: (country) {
-                              setState(() {
-                                _countryCode = country.dialCode.replaceAll('+', '');
-                              });
-                            },
+                            keyboardType: TextInputType.number,
+                            animationType: AnimationType.fade,
+                            enableActiveFill: true,
+                            cursorColor: const Color(0xFF1F2937),
                           ),
+                          if (_errorText != null) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              _errorText!,
+                              style: const TextStyle(color: Colors.red, fontSize: 14),
+                            ),
+                          ],
                         ],
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Continue Button
+                    // Verify Button
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24.0),
                       child: SizedBox(
                         width: double.infinity,
                         height: 60,
                         child: ElevatedButton(
-                          onPressed: _onContinue,
+                          onPressed: _onVerify,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1F2937),
                             shape: RoundedRectangleBorder(
@@ -173,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             elevation: 8,
                           ),
                           child: const Text(
-                            'Continue',
+                            'Verify',
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w400,
@@ -187,16 +182,50 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 16),
                     // Info Text
-                    const Text(
-                      "We'll send you an OTP to verify your number",
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 12,
-                        height: 20 / 12,
-                        color: Color(0xFF6B7280),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "Didn't receive the code? ",
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            // Resend logic or print message
+                          },
+                          child: const Text(
+                            'Resend',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 14,
+                              color: Color(0xFF1F2937),
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // Change number
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: const Text(
+                        'Change number',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                          color: Color(0xFF1F2937),
+                          decoration: TextDecoration.underline,
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
