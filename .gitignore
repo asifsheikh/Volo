@@ -60,8 +60,11 @@ DerivedData/
 *.xcuserstate
 *.xcuserdatad
 *.moved-aside
-*.xcassets
+-*.xcassets
 *.xcuserstate
+
+# Allow tracking of iOS app icons
+!ios/Runner/Assets.xcassets/AppIcon.appiconset/
 
 # CocoaPods related
 ios/Pods/
