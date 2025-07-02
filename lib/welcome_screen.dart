@@ -19,24 +19,17 @@ class WelcomeScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // App Icon
-                      Container(
-                        width: 96,
-                        height: 96,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.7),
+                      Material(
+                        elevation: 2,
+                        borderRadius: BorderRadius.circular(24),
+                        shadowColor: Colors.black.withOpacity(0.08),
+                        color: Colors.transparent,
+                        child: ClipRRect(
                           borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              blurRadius: 16,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
                           child: Image.asset(
                             'assets/volo_app_icon.png',
+                            width: 96,
+                            height: 96,
                             fit: BoxFit.contain,
                           ),
                         ),
