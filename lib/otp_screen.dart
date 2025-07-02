@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'onboarding_screen.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
@@ -19,7 +20,11 @@ class _OtpScreenState extends State<OtpScreen> {
         _errorText = 'Please enter the 6-digit code';
       } else {
         _errorText = null;
-        // Proceed with verification logic
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => OnboardingScreen(phoneNumber: widget.phoneNumber),
+          ),
+        );
       }
     });
   }
