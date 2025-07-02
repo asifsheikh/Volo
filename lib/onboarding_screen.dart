@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'home_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final String phoneNumber;
@@ -212,7 +213,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           width: double.infinity,
                           height: 60,
                           child: ElevatedButton(
-                            onPressed: _isFirstNameValid ? () {} : null,
+                            onPressed: _isFirstNameValid
+                                ? () {
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                        builder: (context) => HomeScreen(
+                                          username: _firstNameController.text,
+                                        ),
+                                      ),
+                                      (route) => false,
+                                    );
+                                  }
+                                : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF1F2937),
                               shape: RoundedRectangleBorder(
