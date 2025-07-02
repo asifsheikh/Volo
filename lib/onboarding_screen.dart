@@ -238,39 +238,41 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         ),
                         const SizedBox(height: 32),
-                        // Terms/Privacy
-                        const Text.rich(
-                          TextSpan(
-                            text: 'By continuing, you agree to our ',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14,
-                              color: Color(0xFF9CA3AF),
-                            ),
-                            children: [
-                              TextSpan(
-                                text: 'Terms',
-                                style: TextStyle(
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                              TextSpan(text: ' and '),
-                              TextSpan(
-                                text: 'Privacy Policy',
-                                style: TextStyle(
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ],
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
                       ],
                     ),
                   ),
                 ),
+              ),
+            ),
+            // Terms/Privacy at bottom
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0, left: 24.0, right: 24.0),
+              child: const Text.rich(
+                TextSpan(
+                  text: 'By continuing, you agree to our ',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14,
+                    color: Color(0xFF9CA3AF),
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Terms',
+                      style: TextStyle(
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                    TextSpan(text: ' and '),
+                    TextSpan(
+                      text: 'Privacy Policy',
+                      style: TextStyle(
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
           ],
