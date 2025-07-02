@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'otp_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final String phoneNumber;
@@ -51,10 +50,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 alignment: Alignment.centerLeft,
                 child: IconButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => OtpScreen(phoneNumber: widget.phoneNumber)),
-                    );
+                    Navigator.pop(context);
                   },
                   icon: const Icon(
                     Icons.arrow_back_ios,
