@@ -43,3 +43,50 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# macOS related
+macos/
+
+# Windows related
+windows/
+
+# Linux related
+linux/
+
+# Xcode related
+xcuserdata/
+DerivedData/
+*.xcworkspace
+*.xcuserstate
+*.xcuserdatad
+*.moved-aside
+*.xcassets
+*.xcuserstate
+
+# CocoaPods related
+ios/Pods/
+macos/Pods/
+Podfile.lock
+
+# Firebase/Crashlytics
+**/google-services.json
+**/GoogleService-Info.plist
+**/firebase_app_id_file.json
+**/crashlytics-build.properties
+
+# Editor directories and files
+.vscode/
+*.sublime-workspace
+*.sublime-project
+*.code-workspace
+
+# Flutter generated files
+.flutter-*
+.packages
+
+# Other
+*.orig
+*.rej
+*.bak
+*.tmp
+*.temp
