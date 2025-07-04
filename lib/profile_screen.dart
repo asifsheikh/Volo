@@ -158,7 +158,7 @@ class ProfileScreen extends StatelessWidget {
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: Color(0x33008080), // rgba(0,128,128,0.2)
+                          color: Color(0x33008080),
                           shape: BoxShape.circle,
                         ),
                         child: const Center(
@@ -198,7 +198,7 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ),
                       title: const Text(
-                        'Your Flight Journey',
+                        'My Flight Journey',
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w400,
@@ -208,7 +208,17 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       onTap: () {},
                     ),
-                    const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Column(
+                  children: [
                     ListTile(
                       leading: Container(
                         decoration: BoxDecoration(
