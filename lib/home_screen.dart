@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'add_flight_screen.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final String username;
@@ -25,18 +27,21 @@ class HomeScreen extends StatelessWidget {
                       color: Color(0xFF1F2937),
                     ),
                   ),
-                  Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Color(0xFFE0E7FF), width: 3),
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/profile_placeholder.png',
-                        fit: BoxFit.cover,
-                      ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ProfileScreen(
+                            username: username,
+                            phoneNumber: '+1 (555) 123-4567', // Placeholder, replace with real data if available
+                          ),
+                        ),
+                      );
+                    },
+                    child: CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Colors.white,
+                      backgroundImage: AssetImage('assets/profile_placeholder.png'),
                     ),
                   ),
                 ],
@@ -73,7 +78,11 @@ class HomeScreen extends StatelessWidget {
                     width: 320,
                     height: 60,
                     child: ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => const AddFlightScreen()),
+                        );
+                      },
                       icon: const Icon(Icons.flight_takeoff, color: Colors.white, size: 28),
                       label: const Text(
                         'Add Flight',
