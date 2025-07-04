@@ -163,6 +163,34 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         child: const Center(
                           child: Icon(
+                            Icons.groups,
+                            color: Color(0xFF008080),
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                      title: const Text(
+                        'My Circle',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 18,
+                          color: Color(0xFF333333),
+                        ),
+                      ),
+                      onTap: () {},
+                    ),
+                    const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                    ListTile(
+                      leading: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Color(0x33008080),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Icon(
                             Icons.flight_takeoff,
                             color: Color(0xFF008080),
                             size: 20,
