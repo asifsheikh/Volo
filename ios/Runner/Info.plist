@@ -45,5 +45,8 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<key>FirebaseAppCheckProviderFactory</key>
+	<string>FirebaseAppCheckDebugProviderFactory</string>
 </dict>
 </plist>
