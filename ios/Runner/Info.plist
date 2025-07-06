@@ -46,8 +46,7 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 
-	<key>FirebaseAppCheckProviderFactory</key>
-	<string>FirebaseAppCheckDebugProviderFactory</string>
+
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

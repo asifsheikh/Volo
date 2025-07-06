@@ -27,11 +27,11 @@ void main() async {
     developer.log('App: Firebase initialized successfully', name: 'VoloAuth');
     
     // Initialize Firebase App Check for security and abuse prevention
-    // Note: Using debug providers for development. Switch to production providers for release.
+    // Note: Using production providers for DeviceCheck and SafetyNet
     developer.log('App: Starting App Check initialization', name: 'VoloAuth');
     await FirebaseAppCheck.instance.activate(
-      androidProvider: AndroidProvider.debug, // Use SafetyNet for production
-      appleProvider: AppleProvider.debug,     // Use DeviceCheck for production
+      androidProvider: AndroidProvider.playIntegrity, // Use Play Integrity for production
+      appleProvider: AppleProvider.deviceCheck,       // Use DeviceCheck for production
     );
     developer.log('App: App Check initialized successfully', name: 'VoloAuth');
   } catch (e) {
