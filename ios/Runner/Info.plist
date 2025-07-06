@@ -48,5 +48,16 @@
 
 	<key>FirebaseAppCheckProviderFactory</key>
 	<string>FirebaseAppCheckDebugProviderFactory</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.volo.volo</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.volo.volo</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
