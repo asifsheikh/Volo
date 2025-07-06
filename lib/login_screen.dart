@@ -330,37 +330,46 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE5E7EB),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Back button
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0, top: 8.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  width: 30,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(9999),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 2,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Color(0xFF1F2937)),
-                    iconSize: 20,
-                    padding: EdgeInsets.zero,
-                    onPressed: () => Navigator.of(context).pop(),
+      body: Container(
+        // Full screen container that extends behind status bar
+        width: double.infinity,
+        height: double.infinity,
+        child: SafeArea(
+          // Only apply safe area to content, not the entire screen
+          maintainBottomViewPadding: true,
+          child: Column(
+            children: [
+              // Back button with proper top padding for status bar
+              Padding(
+                padding: EdgeInsets.only(
+                  left: 16.0, 
+                  top: MediaQuery.of(context).padding.top > 0 ? 8.0 : 16.0,
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    width: 30,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(9999),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 2,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Color(0xFF1F2937)),
+                      iconSize: 20,
+                      padding: EdgeInsets.zero,
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
                   ),
                 ),
               ),
-            ),
             // Main content
             Expanded(
               child: Center(

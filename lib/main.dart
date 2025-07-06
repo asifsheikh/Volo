@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'firebase_options.dart';
@@ -40,6 +41,18 @@ void main() async {
   }
   
   developer.log('App: Starting MyApp', name: 'VoloAuth');
+  
+  // Set system UI overlay style for full-screen experience
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent, // Transparent status bar
+      statusBarIconBrightness: Brightness.dark, // Dark status bar icons
+      statusBarBrightness: Brightness.light, // Light status bar for iOS
+      systemNavigationBarColor: Colors.transparent, // Transparent navigation bar
+      systemNavigationBarIconBrightness: Brightness.dark, // Dark navigation icons
+    ),
+  );
+  
   runApp(const MyApp());
 }
 
@@ -50,6 +63,7 @@ void main() async {
 /// - Theme configuration with custom color scheme
 /// - Initial route to WelcomeScreen
 /// - Production-ready configuration
+/// - Full-screen system UI overlay handling
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -61,6 +75,14 @@ class MyApp extends StatelessWidget {
         // Custom theme configuration for Volo app
         // Uses a deep purple color scheme as the base
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        // Configure app bar theme for full-screen experience
+        appBarTheme: const AppBarTheme(
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light,
+          ),
+        ),
       ),
       home: const WelcomeScreen(), // Start with welcome screen
     );

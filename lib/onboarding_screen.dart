@@ -41,26 +41,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE5E7EB),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Back Button
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0, top: 8.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(
-                    Icons.arrow_back_ios,
-                    color: Color(0xFF1F2937),
-                    size: 24,
+      body: Container(
+        // Full screen container that extends behind status bar
+        width: double.infinity,
+        height: double.infinity,
+        child: SafeArea(
+          // Only apply safe area to content, not the entire screen
+          maintainBottomViewPadding: true,
+          child: Column(
+            children: [
+              // Back Button with proper top padding for status bar
+              Padding(
+                padding: EdgeInsets.only(
+                  left: 16.0, 
+                  top: MediaQuery.of(context).padding.top > 0 ? 8.0 : 16.0,
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back_ios,
+                      color: Color(0xFF1F2937),
+                      size: 24,
+                    ),
                   ),
                 ),
               ),
-            ),
             // Main Content
             Expanded(
               child: Center(

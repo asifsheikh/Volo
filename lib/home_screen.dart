@@ -10,11 +10,22 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE5E7EB),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+      body: Container(
+        // Full screen container that extends behind status bar
+        width: double.infinity,
+        height: double.infinity,
+        child: SafeArea(
+          // Only apply safe area to content, not the entire screen
+          maintainBottomViewPadding: true,
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(
+                  left: 24.0, 
+                  right: 24.0,
+                  top: MediaQuery.of(context).padding.top > 0 ? 24.0 : 32.0,
+                  bottom: 24.0,
+                ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
