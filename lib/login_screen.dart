@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'otp_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -13,25 +14,84 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
   String? _errorText;
   String _countryCode = '+91';
+  bool _isLoading = false;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  void _onContinue() {
+  Future<void> _onContinue() async {
     setState(() {
       if (_phoneController.text.isEmpty) {
         _errorText = 'Please enter your phone number';
+        return;
       } else {
         _errorText = null;
-        String formattedCountryCode = _countryCode.trim();
-        String formattedNumber = _phoneController.text.trim();
-        if (formattedNumber.startsWith('+')) {
-          formattedNumber = formattedNumber.substring(1);
-        }
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => OtpScreen(phoneNumber: '+$formattedCountryCode $formattedNumber'),
-          ),
-        );
+        _isLoading = true;
       }
     });
+
+    try {
+      String formattedCountryCode = _countryCode.trim();
+      String formattedNumber = _phoneController.text.trim();
+      if (formattedNumber.startsWith('+')) {
+        formattedNumber = formattedNumber.substring(1);
+      }
+      
+      String fullPhoneNumber = '+$formattedCountryCode$formattedNumber';
+      
+      // Send OTP via Firebase
+      await _auth.verifyPhoneNumber(
+        phoneNumber: fullPhoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          // Auto-verification if SMS is not required
+          await _auth.signInWithCredential(credential);
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => OtpScreen(
+                  phoneNumber: fullPhoneNumber,
+                  verificationId: null, // Auto-verified
+                ),
+              ),
+            );
+          }
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          setState(() {
+            _isLoading = false;
+            if (e.code == 'invalid-phone-number') {
+              _errorText = 'Invalid phone number';
+            } else if (e.code == 'too-many-requests') {
+              _errorText = 'Too many requests. Please try again later.';
+            } else {
+              _errorText = 'Failed to send OTP. Please try again.';
+            }
+          });
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          setState(() {
+            _isLoading = false;
+          });
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => OtpScreen(
+                phoneNumber: fullPhoneNumber,
+                verificationId: verificationId,
+              ),
+            ),
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          setState(() {
+            _isLoading = false;
+          });
+        },
+        timeout: const Duration(seconds: 60),
+      );
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorText = 'An error occurred. Please try again.';
+      });
+    }
   }
 
   @override
@@ -166,7 +226,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: double.infinity,
                           height: 60,
                           child: ElevatedButton(
-                            onPressed: _onContinue,
+                            onPressed: _isLoading ? null : _onContinue,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF1F2937),
                               shape: RoundedRectangleBorder(
@@ -175,16 +235,25 @@ class _LoginScreenState extends State<LoginScreen> {
                               shadowColor: Colors.black.withOpacity(0.1),
                               elevation: 8,
                             ),
-                            child: const Text(
-                              'Continue',
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 18,
-                                height: 22 / 18,
-                                color: Colors.white,
-                              ),
-                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    ),
+                                  )
+                                : const Text(
+                                    'Continue',
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 18,
+                                      height: 22 / 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
                         ),
                       ),

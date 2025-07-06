@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'onboarding_screen.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
-  const OtpScreen({Key? key, required this.phoneNumber}) : super(key: key);
+  final String? verificationId;
+  const OtpScreen({Key? key, required this.phoneNumber, this.verificationId}) : super(key: key);
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -13,20 +15,73 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> {
   String _otp = '';
   String? _errorText;
+  bool _isLoading = false;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String? _currentVerificationId;
 
-  void _onVerify() {
+  @override
+  void initState() {
+    super.initState();
+    _currentVerificationId = widget.verificationId;
+  }
+
+  Future<void> _onVerify() async {
     setState(() {
       if (_otp.length != 6) {
         _errorText = 'Please enter the 6-digit code';
+        return;
       } else {
         _errorText = null;
-        Navigator.of(context).push(
+        _isLoading = true;
+      }
+    });
+
+    try {
+      String verificationId = _currentVerificationId ?? widget.verificationId ?? '';
+      
+      if (verificationId.isEmpty) {
+        // Auto-verified case, proceed to onboarding
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => OnboardingScreen(phoneNumber: widget.phoneNumber),
+          ),
+        );
+        return;
+      }
+
+      // Create credential with OTP
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: _otp,
+      );
+
+      // Sign in with credential
+      await _auth.signInWithCredential(credential);
+      
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => OnboardingScreen(phoneNumber: widget.phoneNumber),
           ),
         );
       }
-    });
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        _isLoading = false;
+        if (e.code == 'invalid-verification-code') {
+          _errorText = 'Invalid OTP. Please try again.';
+        } else if (e.code == 'session-expired') {
+          _errorText = 'OTP expired. Please request a new one.';
+        } else {
+          _errorText = 'Verification failed. Please try again.';
+        }
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorText = 'An error occurred. Please try again.';
+      });
+    }
   }
 
   @override
@@ -166,7 +221,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           width: double.infinity,
                           height: 60,
                           child: ElevatedButton(
-                            onPressed: _onVerify,
+                            onPressed: _isLoading ? null : _onVerify,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF1F2937),
                               shape: RoundedRectangleBorder(
@@ -175,16 +230,25 @@ class _OtpScreenState extends State<OtpScreen> {
                               shadowColor: Colors.black.withOpacity(0.1),
                               elevation: 8,
                             ),
-                            child: const Text(
-                              'Verify',
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 18,
-                                height: 22 / 18,
-                                color: Colors.white,
-                              ),
-                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    ),
+                                  )
+                                : const Text(
+                                    'Verify',
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 18,
+                                      height: 22 / 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
                         ),
                       ),
@@ -203,9 +267,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             ),
                           ),
                           GestureDetector(
-                            onTap: () {
-                              // Resend logic or print message
-                            },
+                            onTap: _resendOTP,
                             child: const Text(
                               'Resend',
                               style: TextStyle(
@@ -276,5 +338,62 @@ class _OtpScreenState extends State<OtpScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _resendOTP() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      await _auth.verifyPhoneNumber(
+        phoneNumber: widget.phoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await _auth.signInWithCredential(credential);
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => OnboardingScreen(phoneNumber: widget.phoneNumber),
+              ),
+            );
+          }
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          setState(() {
+            _isLoading = false;
+            if (e.code == 'too-many-requests') {
+              _errorText = 'Too many requests. Please try again later.';
+            } else {
+              _errorText = 'Failed to resend OTP. Please try again.';
+            }
+          });
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          setState(() {
+            _isLoading = false;
+            _errorText = null;
+          });
+          // Update the verification ID
+          _currentVerificationId = verificationId;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('OTP resent successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          setState(() {
+            _isLoading = false;
+          });
+        },
+        timeout: const Duration(seconds: 60),
+      );
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorText = 'Failed to resend OTP. Please try again.';
+      });
+    }
   }
 } 
