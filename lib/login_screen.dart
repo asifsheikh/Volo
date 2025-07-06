@@ -330,14 +330,8 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE5E7EB),
-      body: Container(
-        // Full screen container that extends behind status bar
-        width: double.infinity,
-        height: double.infinity,
-        child: SafeArea(
-          // Only apply safe area to content, not the entire screen
-          maintainBottomViewPadding: true,
-          child: Column(
+      body: SafeArea(
+        child: Column(
             children: [
               // Back button with proper top padding for status bar
               Padding(
