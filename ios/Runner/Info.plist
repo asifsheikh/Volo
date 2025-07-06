@@ -58,6 +58,14 @@
 				<string>com.volo.volo</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>Firebase Auth</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>app-1-318768314662-ios-cb7f7024924cb5ea45e9e7</string>
+			</array>
+		</dict>
 	</array>
 </dict>
 </plist>
