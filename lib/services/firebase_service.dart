@@ -15,14 +15,67 @@ class FirebaseService {
   // Test Firebase connection
   static Future<bool> testConnection() async {
     try {
+      developer.log('FirebaseService: Testing Firestore connection...', name: 'FirebaseService');
+      
       // Try to access Firestore Users collection
-      await _firestore.collection('Users').limit(1).get();
-      developer.log('Firebase connection test successful', name: 'FirebaseService');
+      final querySnapshot = await _firestore.collection('Users').limit(1).get();
+      developer.log('FirebaseService: Connection test successful - found ${querySnapshot.docs.length} documents', name: 'FirebaseService');
       return true;
     } catch (e) {
-      developer.log('Firebase connection test failed: $e', name: 'FirebaseService');
+      developer.log('FirebaseService: Connection test failed: $e', name: 'FirebaseService');
+      developer.log('FirebaseService: Error type: ${e.runtimeType}', name: 'FirebaseService');
       return false;
     }
+  }
+
+  // Comprehensive Firestore test
+  static Future<Map<String, dynamic>> testFirestoreComprehensive() async {
+    final results = <String, dynamic>{};
+    
+    try {
+      developer.log('FirebaseService: Starting comprehensive Firestore test', name: 'FirebaseService');
+      
+      // Test 1: Basic connection
+      results['basic_connection'] = await testConnection();
+      
+      // Test 2: Authentication status
+      final user = _auth.currentUser;
+      results['user_authenticated'] = user != null;
+      results['user_uid'] = user?.uid;
+      results['user_phone'] = user?.phoneNumber;
+      
+      // Test 3: Try to write a test document
+      if (user != null) {
+        try {
+          final testData = {
+            'test': true,
+            'timestamp': FieldValue.serverTimestamp(),
+          };
+          
+          await _firestore.collection('Users').doc('test_${user.uid}').set(testData);
+          results['write_test'] = true;
+          
+          // Clean up test document
+          await _firestore.collection('Users').doc('test_${user.uid}').delete();
+          results['delete_test'] = true;
+          
+        } catch (e) {
+          results['write_test'] = false;
+          results['write_error'] = e.toString();
+        }
+      } else {
+        results['write_test'] = false;
+        results['write_error'] = 'No authenticated user';
+      }
+      
+      developer.log('FirebaseService: Comprehensive test results: $results', name: 'FirebaseService');
+      
+    } catch (e) {
+      developer.log('FirebaseService: Comprehensive test failed: $e', name: 'FirebaseService');
+      results['overall_error'] = e.toString();
+    }
+    
+    return results;
   }
 
   // Get current user
@@ -63,7 +116,11 @@ class FirebaseService {
     required String phoneNumber,
   }) async {
     try {
+      developer.log('FirebaseService: Starting saveUserProfile', name: 'FirebaseService');
+      
       final user = _auth.currentUser;
+      developer.log('FirebaseService: Current user: ${user?.uid ?? 'null'}', name: 'FirebaseService');
+      
       if (user == null) {
         throw Exception('No authenticated user found');
       }
@@ -77,10 +134,22 @@ class FirebaseService {
         'isOnboarded': true,
       };
 
+      developer.log('FirebaseService: User data prepared: $userData', name: 'FirebaseService');
+      developer.log('FirebaseService: Attempting to save to Users/${user.uid}', name: 'FirebaseService');
+
+      // Test Firestore connection first
+      final connectionTest = await testConnection();
+      developer.log('FirebaseService: Connection test result: $connectionTest', name: 'FirebaseService');
+      
+      if (!connectionTest) {
+        throw Exception('Firestore connection failed');
+      }
+
       await _firestore.collection('Users').doc(user.uid).set(userData);
-      developer.log('User profile saved successfully', name: 'FirebaseService');
+      developer.log('FirebaseService: User profile saved successfully', name: 'FirebaseService');
     } catch (e) {
-      developer.log('Error saving user profile: $e', name: 'FirebaseService');
+      developer.log('FirebaseService: Error saving user profile: $e', name: 'FirebaseService');
+      developer.log('FirebaseService: Error type: ${e.runtimeType}', name: 'FirebaseService');
       rethrow;
     }
   }
