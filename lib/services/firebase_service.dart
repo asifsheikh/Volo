@@ -14,10 +14,10 @@ class FirebaseService {
     // Initialize Firestore with the correct database name
     _firestore = FirebaseFirestore.instanceFor(
       app: Firebase.app(),
-      databaseId: 'volo', // Use the "volo" database
+      databaseId: 'Volo', // Use the "Volo" database
     );
     
-    developer.log('FirebaseService: Initialized with database: volo', name: 'FirebaseService');
+    developer.log('FirebaseService: Initialized with database: Volo', name: 'FirebaseService');
   }
 
   // Test Firebase connection
