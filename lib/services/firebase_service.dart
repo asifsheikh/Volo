@@ -15,8 +15,9 @@ class FirebaseService {
   // Test Firebase connection
   static Future<bool> testConnection() async {
     try {
-      // Try to access Firestore
-      await _firestore.collection('test').limit(1).get();
+      // Try to access Firestore Users collection
+      await _firestore.collection('Users').limit(1).get();
+      developer.log('Firebase connection test successful', name: 'FirebaseService');
       return true;
     } catch (e) {
       developer.log('Firebase connection test failed: $e', name: 'FirebaseService');
@@ -76,7 +77,7 @@ class FirebaseService {
         'isOnboarded': true,
       };
 
-      await _firestore.collection('users').doc(user.uid).set(userData);
+      await _firestore.collection('Users').doc(user.uid).set(userData);
       developer.log('User profile saved successfully', name: 'FirebaseService');
     } catch (e) {
       developer.log('Error saving user profile: $e', name: 'FirebaseService');
@@ -92,7 +93,7 @@ class FirebaseService {
         return null;
       }
 
-      final doc = await _firestore.collection('users').doc(user.uid).get();
+      final doc = await _firestore.collection('Users').doc(user.uid).get();
       if (doc.exists) {
         final data = doc.data();
         developer.log('User profile retrieved successfully', name: 'FirebaseService');
@@ -128,7 +129,7 @@ class FirebaseService {
 
       updates['updatedAt'] = FieldValue.serverTimestamp();
       
-      await _firestore.collection('users').doc(user.uid).update(updates);
+      await _firestore.collection('Users').doc(user.uid).update(updates);
       developer.log('User profile updated successfully', name: 'FirebaseService');
     } catch (e) {
       developer.log('Error updating user profile: $e', name: 'FirebaseService');
@@ -145,7 +146,7 @@ class FirebaseService {
       }
 
       // Delete user data from Firestore
-      await _firestore.collection('users').doc(user.uid).delete();
+      await _firestore.collection('Users').doc(user.uid).delete();
       
       // Delete the user account
       await user.delete();

@@ -77,7 +77,7 @@ App Start → AuthWrapper Check → Home Screen (Direct)
 ### Users Collection
 
 ```javascript
-users/{userId} {
+Users/{userId} {
   firstName: string,           // Required
   lastName: string,            // Optional
   phoneNumber: string,         // Required (from Firebase Auth)
