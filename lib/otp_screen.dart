@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'onboarding_screen.dart';
 import 'dart:developer' as developer;
 import 'dart:async';
+import 'home_screen.dart';
+import 'services/firebase_service.dart';
 
 /// OTP Verification Screen for Volo App
 /// 
@@ -196,12 +198,8 @@ class _OtpScreenState extends State<OtpScreen> {
       
       // Handle auto-verification case (test phone numbers)
       if (verificationId.isEmpty) {
-        // Auto-verified case, proceed to onboarding
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => OnboardingScreen(phoneNumber: widget.phoneNumber),
-          ),
-        );
+        // Auto-verified case, check if user profile exists
+        await _handlePostAuthentication();
         return;
       }
 
@@ -223,14 +221,8 @@ class _OtpScreenState extends State<OtpScreen> {
         ),
       );
       
-      // Navigate to onboarding screen
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => OnboardingScreen(phoneNumber: widget.phoneNumber),
-          ),
-        );
-      }
+      // Handle post-authentication routing
+      await _handlePostAuthentication();
     } on FirebaseAuthException catch (e) {
       setState(() {
         _isLoading = false;
@@ -257,6 +249,44 @@ class _OtpScreenState extends State<OtpScreen> {
         _isLoading = false;
         _errorText = 'An unexpected error occurred. Please try again.';
       });
+    }
+  }
+
+  /// Handle post-authentication routing based on user profile existence
+  Future<void> _handlePostAuthentication() async {
+    try {
+      // Check if user profile exists in Firestore
+      final userProfile = await FirebaseService.getUserProfile();
+      
+      if (mounted) {
+        if (userProfile != null) {
+          // User profile exists - skip onboarding, go directly to home
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(
+                username: userProfile['firstName'] ?? 'User',
+              ),
+            ),
+            (route) => false,
+          );
+        } else {
+          // No user profile - show onboarding screen
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => OnboardingScreen(phoneNumber: widget.phoneNumber),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // If there's an error checking profile, default to onboarding
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => OnboardingScreen(phoneNumber: widget.phoneNumber),
+          ),
+        );
+      }
     }
   }
 
@@ -556,11 +586,7 @@ class _OtpScreenState extends State<OtpScreen> {
         verificationCompleted: (PhoneAuthCredential credential) async {
           await _auth.signInWithCredential(credential);
           if (mounted) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => OnboardingScreen(phoneNumber: widget.phoneNumber),
-              ),
-            );
+            await _handlePostAuthentication();
           }
         },
         // Error handling callback
