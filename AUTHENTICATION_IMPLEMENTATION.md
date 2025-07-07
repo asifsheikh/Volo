@@ -29,35 +29,48 @@ This document describes the comprehensive authentication state management system
 
 ### State Management Logic
 
-The app uses a three-state authentication system:
+The app uses a simplified two-state authentication system:
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Not Auth      │───▶│  Auth + No       │───▶│  Auth +         │
-│                 │    │  Onboarding      │    │  Onboarded      │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-        │                       │                       │
-        ▼                       ▼                       ▼
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  Welcome        │    │   Onboarding     │    │     Home        │
-│  Screen         │    │   Screen         │    │   Screen        │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+┌─────────────────┐    ┌─────────────────┐
+│   Not Auth      │───▶│  Auth +         │
+│   OR Not        │    │  Onboarded      │
+│   Onboarded     │    │                 │
+└─────────────────┘    └─────────────────┘
+        │                       │
+        ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐
+│  Welcome        │    │     Home        │
+│  Screen         │    │   Screen        │
+└─────────────────┘    └─────────────────┘
 ```
 
 ### Routing Logic
 
-1. **Not Authenticated** → Welcome Screen
+1. **Not Authenticated OR Not Onboarded** → Welcome Screen
    - User has not completed phone authentication
-   - Shows login flow
+   - OR user is authenticated but hasn't completed onboarding
+   - Shows complete login flow (Welcome → Login → OTP → Onboarding)
 
-2. **Authenticated but Not Onboarded** → Onboarding Screen
-   - User has verified phone number but hasn't completed profile setup
-   - Collects first name and last name
-   - Saves data to Firestore
-
-3. **Authenticated and Onboarded** → Home Screen
+2. **Authenticated and Onboarded** → Home Screen
    - User has completed both authentication and onboarding
    - Shows main app interface
+
+### User Experience Flow
+
+#### Fresh User or Incomplete Onboarding
+```
+Welcome Screen → Login Screen → OTP Screen → Onboarding Screen → Home Screen
+```
+
+#### Returning User (Fully Onboarded)
+```
+App Start → AuthWrapper Check → Home Screen (Direct)
+```
+
+#### App Kill and Restart
+- **Fully onboarded user**: Direct to Home Screen
+- **Incomplete onboarding user**: Start fresh from Welcome Screen
 
 ## Firestore Data Structure
 
@@ -111,6 +124,11 @@ users/{userId} {
 - User-friendly error messages
 - Loading states for all async operations
 
+### 6. Fresh Start for Incomplete Users
+- Users who haven't completed onboarding start fresh
+- Prevents confusion from partial authentication states
+- Ensures complete user journey
+
 ## Implementation Details
 
 ### AuthWrapper State Management
@@ -146,6 +164,17 @@ class _AuthWrapperState extends State<AuthWrapper> {
         });
       }
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // User is not authenticated OR user is authenticated but not onboarded
+    if (_currentUser == null || !_isOnboarded) {
+      return const WelcomeScreen();
+    }
+
+    // User is authenticated and onboarded
+    return _buildHomeScreen();
   }
 }
 ```
@@ -234,14 +263,24 @@ FirebaseService.authStateChanges.listen((User? user) {
 ### 3. Returning User (Not Onboarded)
 - App checks authentication state
 - User is authenticated but not onboarded
-- App routes to Onboarding Screen
+- App routes to Welcome Screen (fresh start)
 
-### 4. Sign Out
+### 4. App Kill and Restart (Onboarded)
+- User kills app and restarts
+- AuthWrapper detects authenticated and onboarded state
+- App directly routes to Home Screen
+
+### 5. App Kill and Restart (Not Onboarded)
+- User kills app and restarts
+- AuthWrapper detects authenticated but not onboarded state
+- App routes to Welcome Screen (fresh start)
+
+### 6. Sign Out
 - User signs out from Profile Screen
 - AuthWrapper detects state change
 - App routes to Welcome Screen
 
-### 5. Account Deletion
+### 7. Account Deletion
 - User deletes account from Profile Screen
 - User data is removed from Firestore
 - User account is deleted from Firebase Auth
@@ -282,6 +321,11 @@ FirebaseService.authStateChanges.listen((User? user) {
    - Verify navigation logic
    - Check for error logs
 
+4. **User not going to home screen after onboarding**
+   - Check if user data was saved to Firestore
+   - Verify isOnboarded flag is set to true
+   - Check AuthWrapper routing logic
+
 ### Debug Logging
 
 The implementation includes comprehensive logging with the tag 'VoloAuth':
@@ -294,4 +338,4 @@ Check logs for detailed authentication flow information.
 
 ## Conclusion
 
-This authentication state management system provides a robust, secure, and user-friendly experience for the Volo app. It handles all edge cases, provides proper error handling, and integrates seamlessly with Firebase services while maintaining clean separation of concerns. 
+This authentication state management system provides a robust, secure, and user-friendly experience for the Volo app. The simplified routing logic ensures users always have a complete and consistent experience, whether they're new users or returning users with incomplete onboarding. The system handles all edge cases, provides proper error handling, and integrates seamlessly with Firebase services while maintaining clean separation of concerns. 

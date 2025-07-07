@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as developer;
 import 'services/firebase_service.dart';
 import 'welcome_screen.dart';
-import 'onboarding_screen.dart';
 import 'home_screen.dart';
 
 /// Authentication wrapper that handles routing based on user authentication state
@@ -13,7 +12,7 @@ import 'home_screen.dart';
 /// 2. Checks if user has completed onboarding
 /// 3. Routes to appropriate screen based on state:
 ///    - Not authenticated → Welcome screen
-///    - Authenticated but not onboarded → Onboarding screen
+///    - Authenticated but not onboarded → Welcome screen (start fresh)
 ///    - Authenticated and onboarded → Home screen
 class AuthWrapper extends StatefulWidget {
   const AuthWrapper({Key? key}) : super(key: key);
@@ -84,16 +83,11 @@ class _AuthWrapperState extends State<AuthWrapper> {
       return _buildLoadingScreen();
     }
 
-    // User is not authenticated
-    if (_currentUser == null) {
+    // User is not authenticated OR user is authenticated but not onboarded
+    if (_currentUser == null || !_isOnboarded) {
       developer.log('AuthWrapper: Routing to WelcomeScreen', name: 'VoloAuth');
+      developer.log('  - Reason: ${_currentUser == null ? "Not authenticated" : "Not onboarded"}', name: 'VoloAuth');
       return const WelcomeScreen();
-    }
-
-    // User is authenticated but not onboarded
-    if (!_isOnboarded) {
-      developer.log('AuthWrapper: Routing to OnboardingScreen', name: 'VoloAuth');
-      return OnboardingScreen(phoneNumber: _currentUser!.phoneNumber ?? '');
     }
 
     // User is authenticated and onboarded
