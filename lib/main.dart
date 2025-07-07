@@ -6,15 +6,16 @@ import 'firebase_options.dart';
 import 'auth_wrapper.dart';
 import 'services/firebase_service.dart';
 import 'dart:developer' as developer;
+import 'package:flutter/foundation.dart';
 
 /// Main entry point for the Volo Flutter application
 /// 
 /// This function initializes Firebase services and starts the app.
 /// Features include:
 /// - Firebase Core initialization with platform-specific options
-/// - Firebase App Check initialization for security
+/// - Firebase App Check initialization with production-ready configuration
 /// - Comprehensive error handling and logging
-/// - Debug mode configuration for development
+/// - Automatic debug/production mode switching
 void main() async {
   // Ensure Flutter bindings are initialized before Firebase
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,12 +41,22 @@ void main() async {
     await FirebaseService.initialize();
     developer.log('App: Firebase Service initialized successfully', name: 'VoloAuth');
     
-    // Initialize Firebase App Check (debug provider for dev)
-    await FirebaseAppCheck.instance.activate(
-      androidProvider: AndroidProvider.debug,
-      appleProvider: AppleProvider.debug,
-    );
-    developer.log('App: Firebase App Check initialized successfully', name: 'VoloAuth');
+    // Initialize Firebase App Check with production-ready configuration
+    if (kDebugMode) {
+      // Use debug providers for development
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.debug,
+        appleProvider: AppleProvider.debug,
+      );
+      developer.log('App: Firebase App Check initialized with DEBUG providers', name: 'VoloAuth');
+    } else {
+      // Use production providers for release builds
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.playIntegrity,
+        appleProvider: AppleProvider.deviceCheck,
+      );
+      developer.log('App: Firebase App Check initialized with PRODUCTION providers', name: 'VoloAuth');
+    }
   } catch (e) {
     // Log and rethrow Firebase initialization errors
     developer.log('App: Firebase initialization failed: $e', name: 'VoloAuth');
