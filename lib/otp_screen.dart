@@ -33,6 +33,7 @@ class _OtpScreenState extends State<OtpScreen> {
   String? _currentVerificationId;
   bool _canResend = true;
   int _resendCountdown = 0;
+  int? _resendToken;
 
   @override
   void initState() {
@@ -179,14 +180,9 @@ class _OtpScreenState extends State<OtpScreen> {
   /// 4. Handles success and error cases
   /// 5. Shows appropriate user feedback
   Future<void> _onVerify() async {
-    developer.log('OtpScreen: Verify button pressed', name: 'VoloAuth');
-    developer.log('  - OTP length: ${_otp.length}', name: 'VoloAuth');
-    developer.log('  - OTP value: $_otp', name: 'VoloAuth');
-    
     setState(() {
       if (_otp.length != 6) {
         _errorText = 'Please enter the 6-digit code';
-        developer.log('OtpScreen: OTP length is not 6 digits', name: 'VoloAuth');
         return;
       } else {
         _errorText = null;
@@ -197,14 +193,9 @@ class _OtpScreenState extends State<OtpScreen> {
     try {
       // Get the verification ID for this session
       String verificationId = _currentVerificationId ?? widget.verificationId ?? '';
-      developer.log('OtpScreen: Verification details:', name: 'VoloAuth');
-      developer.log('  - Current verification ID: $_currentVerificationId', name: 'VoloAuth');
-      developer.log('  - Widget verification ID: ${widget.verificationId}', name: 'VoloAuth');
-      developer.log('  - Final verification ID: $verificationId', name: 'VoloAuth');
       
       // Handle auto-verification case (test phone numbers)
       if (verificationId.isEmpty) {
-        developer.log('OtpScreen: No verification ID, proceeding to onboarding (auto-verified)', name: 'VoloAuth');
         // Auto-verified case, proceed to onboarding
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
@@ -215,17 +206,13 @@ class _OtpScreenState extends State<OtpScreen> {
       }
 
       // Create PhoneAuthCredential with OTP
-      developer.log('OtpScreen: Creating PhoneAuthCredential', name: 'VoloAuth');
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: verificationId,
         smsCode: _otp,
       );
-      developer.log('OtpScreen: Credential created successfully', name: 'VoloAuth');
 
       // Sign in with Firebase using the credential
-      developer.log('OtpScreen: Attempting to sign in with credential', name: 'VoloAuth');
       await _auth.signInWithCredential(credential);
-      developer.log('OtpScreen: Sign in successful', name: 'VoloAuth');
       
       // Show success message to user
       ScaffoldMessenger.of(context).showSnackBar(
@@ -245,12 +232,6 @@ class _OtpScreenState extends State<OtpScreen> {
         );
       }
     } on FirebaseAuthException catch (e) {
-      // Handle Firebase authentication errors
-      developer.log('OtpScreen: FirebaseAuthException occurred', name: 'VoloAuth');
-      developer.log('  - Error code: ${e.code}', name: 'VoloAuth');
-      developer.log('  - Error message: ${e.message}', name: 'VoloAuth');
-      developer.log('  - Error details: ${e.toString()}', name: 'VoloAuth');
-      
       setState(() {
         _isLoading = false;
         _errorText = _getUserFriendlyErrorMessage(e);
@@ -272,24 +253,10 @@ class _OtpScreenState extends State<OtpScreen> {
         );
       }
     } catch (e) {
-      // Handle any unexpected exceptions
-      developer.log('OtpScreen: General exception occurred', name: 'VoloAuth');
-      developer.log('  - Exception: $e', name: 'VoloAuth');
-      developer.log('  - Exception type: ${e.runtimeType}', name: 'VoloAuth');
-      
       setState(() {
         _isLoading = false;
         _errorText = 'An unexpected error occurred. Please try again.';
       });
-      
-      // Show error snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: ${e.toString()}'),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 4),
-        ),
-      );
     }
   }
 
@@ -571,12 +538,8 @@ class _OtpScreenState extends State<OtpScreen> {
   /// 3. Handles success and error cases
   /// 4. Restarts countdown timer
   Future<void> _resendOTP() async {
-    developer.log('OtpScreen: Resend OTP button pressed', name: 'VoloAuth');
-    developer.log('  - Phone number: ${widget.phoneNumber}', name: 'VoloAuth');
-    
     // Check if resend is allowed (countdown finished)
     if (!_canResend) {
-      developer.log('OtpScreen: Resend blocked - countdown active', name: 'VoloAuth');
       return;
     }
     
@@ -587,12 +550,10 @@ class _OtpScreenState extends State<OtpScreen> {
       });
 
       // Call Firebase to resend OTP
-      developer.log('OtpScreen: Calling Firebase verifyPhoneNumber for resend', name: 'VoloAuth');
       await _auth.verifyPhoneNumber(
         phoneNumber: widget.phoneNumber,
         // Auto-verification callback (Android only)
         verificationCompleted: (PhoneAuthCredential credential) async {
-          developer.log('OtpScreen: Resend - Auto-verification completed', name: 'VoloAuth');
           await _auth.signInWithCredential(credential);
           if (mounted) {
             Navigator.of(context).pushReplacement(
@@ -604,11 +565,6 @@ class _OtpScreenState extends State<OtpScreen> {
         },
         // Error handling callback
         verificationFailed: (FirebaseAuthException e) {
-          developer.log('OtpScreen: Resend - Verification failed', name: 'VoloAuth');
-          developer.log('  - Error code: ${e.code}', name: 'VoloAuth');
-          developer.log('  - Error message: ${e.message}', name: 'VoloAuth');
-          developer.log('  - Error details: ${e.toString()}', name: 'VoloAuth');
-          
           setState(() {
             _isLoading = false;
             _errorText = _getUserFriendlyErrorMessage(e);
@@ -625,65 +581,43 @@ class _OtpScreenState extends State<OtpScreen> {
         },
         // Success callback - OTP resent successfully
         codeSent: (String verificationId, int? resendToken) {
-          developer.log('OtpScreen: Resend - OTP code sent successfully', name: 'VoloAuth');
-          developer.log('  - New verification ID: $verificationId', name: 'VoloAuth');
-          developer.log('  - Resend token: $resendToken', name: 'VoloAuth');
-          
           setState(() {
             _isLoading = false;
+            _currentVerificationId = verificationId;
+            _resendToken = resendToken;
             _errorText = null;
           });
           
-          // Update the verification ID for this session
-          _currentVerificationId = verificationId;
-          
-          // Restart countdown timer
+          // Start countdown timer
           _startResendCountdown();
           
-          // Show success message to user
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('OTP resent to ${widget.phoneNumber}'),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        },
-        // Auto-retrieval timeout callback
-        codeAutoRetrievalTimeout: (String verificationId) {
-          developer.log('OtpScreen: Resend - Auto-retrieval timeout', name: 'VoloAuth');
-          developer.log('  - Verification ID: $verificationId', name: 'VoloAuth');
-          
-          setState(() {
-            _isLoading = false;
-          });
-          
-          // Show timeout message to user
+          // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Auto-retrieval timeout. Please enter the code manually.'),
-              backgroundColor: Colors.orange,
-              duration: Duration(seconds: 3),
+              content: Text('OTP resent successfully!'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
             ),
           );
         },
-        timeout: const Duration(seconds: 60), // 60 second timeout
+        // Timeout callback
+        codeAutoRetrievalTimeout: (String verificationId) {
+          setState(() {
+            _currentVerificationId = verificationId;
+          });
+        },
+        timeout: const Duration(seconds: 60),
+        forceResendingToken: _resendToken,
       );
     } catch (e) {
-      // Handle any unexpected exceptions during resend
-      developer.log('OtpScreen: Resend - Exception occurred', name: 'VoloAuth');
-      developer.log('  - Exception: $e', name: 'VoloAuth');
-      developer.log('  - Exception type: ${e.runtimeType}', name: 'VoloAuth');
-      
       setState(() {
         _isLoading = false;
         _errorText = 'Failed to resend OTP. Please try again.';
       });
       
-      // Show error snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: ${e.toString()}'),
+          content: Text(_errorText!),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 4),
         ),

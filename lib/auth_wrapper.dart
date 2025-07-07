@@ -35,28 +35,25 @@ class _AuthWrapperState extends State<AuthWrapper> {
   /// Check authentication state and onboarding status
   Future<void> _checkAuthState() async {
     try {
-      developer.log('AuthWrapper: Checking authentication state', name: 'VoloAuth');
-      
       // Listen to authentication state changes
       FirebaseAuth.instance.authStateChanges().listen((User? user) async {
-        developer.log('AuthWrapper: Auth state changed', name: 'VoloAuth');
-        developer.log('  - User: ${user?.uid ?? 'null'}', name: 'VoloAuth');
-        
         if (user != null) {
           // User is authenticated, check onboarding status
           final isOnboarded = await FirebaseService.isUserOnboarded();
-          developer.log('AuthWrapper: User onboarded: $isOnboarded', name: 'VoloAuth');
+          
+          // Double-check: if user profile doesn't exist, they're not onboarded
+          final userProfile = await FirebaseService.getUserProfile();
+          final hasProfile = userProfile != null;
           
           if (mounted) {
             setState(() {
               _currentUser = user;
-              _isOnboarded = isOnboarded;
+              _isOnboarded = isOnboarded && hasProfile;
               _isLoading = false;
             });
           }
         } else {
           // User is not authenticated
-          developer.log('AuthWrapper: No authenticated user', name: 'VoloAuth');
           if (mounted) {
             setState(() {
               _currentUser = null;
@@ -67,7 +64,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
         }
       });
     } catch (e) {
-      developer.log('AuthWrapper: Error checking auth state: $e', name: 'VoloAuth');
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -146,13 +142,24 @@ class _AuthWrapperState extends State<AuthWrapper> {
     return FutureBuilder<Map<String, dynamic>?>(
       future: FirebaseService.getUserProfile(),
       builder: (context, snapshot) {
-        String displayName = 'User';
+        // If still loading, show loading
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _buildLoadingScreen();
+        }
         
-        if (snapshot.hasData && snapshot.data != null) {
-          final firstName = snapshot.data!['firstName'] as String?;
-          if (firstName != null && firstName.isNotEmpty) {
-            displayName = firstName;
-          }
+        // If no data or error, user is not properly onboarded
+        if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
+          // User profile doesn't exist, they haven't completed onboarding
+          // Sign them out and redirect to welcome screen
+          FirebaseService.signOut();
+          return const WelcomeScreen();
+        }
+        
+        // User profile exists, get display name
+        String displayName = 'User';
+        final firstName = snapshot.data!['firstName'] as String?;
+        if (firstName != null && firstName.isNotEmpty) {
+          displayName = firstName;
         }
         
         return HomeScreen(username: displayName);

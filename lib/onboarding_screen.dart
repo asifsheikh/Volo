@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as developer;
 import 'services/firebase_service.dart';
 import 'home_screen.dart';
-import 'package:flutter/foundation.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final String phoneNumber;
@@ -53,21 +52,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     });
 
     try {
-      developer.log('OnboardingScreen: Starting onboarding completion', name: 'VoloAuth');
-      developer.log('  - First name: ${_firstNameController.text}', name: 'VoloAuth');
-      developer.log('  - Last name: ${_lastNameController.text}', name: 'VoloAuth');
-      developer.log('  - Phone number: ${widget.phoneNumber}', name: 'VoloAuth');
-
       // Check if user is authenticated
       final currentUser = FirebaseService.getCurrentUser();
-      developer.log('OnboardingScreen: Current user: ${currentUser?.uid ?? 'null'}', name: 'VoloAuth');
       
       if (currentUser == null) {
         throw Exception('No authenticated user found');
       }
 
-      developer.log('OnboardingScreen: Calling saveUserProfile...', name: 'VoloAuth');
-      
       // Save user profile to Firestore
       await FirebaseService.saveUserProfile(
         firstName: _firstNameController.text.trim(),
@@ -75,11 +66,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         phoneNumber: widget.phoneNumber,
       );
 
-      developer.log('OnboardingScreen: saveUserProfile completed successfully', name: 'VoloAuth');
-
       // Navigate to home screen and clear navigation stack
       if (mounted) {
-        developer.log('OnboardingScreen: Navigating to HomeScreen', name: 'VoloAuth');
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (context) => HomeScreen(
@@ -90,15 +78,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         );
       }
     } catch (e) {
-      developer.log('OnboardingScreen: Error completing onboarding: $e', name: 'VoloAuth');
-      developer.log('OnboardingScreen: Error type: ${e.runtimeType}', name: 'VoloAuth');
-      
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
 
-        // Show detailed error message to user
+        // Show error message to user
         String errorMessage = 'Failed to save profile. Please try again.';
         if (e.toString().contains('permission-denied')) {
           errorMessage = 'Permission denied. Please check your Firestore rules.';
@@ -116,73 +101,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               textColor: Colors.white,
               onPressed: _completeOnboarding,
             ),
-          ),
-        );
-      }
-    }
-  }
-
-  void _testFirestore() async {
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-
-      developer.log('OnboardingScreen: Running Firestore test...', name: 'VoloAuth');
-      
-      final results = await FirebaseService.testFirestoreComprehensive();
-      
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-
-        // Show results in a dialog
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Firestore Test Results'),
-              content: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('Basic Connection: ${results['basic_connection'] ?? 'Unknown'}'),
-                    Text('User Authenticated: ${results['user_authenticated'] ?? 'Unknown'}'),
-                    Text('User UID: ${results['user_uid'] ?? 'None'}'),
-                    Text('User Phone: ${results['user_phone'] ?? 'None'}'),
-                    Text('Write Test: ${results['write_test'] ?? 'Unknown'}'),
-                    if (results['write_error'] != null)
-                      Text('Write Error: ${results['write_error']}'),
-                    if (results['overall_error'] != null)
-                      Text('Overall Error: ${results['overall_error']}'),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    } catch (e) {
-      developer.log('OnboardingScreen: Test failed: $e', name: 'VoloAuth');
-      
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Test failed: $e'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -402,31 +320,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   ),
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        // Test Button (for debugging)
-                        if (kDebugMode)
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: ElevatedButton(
-                              onPressed: _isLoading ? null : _testFirestore,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: const Text(
-                                'Test Firestore (Debug)',
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
                         const SizedBox(height: 32),
                       ],
                     ),

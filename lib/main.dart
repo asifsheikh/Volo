@@ -40,13 +40,12 @@ void main() async {
     await FirebaseService.initialize();
     developer.log('App: Firebase Service initialized successfully', name: 'VoloAuth');
     
-    // Initialize Firebase App Check for security and abuse prevention (DEVELOPMENT)
-    developer.log('App: Starting App Check initialization', name: 'VoloAuth');
+    // Initialize Firebase App Check (debug provider for dev)
     await FirebaseAppCheck.instance.activate(
-      androidProvider: AndroidProvider.debug, // Use debug for development
-      appleProvider: AppleProvider.debug,     // Use debug for development
+      androidProvider: AndroidProvider.debug,
+      appleProvider: AppleProvider.debug,
     );
-    developer.log('App: App Check initialized successfully', name: 'VoloAuth');
+    developer.log('App: Firebase App Check initialized successfully', name: 'VoloAuth');
   } catch (e) {
     // Log and rethrow Firebase initialization errors
     developer.log('App: Firebase initialization failed: $e', name: 'VoloAuth');
