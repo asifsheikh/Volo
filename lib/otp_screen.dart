@@ -6,6 +6,7 @@ import 'dart:developer' as developer;
 import 'dart:async';
 import 'home_screen.dart';
 import 'services/firebase_service.dart';
+import 'welcome_back_screen.dart';
 
 /// OTP Verification Screen for Volo App
 /// 
@@ -260,11 +261,11 @@ class _OtpScreenState extends State<OtpScreen> {
       
       if (mounted) {
         if (userProfile != null) {
-          // User profile exists - skip onboarding, go directly to home
+          // User profile exists - show WelcomeBackScreen
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-              builder: (context) => HomeScreen(
-                username: userProfile['firstName'] ?? 'User',
+              builder: (context) => WelcomeBackScreen(
+                userName: userProfile['firstName'] ?? 'User',
               ),
             ),
             (route) => false,
