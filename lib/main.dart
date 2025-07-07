@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'firebase_options.dart';
 import 'auth_wrapper.dart';
+import 'services/firebase_service.dart';
 import 'dart:developer' as developer;
 
 /// Main entry point for the Volo Flutter application
@@ -34,6 +35,10 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     developer.log('App: Firebase initialized successfully', name: 'VoloAuth');
+    
+    // Initialize Firebase Service with correct database
+    await FirebaseService.initialize();
+    developer.log('App: Firebase Service initialized successfully', name: 'VoloAuth');
     
     // Initialize Firebase App Check for security and abuse prevention (DEVELOPMENT)
     developer.log('App: Starting App Check initialization', name: 'VoloAuth');

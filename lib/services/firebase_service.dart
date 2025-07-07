@@ -5,11 +5,19 @@ import 'dart:developer' as developer;
 
 class FirebaseService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
-  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static late final FirebaseFirestore _firestore;
 
   // Initialize Firebase
   static Future<void> initialize() async {
     await Firebase.initializeApp();
+    
+    // Initialize Firestore with the correct database name
+    _firestore = FirebaseFirestore.instanceFor(
+      app: Firebase.app(),
+      databaseId: 'Volo', // Use the "Volo" database
+    );
+    
+    developer.log('FirebaseService: Initialized with database: Volo', name: 'FirebaseService');
   }
 
   // Test Firebase connection
@@ -17,8 +25,8 @@ class FirebaseService {
     try {
       developer.log('FirebaseService: Testing Firestore connection...', name: 'FirebaseService');
       
-      // Try to access Firestore Users collection
-      final querySnapshot = await _firestore.collection('Users').limit(1).get();
+      // Try to access Firestore users collection
+      final querySnapshot = await _firestore.collection('users').limit(1).get();
       developer.log('FirebaseService: Connection test successful - found ${querySnapshot.docs.length} documents', name: 'FirebaseService');
       return true;
     } catch (e) {
@@ -52,11 +60,11 @@ class FirebaseService {
             'timestamp': FieldValue.serverTimestamp(),
           };
           
-          await _firestore.collection('Users').doc('test_${user.uid}').set(testData);
+          await _firestore.collection('users').doc('test_${user.uid}').set(testData);
           results['write_test'] = true;
           
           // Clean up test document
-          await _firestore.collection('Users').doc('test_${user.uid}').delete();
+          await _firestore.collection('users').doc('test_${user.uid}').delete();
           results['delete_test'] = true;
           
         } catch (e) {
@@ -135,7 +143,7 @@ class FirebaseService {
       };
 
       developer.log('FirebaseService: User data prepared: $userData', name: 'FirebaseService');
-      developer.log('FirebaseService: Attempting to save to Users/${user.uid}', name: 'FirebaseService');
+      developer.log('FirebaseService: Attempting to save to users/${user.uid}', name: 'FirebaseService');
 
       // Test Firestore connection first
       final connectionTest = await testConnection();
@@ -145,7 +153,7 @@ class FirebaseService {
         throw Exception('Firestore connection failed');
       }
 
-      await _firestore.collection('Users').doc(user.uid).set(userData);
+      await _firestore.collection('users').doc(user.uid).set(userData);
       developer.log('FirebaseService: User profile saved successfully', name: 'FirebaseService');
     } catch (e) {
       developer.log('FirebaseService: Error saving user profile: $e', name: 'FirebaseService');
@@ -162,7 +170,7 @@ class FirebaseService {
         return null;
       }
 
-      final doc = await _firestore.collection('Users').doc(user.uid).get();
+      final doc = await _firestore.collection('users').doc(user.uid).get();
       if (doc.exists) {
         final data = doc.data();
         developer.log('User profile retrieved successfully', name: 'FirebaseService');
@@ -198,7 +206,7 @@ class FirebaseService {
 
       updates['updatedAt'] = FieldValue.serverTimestamp();
       
-      await _firestore.collection('Users').doc(user.uid).update(updates);
+      await _firestore.collection('users').doc(user.uid).update(updates);
       developer.log('User profile updated successfully', name: 'FirebaseService');
     } catch (e) {
       developer.log('Error updating user profile: $e', name: 'FirebaseService');
@@ -215,7 +223,7 @@ class FirebaseService {
       }
 
       // Delete user data from Firestore
-      await _firestore.collection('Users').doc(user.uid).delete();
+      await _firestore.collection('users').doc(user.uid).delete();
       
       // Delete the user account
       await user.delete();
