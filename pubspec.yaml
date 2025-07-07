@@ -77,6 +77,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/volo_app_icon.png
+    - assets/volo_launcher_logo.png
     - assets/profile_placeholder.png
     - assets/test.png
     - assets/onboarding_illustration3.png
@@ -110,6 +111,6 @@ flutter:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/volo_app_icon.png"
+  image_path: "assets/app_icon.png"
   adaptive_icon_background: "#00000000"
-  remove_alpha_ios: false
+  remove_alpha_ios: true
