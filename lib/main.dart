@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'firebase_options.dart';
-import 'welcome_screen.dart';
+import 'auth_wrapper.dart';
 import 'dart:developer' as developer;
 
 /// Main entry point for the Volo Flutter application
@@ -58,7 +58,7 @@ void main() async {
 /// This widget configures the MaterialApp with:
 /// - App title and branding
 /// - Theme configuration with custom color scheme
-/// - Initial route to WelcomeScreen
+/// - Initial route to AuthWrapper for authentication state management
 /// - Production-ready configuration
 /// - Full-screen system UI overlay handling
 class MyApp extends StatelessWidget {
@@ -73,7 +73,7 @@ class MyApp extends StatelessWidget {
         // Uses a deep purple color scheme as the base
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const WelcomeScreen(), // Start with welcome screen
+      home: const AuthWrapper(), // Use AuthWrapper for authentication state management
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:developer' as developer;
 
 class FirebaseService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -18,7 +19,7 @@ class FirebaseService {
       await _firestore.collection('test').limit(1).get();
       return true;
     } catch (e) {
-      print('Firebase connection test failed: $e');
+      developer.log('Firebase connection test failed: $e', name: 'FirebaseService');
       return false;
     }
   }
@@ -28,26 +29,137 @@ class FirebaseService {
     return _auth.currentUser;
   }
 
-  // Sign in with phone number
-  static Future<void> signInWithPhoneNumber(String phoneNumber) async {
-    // This is a placeholder for phone authentication
-    // You'll need to implement the full phone auth flow
-    print('Phone authentication not yet implemented');
+  // Check if user is authenticated
+  static bool isUserAuthenticated() {
+    return _auth.currentUser != null;
+  }
+
+  // Get user's phone number
+  static String? getUserPhoneNumber() {
+    return _auth.currentUser?.phoneNumber;
+  }
+
+  // Get user's UID
+  static String? getUserUid() {
+    return _auth.currentUser?.uid;
   }
 
   // Sign out
   static Future<void> signOut() async {
-    await _auth.signOut();
+    try {
+      await _auth.signOut();
+      developer.log('User signed out successfully', name: 'FirebaseService');
+    } catch (e) {
+      developer.log('Error signing out: $e', name: 'FirebaseService');
+      rethrow;
+    }
   }
 
-  // Save user data to Firestore
-  static Future<void> saveUserData(String userId, Map<String, dynamic> userData) async {
-    await _firestore.collection('users').doc(userId).set(userData);
+  // Save user profile data to Firestore (without email)
+  static Future<void> saveUserProfile({
+    required String firstName,
+    required String lastName,
+    required String phoneNumber,
+  }) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('No authenticated user found');
+      }
+
+      final userData = {
+        'firstName': firstName,
+        'lastName': lastName,
+        'phoneNumber': phoneNumber,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'isOnboarded': true,
+      };
+
+      await _firestore.collection('users').doc(user.uid).set(userData);
+      developer.log('User profile saved successfully', name: 'FirebaseService');
+    } catch (e) {
+      developer.log('Error saving user profile: $e', name: 'FirebaseService');
+      rethrow;
+    }
   }
 
-  // Get user data from Firestore
-  static Future<Map<String, dynamic>?> getUserData(String userId) async {
-    final doc = await _firestore.collection('users').doc(userId).get();
-    return doc.data();
+  // Get user profile data from Firestore
+  static Future<Map<String, dynamic>?> getUserProfile() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        return null;
+      }
+
+      final doc = await _firestore.collection('users').doc(user.uid).get();
+      if (doc.exists) {
+        final data = doc.data();
+        developer.log('User profile retrieved successfully', name: 'FirebaseService');
+        return data;
+      } else {
+        developer.log('User profile not found', name: 'FirebaseService');
+        return null;
+      }
+    } catch (e) {
+      developer.log('Error getting user profile: $e', name: 'FirebaseService');
+      return null;
+    }
   }
+
+  // Check if user has completed onboarding
+  static Future<bool> isUserOnboarded() async {
+    try {
+      final profile = await getUserProfile();
+      return profile != null && (profile['isOnboarded'] == true);
+    } catch (e) {
+      developer.log('Error checking onboarding status: $e', name: 'FirebaseService');
+      return false;
+    }
+  }
+
+  // Update user profile
+  static Future<void> updateUserProfile(Map<String, dynamic> updates) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('No authenticated user found');
+      }
+
+      updates['updatedAt'] = FieldValue.serverTimestamp();
+      
+      await _firestore.collection('users').doc(user.uid).update(updates);
+      developer.log('User profile updated successfully', name: 'FirebaseService');
+    } catch (e) {
+      developer.log('Error updating user profile: $e', name: 'FirebaseService');
+      rethrow;
+    }
+  }
+
+  // Delete user account and data
+  static Future<void> deleteUserAccount() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('No authenticated user found');
+      }
+
+      // Delete user data from Firestore
+      await _firestore.collection('users').doc(user.uid).delete();
+      
+      // Delete the user account
+      await user.delete();
+      
+      developer.log('User account deleted successfully', name: 'FirebaseService');
+    } catch (e) {
+      developer.log('Error deleting user account: $e', name: 'FirebaseService');
+      rethrow;
+    }
+  }
+
+  // Listen to authentication state changes
+  static Stream<User?> get authStateChanges => _auth.authStateChanges();
+
+  // Listen to user changes
+  static Stream<User?> get userChanges => _auth.userChanges();
 } 

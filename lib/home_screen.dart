@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:developer' as developer;
+import 'services/firebase_service.dart';
 import 'add_flight_screen.dart';
 import 'profile_screen.dart';
 
@@ -34,14 +37,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ProfileScreen(
-                            username: username,
-                            phoneNumber: '+1 (555) 123-4567', // Placeholder, replace with real data if available
-                          ),
-                        ),
-                      );
+                      _navigateToProfile(context);
                     },
                     child: CircleAvatar(
                       radius: 28,
@@ -140,6 +136,21 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 12,
         type: BottomNavigationBarType.fixed,
+      ),
+    );
+  }
+
+  /// Navigate to profile screen with user data
+  void _navigateToProfile(BuildContext context) {
+    final phoneNumber = FirebaseService.getUserPhoneNumber() ?? 'Unknown';
+    developer.log('HomeScreen: Navigating to profile with phone: $phoneNumber', name: 'VoloAuth');
+    
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ProfileScreen(
+          username: username,
+          phoneNumber: phoneNumber,
+        ),
       ),
     );
   }

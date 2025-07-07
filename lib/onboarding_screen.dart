@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:developer' as developer;
+import 'services/firebase_service.dart';
 import 'home_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -13,6 +16,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   String? _firstNameError;
+  bool _isLoading = false;
 
   bool get _isFirstNameValid =>
       _firstNameController.text.isNotEmpty && RegExp(r'^[a-zA-Z]+$').hasMatch(_firstNameController.text);
@@ -35,6 +39,62 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         // Optionally show error for last name, but not required
       }
     });
+  }
+
+  /// Handle onboarding completion
+  Future<void> _completeOnboarding() async {
+    if (!_isFirstNameValid) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      developer.log('OnboardingScreen: Completing onboarding', name: 'VoloAuth');
+      developer.log('  - First name: ${_firstNameController.text}', name: 'VoloAuth');
+      developer.log('  - Last name: ${_lastNameController.text}', name: 'VoloAuth');
+      developer.log('  - Phone number: ${widget.phoneNumber}', name: 'VoloAuth');
+
+      // Save user profile to Firestore
+      await FirebaseService.saveUserProfile(
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        phoneNumber: widget.phoneNumber,
+      );
+
+      developer.log('OnboardingScreen: Onboarding completed successfully', name: 'VoloAuth');
+
+      // Navigate to home screen and clear navigation stack
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(
+              username: _firstNameController.text.trim(),
+            ),
+          ),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      developer.log('OnboardingScreen: Error completing onboarding: $e', name: 'VoloAuth');
+      
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        // Show error message to user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save profile. Please try again.'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -143,6 +203,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         TextField(
                           controller: _firstNameController,
                           onChanged: _onFirstNameChanged,
+                          enabled: !_isLoading,
                           decoration: InputDecoration(
                             hintText: 'First name',
                             filled: true,
@@ -186,6 +247,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         TextField(
                           controller: _lastNameController,
                           onChanged: _onLastNameChanged,
+                          enabled: !_isLoading,
                           decoration: InputDecoration(
                             hintText: 'Last name',
                             filled: true,
@@ -216,17 +278,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           width: double.infinity,
                           height: 60,
                           child: ElevatedButton(
-                            onPressed: _isFirstNameValid
-                                ? () {
-                                    Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                        builder: (context) => HomeScreen(
-                                          username: _firstNameController.text,
-                                        ),
-                                      ),
-                                      (route) => false,
-                                    );
-                                  }
+                            onPressed: (_isFirstNameValid && !_isLoading)
+                                ? _completeOnboarding
                                 : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF1F2937),
@@ -236,16 +289,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               shadowColor: Colors.black.withOpacity(0.1),
                               elevation: 8,
                             ),
-                            child: const Text(
-                              'Continue',
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 18,
-                                height: 22 / 18,
-                                color: Colors.white,
-                              ),
-                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Continue',
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 18,
+                                      height: 22 / 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
                         ),
                         const SizedBox(height: 32),
