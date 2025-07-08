@@ -256,9 +256,14 @@ class _OtpScreenState extends State<OtpScreen> {
   /// Handle post-authentication routing based on user profile existence
   Future<void> _handlePostAuthentication() async {
     try {
-      // Check if user profile exists in Firestore
-      final userProfile = await FirebaseService.getUserProfile();
-      
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      // Check if user profile exists in Firestore by phone number
+      final userProfile = await FirebaseService.getUserProfileByPhoneNumber(user.phoneNumber ?? '');
+      if (userProfile != null) {
+        // Migrate profile to current UID if needed
+        await FirebaseService.migrateUserProfileToCurrentUid(user.phoneNumber ?? '');
+      }
       if (mounted) {
         if (userProfile != null) {
           // User profile exists - show WelcomeBackScreen

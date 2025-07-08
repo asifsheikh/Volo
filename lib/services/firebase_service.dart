@@ -93,14 +93,55 @@ class FirebaseService {
     }
   }
 
-  // Check if user has completed onboarding
+  // Find user profile by phone number
+  static Future<Map<String, dynamic>?> getUserProfileByPhoneNumber(String phoneNumber) async {
+    try {
+      final query = await _firestore
+          .collection('users')
+          .where('phoneNumber', isEqualTo: phoneNumber)
+          .limit(1)
+          .get();
+      if (query.docs.isNotEmpty) {
+        return query.docs.first.data();
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Migrate user profile to new UID if needed
+  static Future<void> migrateUserProfileToCurrentUid(String phoneNumber) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) return;
+    final query = await _firestore
+        .collection('users')
+        .where('phoneNumber', isEqualTo: phoneNumber)
+        .limit(1)
+        .get();
+    if (query.docs.isNotEmpty) {
+      final oldDoc = query.docs.first;
+      if (oldDoc.id != currentUser.uid) {
+        final data = oldDoc.data();
+        await _firestore.collection('users').doc(currentUser.uid).set(data);
+        await oldDoc.reference.delete();
+      }
+    }
+  }
+
+  // Check if user has completed onboarding (by phone number)
   static Future<bool> isUserOnboarded() async {
     try {
-      final profile = await getUserProfile();
-      // User is onboarded only if profile exists AND isOnboarded flag is true
+      final user = _auth.currentUser;
+      if (user == null) return false;
+      final profile = await getUserProfileByPhoneNumber(user.phoneNumber ?? '');
+      // If found, migrate to current UID if needed
+      if (profile != null) {
+        await migrateUserProfileToCurrentUid(user.phoneNumber ?? '');
+      }
       return profile != null && (profile['isOnboarded'] == true);
     } catch (e) {
-      // If there's any error getting the profile, user is not onboarded
       return false;
     }
   }
