@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:developer' as developer;
-import 'services/firebase_service.dart';
-import 'home_screen.dart';
+
+import '../../services/firebase_service.dart';
+import '../home/home_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final String phoneNumber;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as developer;
-import 'services/firebase_service.dart';
-import 'welcome_screen.dart';
-import 'home_screen.dart';
+import '../services/firebase_service.dart';
+import '../screens/auth/welcome_screen.dart';
+import '../screens/home/home_screen.dart';
 
 /// Authentication wrapper that handles routing based on user authentication state
 /// 

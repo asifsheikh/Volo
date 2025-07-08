@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'onboarding_screen.dart';
+import '../onboarding/onboarding_screen.dart';
 import 'dart:developer' as developer;
 import 'dart:async';
-import 'home_screen.dart';
-import 'services/firebase_service.dart';
-import 'welcome_back_screen.dart';
+
+import '../../services/firebase_service.dart';
+import '../onboarding/welcome_back_screen.dart';
 
 /// OTP Verification Screen for Volo App
 /// 

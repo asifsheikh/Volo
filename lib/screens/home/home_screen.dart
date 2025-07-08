@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'dart:developer' as developer;
-import 'services/firebase_service.dart';
+import '../../services/firebase_service.dart';
 import 'add_flight_screen.dart';
-import 'profile_screen.dart';
+import '../profile/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final String username;

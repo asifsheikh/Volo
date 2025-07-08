@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'firebase_options.dart';
-import 'auth_wrapper.dart';
+import 'core/auth_wrapper.dart';
 import 'services/firebase_service.dart';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
