@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'dart:async';
+import '../../services/flight_api_service.dart';
+import 'flight_results_screen.dart';
 
 class Airport {
   final String city;
@@ -254,7 +256,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     }
   }
 
-  void _searchFlights() {
+  Future<void> _searchFlights() async {
     // Extract IATA codes from selected cities
     final departureAirport = _allAirports.firstWhere(
       (airport) => airport.displayName == _selectedDepartureCity,
@@ -266,15 +268,69 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
       orElse: () => Airport(city: '', airport: '', iata: ''),
     );
 
+    if (departureAirport.iata.isEmpty || arrivalAirport.iata.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select valid departure and arrival cities'),
+          backgroundColor: Color(0xFFDC2626),
+        ),
+      );
+      return;
+    }
+
     print('Searching flights:');
     print('Departure: ${departureAirport.iata} (${departureAirport.city})');
     print('Arrival: ${arrivalAirport.iata} (${arrivalAirport.city})');
     print('Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate!)}');
     print('Flight Number: ${_flightNumberController.text.isNotEmpty ? _flightNumberController.text : "Not specified"}');
-    
-    // TODO: Call SerpApi Google Flights API
-    // TODO: Filter results by flight number if provided
-    // TODO: Show results to user
+
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1F2937)),
+          ),
+        );
+      },
+    );
+
+    try {
+      final searchResponse = await FlightApiService.searchFlights(
+        departureIata: departureAirport.iata,
+        arrivalIata: arrivalAirport.iata,
+        date: DateFormat('yyyy-MM-dd').format(_selectedDate!),
+        flightNumber: _flightNumberController.text.isNotEmpty ? _flightNumberController.text : null,
+      );
+
+      // Hide loading dialog
+      Navigator.of(context).pop();
+
+      // Navigate to results screen
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => FlightResultsScreen(
+            searchResponse: searchResponse,
+            departureCity: departureAirport.city,
+            arrivalCity: arrivalAirport.city,
+            date: DateFormat('yyyy-MM-dd').format(_selectedDate!),
+          ),
+        ),
+      );
+    } catch (e) {
+      // Hide loading dialog
+      Navigator.of(context).pop();
+      
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error searching flights: ${e.toString()}'),
+          backgroundColor: const Color(0xFFDC2626),
+        ),
+      );
+    }
   }
 
   @override

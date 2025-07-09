@@ -81,6 +81,7 @@ flutter:
     - assets/profile_placeholder.png
     - assets/test.png
     - assets/onboarding_illustration3.png
+    - assets/airports_global.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
