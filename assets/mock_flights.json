@@ -1,0 +1,69 @@
+{
+  "best_flights": [
+    {
+      "flights": [
+        {
+          "departure_airport": {"name": "Delhi", "id": "DEL", "time": "2024-07-15T14:45:00+05:30"},
+          "arrival_airport": {"name": "London", "id": "LHR", "time": "2024-07-15T19:30:00+01:00"},
+          "duration": 585,
+          "airplane": "Boeing 777",
+          "airline": "Air India",
+          "airline_logo": "https://upload.wikimedia.org/wikipedia/commons/2/2d/Air_India_Logo.svg",
+          "travel_class": "Economy",
+          "flight_number": "AI111",
+          "extensions": ["Terminal 3, Gate A12"],
+          "overnight": false,
+          "often_delayed_by_over_30_min": false
+        }
+      ],
+      "total_duration": 585,
+      "price": 650,
+      "type": "best",
+      "airline_logo": "https://upload.wikimedia.org/wikipedia/commons/2/2d/Air_India_Logo.svg"
+    },
+    {
+      "flights": [
+        {
+          "departure_airport": {"name": "Delhi", "id": "DEL", "time": "2024-07-15T18:00:00+05:30"},
+          "arrival_airport": {"name": "London", "id": "LHR", "time": "2024-07-15T22:45:00+01:00"},
+          "duration": 585,
+          "airplane": "Boeing 787",
+          "airline": "British Airways",
+          "airline_logo": "https://upload.wikimedia.org/wikipedia/commons/1/1a/British_Airways_Logo.svg",
+          "travel_class": "Economy",
+          "flight_number": "BA256",
+          "extensions": ["Terminal 5, Gate B7"],
+          "overnight": false,
+          "often_delayed_by_over_30_min": false
+        }
+      ],
+      "total_duration": 585,
+      "price": 700,
+      "type": "best",
+      "airline_logo": "https://upload.wikimedia.org/wikipedia/commons/1/1a/British_Airways_Logo.svg"
+    }
+  ],
+  "other_flights": [
+    {
+      "flights": [
+        {
+          "departure_airport": {"name": "Delhi", "id": "DEL", "time": "2024-07-15T23:30:00+05:30"},
+          "arrival_airport": {"name": "London", "id": "LHR", "time": "2024-07-16T04:15:00+01:00"},
+          "duration": 585,
+          "airplane": "Boeing 787",
+          "airline": "Vistara",
+          "airline_logo": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Vistara_logo.svg",
+          "travel_class": "Economy",
+          "flight_number": "UK17",
+          "extensions": ["Terminal 3, Gate C15"],
+          "overnight": true,
+          "often_delayed_by_over_30_min": false
+        }
+      ],
+      "total_duration": 585,
+      "price": 600,
+      "type": "other",
+      "airline_logo": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Vistara_logo.svg"
+    }
+  ]
+} 

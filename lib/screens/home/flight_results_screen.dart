@@ -197,7 +197,7 @@ class FlightResultsScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.flight_cancelled,
+            Icons.flight_takeoff,
             size: 64,
             color: Color(0xFF9CA3AF),
           ),

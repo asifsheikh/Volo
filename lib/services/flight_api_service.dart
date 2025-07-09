@@ -167,6 +167,7 @@ class FlightOption {
   final String? airlineLogo;
   final String? bookingToken;
   final CarbonEmissions? carbonEmissions;
+  final List<Map<String, dynamic>>? layovers;
 
   FlightOption({
     required this.flights,
@@ -176,6 +177,7 @@ class FlightOption {
     this.airlineLogo,
     this.bookingToken,
     this.carbonEmissions,
+    this.layovers,
   });
 
   factory FlightOption.fromJson(Map<String, dynamic> json) {
@@ -191,6 +193,9 @@ class FlightOption {
       carbonEmissions: json['carbon_emissions'] != null 
           ? CarbonEmissions.fromJson(json['carbon_emissions']) 
           : null,
+      layovers: (json['layovers'] as List<dynamic>?)
+          ?.map((item) => Map<String, dynamic>.from(item as Map))
+          .toList(),
     );
   }
 }
