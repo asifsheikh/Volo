@@ -290,13 +290,13 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE5E7EB),
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: const Color(0xFFE5E7EB),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF111827)),
           onPressed: () => Navigator.of(context).pop(),
-          splashRadius: 24,
         ),
         title: const Text(
           'Add Flight',
@@ -310,304 +310,75 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
         centerTitle: false,
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 8),
-              const Text(
-                'Enter your flight details',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFF808080),
+        top: false,
+        child: Column(
+          children: [
+            // Remove custom header, start with form
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 8),
+                      _buildLabeledField(
+                        label: 'Flight Number',
+                        optional: true,
+                        icon: Icons.flight,
+                        controller: _flightNumberController,
+                        hintText: 'e.g. UA4',
+                      ),
+                      const SizedBox(height: 24),
+                      _buildDateField(),
+                      const SizedBox(height: 24),
+                      _buildLabeledField(
+                        label: 'Departure City',
+                        icon: Icons.flight_takeoff,
+                        controller: _departureCityController,
+                        hintText: 'Delhi (DEL)',
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedDepartureCity = value.isNotEmpty ? value : null;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 24),
+                      _buildLabeledField(
+                        label: 'Arrival City',
+                        icon: Icons.flight_land,
+                        controller: _arrivalCityController,
+                        hintText: 'Berlin (BER)',
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedArrivalCity = value.isNotEmpty ? value : null;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        'Enter city names or airport codes. Flight number helps us find exact matches.',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 24),
-              Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Text('✈️ ', style: TextStyle(fontSize: 16)),
-                        const Text(
-                          'Flight Number',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color: Color(0xFF374151),
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        const Text(
-                          '(Optional)',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 13,
-                            color: Color(0xFF9CA3AF),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _flightNumberController,
-                      decoration: InputDecoration(
-                        hintText: 'UA4',
-                        hintStyle: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                          color: Color(0xFFADAEBC),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Color(0xFFE5E7EB)),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Color(0xFFE5E7EB)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Color(0xFF1F2937)),
-                        ),
-                      ),
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 18,
-                        color: Color(0xFF1F2937),
-                      ),
-                      validator: (value) {
-                        if (value != null && value.trim().isNotEmpty) {
-                          final regex = RegExp(r'^[A-Z]{2,3} ?\d{1,4} 0$');
-                          if (!regex.hasMatch(value.trim().toUpperCase())) {
-                            return 'Invalid flight number';
-                          }
-                        }
-                        return null;
-                      },
-                      onChanged: (_) => setState(() {}),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        const Text('📅 ', style: TextStyle(fontSize: 16)),
-                        const Text(
-                          'Departure Date',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color: Color(0xFF374151),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          '*',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    GestureDetector(
-                      onTap: _pickDate,
-                      child: AbsorbPointer(
-                        child: TextFormField(
-                          readOnly: true,
-                          decoration: InputDecoration(
-                            hintText: 'Select date',
-                            hintStyle: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 16,
-                              color: Color(0xFFADAEBC),
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide(color: Color(0xFFE5E7EB)),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide(color: Color(0xFFE5E7EB)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                              borderSide: BorderSide(color: Color(0xFF1F2937)),
-                            ),
-                          ),
-                          controller: TextEditingController(
-                            text: _selectedDate != null
-                                ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
-                                : '',
-                          ),
-                          validator: (value) {
-                            if (_selectedDate == null) {
-                              return 'Please select a date';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        const Text('🛫 ', style: TextStyle(fontSize: 16)),
-                        const Text(
-                          'Departure City',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color: Color(0xFF374151),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          '*',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _departureCityController,
-                      decoration: InputDecoration(
-                        hintText: 'Enter departure city or code',
-                        hintStyle: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                          color: Color(0xFFADAEBC),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Color(0xFFE5E7EB)),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Color(0xFFE5E7EB)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Color(0xFF1F2937)),
-                        ),
-                      ),
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 18,
-                        color: Color(0xFF1F2937),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a city';
-                        }
-                        return null;
-                      },
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedDepartureCity = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        const Text('📍 ', style: TextStyle(fontSize: 16)),
-                        const Text(
-                          'Arrival City',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            color: Color(0xFF374151),
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          '*',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _arrivalCityController,
-                      decoration: InputDecoration(
-                        hintText: 'Enter arrival city or code',
-                        hintStyle: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                          color: Color(0xFFADAEBC),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Color(0xFFE5E7EB)),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Color(0xFFE5E7EB)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Color(0xFF1F2937)),
-                        ),
-                      ),
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 18,
-                        color: Color(0xFF1F2937),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a city';
-                        }
-                        return null;
-                      },
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedArrivalCity = value;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: 60,
+            ),
+            Container(
+              width: double.infinity,
+              color: const Color(0xFFE5E7EB),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+              child: SizedBox(
+                width: 350,
+                height: 56,
                 child: ElevatedButton(
                   onPressed: _isFormValid
                       ? () {
@@ -617,7 +388,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2A2A2A),
+                    backgroundColor: const Color(0xFF1F2937),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -627,14 +398,14 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      Icon(Icons.search, color: Colors.white, size: 24),
+                      Icon(Icons.search, color: Colors.white, size: 20),
                       SizedBox(width: 12),
                       Text(
                         'Search Flights',
                         style: TextStyle(
                           fontFamily: 'Inter',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
                           color: Colors.white,
                         ),
                       ),
@@ -642,11 +413,188 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLabeledField({
+    required String label,
+    bool optional = false,
+    required IconData icon,
+    required TextEditingController controller,
+    required String hintText,
+    ValueChanged<String>? onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                fontSize: 14,
+                color: Color(0xFF4B5563),
+              ),
+            ),
+            if (optional)
+              Text(' (Optional)',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 14,
+                  color: Color(0xFF9CA3AF),
+                ),
+              ),
+            if (!optional)
+              Text(' *',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 14,
+                  color: Color(0xFF9CA3AF),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 58,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Color(0xFFE5E7EB)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 2,
+                offset: Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const SizedBox(width: 16),
+              Icon(icon, color: Color(0xFF9CA3AF), size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextFormField(
+                  controller: controller,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: hintText,
+                    hintStyle: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      color: Color(0xFFADAEBC),
+                    ),
+                  ),
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                    color: Color(0xFF1F2937),
+                  ),
+                  onChanged: onChanged,
+                ),
+              ),
             ],
           ),
         ),
-      ),
+      ],
+    );
+  }
+
+  Widget _buildDateField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              'Departure Date',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                fontSize: 14,
+                color: Color(0xFF4B5563),
+              ),
+            ),
+            Text(' *',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                fontSize: 14,
+                color: Color(0xFF9CA3AF),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: _pickDate,
+          child: Container(
+            height: 58,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Color(0xFFE5E7EB)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 2,
+                  offset: Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                const SizedBox(width: 16),
+                Icon(Icons.calendar_today, color: Color(0xFF9CA3AF), size: 16),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    _selectedDate != null
+                        ? DateFormat('MMMM d, yyyy').format(_selectedDate!)
+                        : 'Departure Date',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      color: _selectedDate != null ? Color(0xFF1F2937) : Color(0xFFADAEBC),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, String label, bool isActive) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, color: isActive ? Color(0xFF1F2937) : Color(0xFF9CA3AF), size: 20),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Inter',
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: isActive ? Color(0xFF1F2937) : Color(0xFF9CA3AF),
+          ),
+        ),
+      ],
     );
   }
 } 
