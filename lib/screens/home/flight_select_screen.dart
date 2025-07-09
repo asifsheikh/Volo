@@ -289,32 +289,47 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> {
             ),
             if (isExpanded) ...[
               const SizedBox(height: 16),
-              for (int i = 0; i < flights.length; i++) ...[
-                _buildSegmentDetail(flights[i], i, flights.length),
-                if (i < flights.length - 1 && layovers.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.airline_stops, size: 18, color: Color(0xFF6B7280)),
-                        const SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
-                            'Layover: ${layovers[i]['id']} (${_formatDuration(layovers[i]['duration'])})',
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 15,
-                              color: Color(0xFF6B7280),
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
+              // Timeline for segments and layovers
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (int i = 0; i < flights.length; i++) ...[
+                    _buildItinerarySegment(flights[i]),
+                    if (i < flights.length - 1 && layovers.isNotEmpty)
+                      _buildLayoverInfo(layovers[i]),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 18),
+              Divider(height: 1, color: Color(0xFFE5E7EB)),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  const Text(
+                    'Airlines:',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      color: Color(0xFF6B7280),
                     ),
                   ),
-              ],
-              const SizedBox(height: 12),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      airlines.join(' · '),
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                        color: Color(0xFF1F2937),
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -325,18 +340,18 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> {
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w600,
-                      fontSize: 18,
+                      fontSize: 16,
                       color: Colors.white,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1F2937),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    elevation: 6,
-                    shadowColor: Colors.black.withOpacity(0.08),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    elevation: 3,
+                    shadowColor: Colors.black.withOpacity(0.05),
                   ),
                 ),
               ),
@@ -400,6 +415,122 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // New: Build a timeline segment for the itinerary
+  Widget _buildItinerarySegment(Flight flight) {
+    final depIata = flight.departureAirport.id;
+    final arrIata = flight.arrivalAirport.id;
+    final depTime = _formatTime(flight.departureAirport.time);
+    final arrTime = _formatTime(flight.arrivalAirport.time);
+    final flightNum = flight.airline != null && flight.flightNumber != null
+        ? '${flight.airline} ${flight.flightNumber}'
+        : (flight.airline ?? flight.flightNumber ?? '');
+    final aircraft = flight.airplane ?? '';
+    String secondLine = '';
+    if (flightNum.isNotEmpty && aircraft.isNotEmpty) {
+      secondLine = '$flightNum · $aircraft';
+    } else if (flightNum.isNotEmpty) {
+      secondLine = flightNum;
+    } else if (aircraft.isNotEmpty) {
+      secondLine = aircraft;
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Airline logo or fallback
+          flight.airlineLogo != null && flight.airlineLogo!.isNotEmpty
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(9999),
+                  child: Image.network(
+                    flight.airlineLogo!,
+                    width: 32,
+                    height: 32,
+                    fit: BoxFit.contain,
+                  ),
+                )
+              : CircleAvatar(
+                  radius: 16,
+                  backgroundColor: const Color(0xFF1F2937),
+                  child: Text(
+                    (flight.airline ?? '?').substring(0, 2).toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$depIata $depTime → $arrIata $arrTime',
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14,
+                    color: Color(0xFF1F2937),
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (secondLine.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    secondLine,
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      color: Color(0xFF6B7280),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // New: Build layover info row
+  Widget _buildLayoverInfo(Map layover) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 44, bottom: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 16,
+            height: 16,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE5E7EB),
+              borderRadius: BorderRadius.circular(9999),
+            ),
+            child: const Icon(Icons.schedule, size: 12, color: Color(0xFF9CA3AF)),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              'Layover in ${layover['id']} – ${_formatDuration(layover['duration'])}',
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                fontSize: 12,
+                color: Color(0xFF6B7280),
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
