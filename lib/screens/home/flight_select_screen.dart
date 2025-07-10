@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/flight_api_service.dart';
+import 'add_contacts_screen.dart';
 
 class FlightSelectScreen extends StatefulWidget {
   final Future<FlightSearchResponse> searchFuture;
@@ -333,7 +334,31 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    // Find departure and arrival thumbnails from response.airports
+                    String depThumb = '', arrThumb = '';
+                    for (final airportInfo in response.airports) {
+                      for (final dep in airportInfo.departure) {
+                        if (dep.airport.id == depIata) depThumb = dep.thumbnail ?? '';
+                      }
+                      for (final arr in airportInfo.arrival) {
+                        if (arr.airport.id == arrIata) arrThumb = arr.thumbnail ?? '';
+                      }
+                    }
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => AddContactsScreen(
+                          args: AddContactsScreenArgs(
+                            selectedFlight: option,
+                            departureCity: depCity,
+                            departureThumbnail: depThumb,
+                            arrivalCity: arrCity,
+                            arrivalThumbnail: arrThumb,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                   icon: const Icon(Icons.check, color: Colors.white),
                   label: const Text(
                     'Track Flight',
