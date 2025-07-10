@@ -3,6 +3,7 @@ import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart
 import 'dart:math' as math;
 import 'city_connection_header.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'confirmation_screen.dart';
 
 // Data model for a contact
 class ContactModel {
@@ -214,7 +215,16 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                 height: 56,
                 child: ElevatedButton(
                   onPressed: () {
-                    // TODO: Implement confirm and track logic
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ConfirmationScreen(
+                          fromCity: args.departureCity,
+                          toCity: args.arrivalCity,
+                          contactNames: _selectedContacts.map((c) => c.name).toList(),
+                          contactAvatars: _selectedContacts.map((c) => c.avatar == 'dummy1' ? 'assets/dummy1.png' : 'assets/dummy2.png').toList(),
+                        ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1F2937),

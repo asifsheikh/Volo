@@ -52,6 +52,7 @@ dependencies:
   firebase_app_check: ^0.3.2+9
   flutter_native_contact_picker: ^0.0.10
   flutter_svg: ^2.0.10
+  google_fonts: ^6.1.0
 
 dev_dependencies:
   flutter_test:
