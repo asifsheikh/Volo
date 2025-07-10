@@ -228,7 +228,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
                       Text(
-                        'Next: Confirm & Start Tracking',
+                        'Next',
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w500,
