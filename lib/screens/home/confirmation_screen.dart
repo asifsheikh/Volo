@@ -197,50 +197,106 @@ class ConfirmationScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              ...contactNames.asMap().entries.map((entry) {
-                                final index = entry.key;
-                                final name = entry.value;
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: Container(
-                                    width: 36,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.white, width: 2),
-                                      borderRadius: BorderRadius.circular(18),
-                                    ),
-                                    child: CircleAvatar(
-                                      radius: 18,
-                                      backgroundColor: const Color(0xFF1F2937),
-                                      child: Text(
-                                        _getInitials(name),
-                                        style: const TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                          color: Colors.white,
+                              // Overlapped contact avatars
+                              SizedBox(
+                                height: 40,
+                                child: Stack(
+                                  children: [
+                                    // Show first 4 contacts with overlap
+                                    ...contactNames.take(4).toList().asMap().entries.map((entry) {
+                                      final index = entry.key;
+                                      final name = entry.value;
+                                      final offset = index * 6.0; // Reduced overlap amount
+                                      return Positioned(
+                                        left: offset,
+                                        child: Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(color: Colors.white, width: 2),
+                                            borderRadius: BorderRadius.circular(20),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.1),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: CircleAvatar(
+                                            radius: 20,
+                                            backgroundColor: const Color(0xFF1F2937),
+                                            child: Text(
+                                              _getInitials(name),
+                                              style: const TextStyle(
+                                                fontFamily: 'Inter',
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                    // Show "+X more" indicator if there are more than 4 contacts
+                                    if (contactNames.length > 4)
+                                      Positioned(
+                                        left: 4 * 6.0, // Position after the 4th contact
+                                        child: Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(color: Colors.white, width: 2),
+                                            borderRadius: BorderRadius.circular(20),
+                                            color: const Color(0xFF6B7280),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.1),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              '+${contactNames.length - 4}',
+                                              style: const TextStyle(
+                                                fontFamily: 'Inter',
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                );
-                              }),
-                              const SizedBox(width: 8),
-                              Flexible(
-                                child: Text(
-                                  _getFirstNames(contactNames).join(' & '),
-                                  style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 16,
-                                    height: 20 / 16,
-                                    color: const Color(0xFF374151),
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
+                                  ],
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              // WhatsApp icon
-                              SvgPicture.string(_whatsappSvg, width: 18, height: 18),
+                              const SizedBox(width: 16),
+                              // Contact names and WhatsApp icon
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        _getFirstNames(contactNames).join(' & '),
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 16,
+                                          height: 20 / 16,
+                                          color: const Color(0xFF374151),
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    // WhatsApp icon
+                                    SvgPicture.string(_whatsappSvg, width: 18, height: 18),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ],
