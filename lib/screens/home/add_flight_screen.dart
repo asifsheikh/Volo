@@ -123,55 +123,206 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   }
 
   void _filterDepartureAirports(String query) {
+    print('🔍 Filtering departure airports for: "$query"');
+    print('📊 Total airports available: ${_allAirports.length}');
+    
     if (query.length < 2) {
       setState(() {
         _filteredDepartureAirports = [];
       });
+      print('❌ Query too short, clearing results');
       return;
     }
 
     final lowercaseQuery = query.toLowerCase();
-    final filtered = _allAirports.where((airport) {
-      return airport.city.toLowerCase().contains(lowercaseQuery) ||
-             airport.airport.toLowerCase().contains(lowercaseQuery) ||
-             airport.iata.toLowerCase().contains(lowercaseQuery);
-    }).take(8).toList();
+    final List<Airport> filtered = [];
+    
+    for (final airport in _allAirports) {
+      final cityLower = airport.city.toLowerCase();
+      final airportLower = airport.airport.toLowerCase();
+      final iataLower = airport.iata.toLowerCase();
+      
+      bool matches = false;
+      int score = 0;
+      
+      // Exact IATA code match (highest priority)
+      if (iataLower == lowercaseQuery) {
+        matches = true;
+        score = 1000;
+        print('🎯 Exact IATA match: ${airport.displayName}');
+      }
+      // IATA code starts with query
+      else if (iataLower.startsWith(lowercaseQuery)) {
+        matches = true;
+        score = 900;
+        print('🎯 IATA starts with: ${airport.displayName}');
+      }
+      // City name starts with query
+      else if (cityLower.startsWith(lowercaseQuery)) {
+        matches = true;
+        score = 800;
+        print('🎯 City starts with: ${airport.displayName}');
+      }
+      // Airport name starts with query
+      else if (airportLower.startsWith(lowercaseQuery)) {
+        matches = true;
+        score = 700;
+        print('🎯 Airport starts with: ${airport.displayName}');
+      }
+      // Contains query in any field
+      else if (cityLower.contains(lowercaseQuery) || 
+               airportLower.contains(lowercaseQuery) || 
+               iataLower.contains(lowercaseQuery)) {
+        matches = true;
+        score = 100;
+        print('✅ Contains match: ${airport.displayName}');
+      }
+      
+      if (matches) {
+        filtered.add(airport);
+      }
+    }
+    
+    // Sort by score (highest first) and take top 8
+    filtered.sort((a, b) {
+      final aScore = _calculateScore(a, lowercaseQuery);
+      final bScore = _calculateScore(b, lowercaseQuery);
+      return bScore.compareTo(aScore);
+    });
+    
+    final result = filtered.take(8).toList();
+
+    print('🎯 Found ${result.length} matching departure airports');
+    if (result.isNotEmpty) {
+      print('📝 First result: ${result.first.displayName}');
+    }
 
     setState(() {
-      _filteredDepartureAirports = filtered;
+      _filteredDepartureAirports = result;
     });
+    print('🔄 Updated filtered departure airports count: ${_filteredDepartureAirports.length}');
   }
 
   void _filterArrivalAirports(String query) {
+    print('🔍 Filtering arrival airports for: "$query"');
+    print('📊 Total airports available: ${_allAirports.length}');
+    
     if (query.length < 2) {
       setState(() {
         _filteredArrivalAirports = [];
       });
+      print('❌ Query too short, clearing results');
       return;
     }
 
     final lowercaseQuery = query.toLowerCase();
-    final filtered = _allAirports.where((airport) {
-      return airport.city.toLowerCase().contains(lowercaseQuery) ||
-             airport.airport.toLowerCase().contains(lowercaseQuery) ||
-             airport.iata.toLowerCase().contains(lowercaseQuery);
-    }).take(8).toList();
+    final List<Airport> filtered = [];
+    
+    for (final airport in _allAirports) {
+      final cityLower = airport.city.toLowerCase();
+      final airportLower = airport.airport.toLowerCase();
+      final iataLower = airport.iata.toLowerCase();
+      
+      bool matches = false;
+      int score = 0;
+      
+      // Exact IATA code match (highest priority)
+      if (iataLower == lowercaseQuery) {
+        matches = true;
+        score = 1000;
+        print('🎯 Exact IATA match: ${airport.displayName}');
+      }
+      // IATA code starts with query
+      else if (iataLower.startsWith(lowercaseQuery)) {
+        matches = true;
+        score = 900;
+        print('🎯 IATA starts with: ${airport.displayName}');
+      }
+      // City name starts with query
+      else if (cityLower.startsWith(lowercaseQuery)) {
+        matches = true;
+        score = 800;
+        print('🎯 City starts with: ${airport.displayName}');
+      }
+      // Airport name starts with query
+      else if (airportLower.startsWith(lowercaseQuery)) {
+        matches = true;
+        score = 700;
+        print('🎯 Airport starts with: ${airport.displayName}');
+      }
+      // Contains query in any field
+      else if (cityLower.contains(lowercaseQuery) || 
+               airportLower.contains(lowercaseQuery) || 
+               iataLower.contains(lowercaseQuery)) {
+        matches = true;
+        score = 100;
+        print('✅ Contains match: ${airport.displayName}');
+      }
+      
+      if (matches) {
+        filtered.add(airport);
+      }
+    }
+    
+    // Sort by score (highest first) and take top 8
+    filtered.sort((a, b) {
+      final aScore = _calculateScore(a, lowercaseQuery);
+      final bScore = _calculateScore(b, lowercaseQuery);
+      return bScore.compareTo(aScore);
+    });
+    
+    final result = filtered.take(8).toList();
+
+    print('🎯 Found ${result.length} matching arrival airports');
+    if (result.isNotEmpty) {
+      print('📝 First result: ${result.first.displayName}');
+    }
 
     setState(() {
-      _filteredArrivalAirports = filtered;
+      _filteredArrivalAirports = result;
     });
+    print('🔄 Updated filtered arrival airports count: ${_filteredArrivalAirports.length}');
+  }
+
+  int _calculateScore(Airport airport, String query) {
+    final cityLower = airport.city.toLowerCase();
+    final airportLower = airport.airport.toLowerCase();
+    final iataLower = airport.iata.toLowerCase();
+    
+    // Exact IATA code match (highest priority)
+    if (iataLower == query) return 1000;
+    
+    // IATA code starts with query
+    if (iataLower.startsWith(query)) return 900;
+    
+    // City name starts with query
+    if (cityLower.startsWith(query)) return 800;
+    
+    // Airport name starts with query
+    if (airportLower.startsWith(query)) return 700;
+    
+    // Contains query in any field
+    if (cityLower.contains(query) || airportLower.contains(query) || iataLower.contains(query)) {
+      return 100;
+    }
+    
+    return 0;
   }
 
   void _onDepartureCityChanged(String value) {
+    print('📝 Departure City changed to: "$value"');
     _departureDebounceTimer?.cancel();
     _departureDebounceTimer = Timer(const Duration(milliseconds: 300), () {
+      print('⏰ Debounce timer fired, filtering for: "$value"');
       _filterDepartureAirports(value);
     });
   }
 
   void _onArrivalCityChanged(String value) {
+    print('📝 Arrival City changed to: "$value"');
     _arrivalDebounceTimer?.cancel();
     _arrivalDebounceTimer = Timer(const Duration(milliseconds: 300), () {
+      print('⏰ Debounce timer fired, filtering for: "$value"');
       _filterArrivalAirports(value);
     });
   }
@@ -425,121 +576,116 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
           ],
         ),
         const SizedBox(height: 8),
-        Stack(
-          children: [
-            Container(
-              height: 58,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Color(0xFFE5E7EB)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 2,
-                    offset: Offset(0, 1),
-                  ),
-                ],
+        Container(
+          height: 58,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Color(0xFFE5E7EB)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 2,
+                offset: Offset(0, 1),
               ),
-              child: Row(
-                children: [
-                  const SizedBox(width: 16),
-                  Icon(icon, color: Color(0xFF9CA3AF), size: 20),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      controller: controller,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: hintText,
-                        hintStyle: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                          color: Color(0xFFADAEBC),
-                        ),
-                        suffixIcon: isLoading
-                            ? Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF9CA3AF)),
-                                  ),
-                                ),
-                              )
-                            : null,
-                      ),
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16,
-                        color: Color(0xFF1F2937),
-                      ),
-                      onChanged: onChanged,
+            ],
+          ),
+          child: Row(
+            children: [
+              const SizedBox(width: 16),
+              Icon(icon, color: Color(0xFF9CA3AF), size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextFormField(
+                  controller: controller,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: hintText,
+                    hintStyle: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      color: Color(0xFFADAEBC),
                     ),
+                    suffixIcon: isLoading
+                        ? Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF9CA3AF)),
+                              ),
+                            ),
+                          )
+                        : null,
                   ),
-                ],
-              ),
-            ),
-            if (suggestions.isNotEmpty)
-              Positioned(
-                top: 58,
-                left: 0,
-                right: 0,
-                child: Container(
-                  constraints: BoxConstraints(maxHeight: 200),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Color(0xFFE5E7EB)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                    color: Color(0xFF1F2937),
                   ),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.zero,
-                    itemCount: suggestions.length,
-                    itemBuilder: (context, index) {
-                      final airport = suggestions[index];
-                      return ListTile(
-                        dense: true,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                        title: Text(
-                          airport.displayName,
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                            color: Color(0xFF1F2937),
-                          ),
-                        ),
-                        subtitle: airport.airport.toLowerCase() != airport.city.toLowerCase()
-                            ? Text(
-                                airport.airport,
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 12,
-                                  color: Color(0xFF6B7280),
-                                ),
-                              )
-                            : null,
-                        onTap: () => onSelected(airport),
-                      );
-                    },
-                  ),
+                  onChanged: onChanged,
                 ),
               ),
-          ],
+            ],
+          ),
         ),
+        if (suggestions.isNotEmpty) ...[
+          Container(
+            margin: const EdgeInsets.only(top: 2),
+            constraints: BoxConstraints(maxHeight: 200),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Color(0xFFE5E7EB)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ListView.builder(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              itemCount: suggestions.length,
+              itemBuilder: (context, index) {
+                final airport = suggestions[index];
+                return ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  title: Text(
+                    airport.displayName,
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      color: Color(0xFF1F2937),
+                    ),
+                  ),
+                  subtitle: airport.airport.toLowerCase() != airport.city.toLowerCase()
+                      ? Text(
+                          airport.airport,
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                            color: Color(0xFF6B7280),
+                          ),
+                        )
+                      : null,
+                  onTap: () {
+                    onSelected(airport);
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ],
     );
   }
