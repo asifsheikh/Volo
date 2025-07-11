@@ -16,6 +16,14 @@ class ConfirmationScreen extends StatelessWidget {
     required this.contactAvatars,
   }) : super(key: key);
 
+  // Helper method to generate initials from contact name
+  String _getInitials(String name) {
+    final nameParts = name.trim().split(' ');
+    if (nameParts.isEmpty) return '?';
+    if (nameParts.length == 1) return nameParts[0].isNotEmpty ? nameParts[0][0].toUpperCase() : '?';
+    return '${nameParts[0][0].toUpperCase()}${nameParts.last[0].toUpperCase()}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -55,13 +63,13 @@ class ConfirmationScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Cancel icon (top left)
+                // Back icon (top left)
                 Align(
                   alignment: Alignment.topLeft,
                   child: IconButton(
-                    icon: const Icon(Icons.close, color: Color(0xFF6B7280), size: 28),
+                    icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 28),
                     onPressed: () {
-                      Navigator.of(context).popUntil((route) => route.isFirst);
+                      Navigator.of(context).pop(); // Go back to add contacts screen
                     },
                   ),
                 ),
@@ -189,26 +197,34 @@ class ConfirmationScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              ...contactAvatars.map((avatar) => Padding(
-                                    padding: const EdgeInsets.only(right: 8),
-                                    child: Container(
-                                      width: 36,
-                                      height: 36,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.white, width: 2),
-                                        borderRadius: BorderRadius.circular(18),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(18),
-                                        child: Image.asset(
-                                          avatar,
-                                          width: 36,
-                                          height: 36,
-                                          fit: BoxFit.cover,
+                              ...contactNames.asMap().entries.map((entry) {
+                                final index = entry.key;
+                                final name = entry.value;
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.white, width: 2),
+                                      borderRadius: BorderRadius.circular(18),
+                                    ),
+                                    child: CircleAvatar(
+                                      radius: 18,
+                                      backgroundColor: const Color(0xFF1F2937),
+                                      child: Text(
+                                        _getInitials(name),
+                                        style: const TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ),
-                                  )),
+                                  ),
+                                );
+                              }),
                               const SizedBox(width: 8),
                               Flexible(
                                 child: Text(
