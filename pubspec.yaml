@@ -48,6 +48,7 @@ flutter:
     - assets/dummy1.png
     - assets/dummy2.png
     - assets/app_icon.svg
+    - assets/mock_flights_response.json
 
 flutter_icons:
   android: true

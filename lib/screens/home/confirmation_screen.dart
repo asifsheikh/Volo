@@ -79,10 +79,10 @@ class ConfirmationScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: SvgPicture.asset(
-                      'assets/app_icon.svg',
-                      width: 128,
-                      height: 128,
+                    child: const Icon(
+                      Icons.flight,
+                      size: 64,
+                      color: Color(0xFF1F2937),
                     ),
                   ),
                 ),

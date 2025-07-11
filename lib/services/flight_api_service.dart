@@ -1,58 +1,101 @@
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 class FlightApiService {
+  /// Toggle this flag to switch between mock and real API
+  static const bool useMockApi = true;
   static const String _baseUrl = 'https://serpapi.com/search.json';
   static const String _apiKey = 'e9f50763e5d701bdb20b8b0619488341b02f382fb648c80c336b92eb004635f2';
 
-  /// Search for flights using SerpApi Google Flights API
+  /// Search for flights using either Mock Data or the real API
   static Future<FlightSearchResponse> searchFlights({
     required String departureIata,
     required String arrivalIata,
     required String date,
     String? flightNumber,
   }) async {
-    try {
-      final queryParameters = {
-        'engine': 'google_flights',
-        'departure_id': departureIata,
-        'arrival_id': arrivalIata,
-        'outbound_date': date,
-        'type': '2', // One-way trip
-        'api_key': _apiKey,
-      };
-
-      final uri = Uri.parse(_baseUrl).replace(queryParameters: queryParameters);
-      
-      print('🔍 Searching flights: $departureIata → $arrivalIata on $date');
-      if (flightNumber != null) {
-        print('✈️ Filtering by flight number: $flightNumber');
-      }
-
-      final response = await http.get(uri);
-      
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        
-        if (data['error'] != null) {
-          throw Exception('API Error: ${data['error']}');
+    if (useMockApi) {
+      // --- MOCK API RESPONSE ---
+      try {
+        print('🔍 [MOCK] Searching flights: $departureIata → $arrivalIata on $date');
+        if (flightNumber != null) {
+          print('✈️ [MOCK] Filtering by flight number: $flightNumber');
         }
-
+        // Load mock data from JSON file
+        final String jsonString = await rootBundle.loadString('assets/mock_flights_response.json');
+        final Map<String, dynamic> data = json.decode(jsonString);
+        // Update search parameters to match the current search
+        data['search_parameters'] = {
+          'engine': 'google_flights',
+          'hl': 'en',
+          'gl': 'us',
+          'type': '2',
+          'departure_id': departureIata,
+          'arrival_id': arrivalIata,
+          'outbound_date': date,
+          'currency': 'USD'
+        };
+        // Update search metadata
+        data['search_metadata'] = {
+          'id': 'mock_${DateTime.now().millisecondsSinceEpoch}',
+          'status': 'Success',
+          'created_at': DateTime.now().toUtc().toString(),
+          'processed_at': DateTime.now().toUtc().toString(),
+          'total_time_taken': 0.1
+        };
+        // (airports array is left as-is from the mock JSON)
         final searchResponse = FlightSearchResponse.fromJson(data);
-        
         // Filter by flight number if provided
         if (flightNumber != null && flightNumber.isNotEmpty) {
           searchResponse.filterByFlightNumber(flightNumber);
         }
-
-        print('✅ Found ${searchResponse.bestFlights.length} flights');
+        print('✅ [MOCK] Found ${searchResponse.bestFlights.length} flights');
         return searchResponse;
-      } else {
-        throw Exception('HTTP Error: ${response.statusCode}');
+      } catch (e) {
+        print('❌ [MOCK] Flight search error: $e');
+        rethrow;
       }
-    } catch (e) {
-      print('❌ Flight search error: $e');
-      rethrow;
+    } else {
+      // --- REAL API RESPONSE ---
+      // Uncomment this block to use the real API
+      /*
+      try {
+        final queryParameters = {
+          'engine': 'google_flights',
+          'departure_id': departureIata,
+          'arrival_id': arrivalIata,
+          'outbound_date': date,
+          'type': '2', // One-way trip
+          'api_key': _apiKey,
+        };
+        final uri = Uri.parse(_baseUrl).replace(queryParameters: queryParameters);
+        print('🔍 [REAL] Searching flights: $departureIata → $arrivalIata on $date');
+        if (flightNumber != null) {
+          print('✈️ [REAL] Filtering by flight number: $flightNumber');
+        }
+        final response = await http.get(uri);
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['error'] != null) {
+            throw Exception('API Error:  [31m${data['error']} [0m');
+          }
+          final searchResponse = FlightSearchResponse.fromJson(data);
+          // Filter by flight number if provided
+          if (flightNumber != null && flightNumber.isNotEmpty) {
+            searchResponse.filterByFlightNumber(flightNumber);
+          }
+          print('✅ [REAL] Found ${searchResponse.bestFlights.length} flights');
+          return searchResponse;
+        } else {
+          throw Exception('HTTP Error: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('❌ [REAL] Flight search error: $e');
+        rethrow;
+      }
+      */
+      throw UnimplementedError('Set useMockApi = true to use mock data, or uncomment the real API block to enable real API calls.');
     }
   }
 }
