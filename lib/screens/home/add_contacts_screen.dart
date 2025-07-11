@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_native_contact_picker/flutter_native_contact_picker.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'dart:math' as math;
 import 'city_connection_header.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -60,22 +60,130 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
   ];
 
   Future<void> _pickContact() async {
-    // Contact picker temporarily disabled for UI testing
-    // try {
-    //   final FlutterNativeContactPicker contactPicker = FlutterNativeContactPicker();
-    //   final Contact? contact = await contactPicker.selectContact();
-    //   if (contact != null && contact.fullName != null && contact.phoneNumbers != null && contact.phoneNumbers!.isNotEmpty) {
-    //     setState(() {
-    //       _selectedContacts.add(ContactModel(
-    //         name: contact.fullName!,
-    //         phoneNumber: contact.phoneNumbers!.first,
-    //         platform: 'WhatsApp', // For now, assume WhatsApp
-    //       ));
-    //     });
-    //   }
-    // } catch (e) {
-    //   // User cancelled or error
-    // }
+    try {
+      // Request permission to access contacts
+      if (!await FlutterContacts.requestPermission(readonly: true)) {
+        // Show permission denied message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Permission to access contacts is required to add contacts.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
+      // Get all contacts with phone numbers
+      final List<Contact> contacts = await FlutterContacts.getContacts(
+        withProperties: true,
+        withPhoto: false,
+      );
+
+      // Filter contacts that have phone numbers
+      final contactsWithPhones = contacts.where((contact) => contact.phones.isNotEmpty).toList();
+
+      if (contactsWithPhones.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No contacts with phone numbers found.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return;
+      }
+
+      // Show contact picker dialog
+      final Contact? selectedContact = await showDialog<Contact>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Select a Contact'),
+            content: SizedBox(
+              width: double.maxFinite,
+              height: 300,
+              child: ListView.builder(
+                itemCount: contactsWithPhones.length,
+                itemBuilder: (context, index) {
+                  final contact = contactsWithPhones[index];
+                  final name = contact.displayName.isNotEmpty 
+                      ? contact.displayName 
+                      : '${contact.name.first} ${contact.name.last}'.trim();
+                  final phone = contact.phones.first.number;
+                  
+                  return ListTile(
+                    title: Text(name),
+                    subtitle: Text(phone),
+                    onTap: () => Navigator.of(context).pop(contact),
+                  );
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cancel'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (selectedContact != null) {
+        final phoneNumber = selectedContact.phones.first.number;
+        final contactName = selectedContact.displayName.isNotEmpty 
+            ? selectedContact.displayName 
+            : (selectedContact.name.first.isNotEmpty || selectedContact.name.last.isNotEmpty)
+                ? '${selectedContact.name.first} ${selectedContact.name.last}'.trim()
+                : 'Unknown Contact';
+        
+        // Check if contact already exists
+        final existingContact = _selectedContacts.any((c) => 
+            c.phoneNumber == phoneNumber || c.name == contactName);
+        
+        if (existingContact) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('This contact is already added.'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+          return;
+        }
+        
+        setState(() {
+          _selectedContacts.add(ContactModel(
+            name: contactName,
+            phoneNumber: phoneNumber,
+            platform: 'WhatsApp', // For now, assume WhatsApp
+          ));
+        });
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Added ${contactName} to your contacts.'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error picking contact: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to pick contact. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _removeContact(int index) {
@@ -141,24 +249,80 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Selected contacts',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                        color: Color(0xFF374151),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Selected contacts',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                            color: Color(0xFF374151),
+                          ),
+                        ),
+                        if (_selectedContacts.isNotEmpty)
+                          Text(
+                            '${_selectedContacts.length} contact${_selectedContacts.length == 1 ? '' : 's'}',
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 14,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                      ],
                     ),
                     const SizedBox(height: 12),
-                    ..._selectedContacts.asMap().entries.map((entry) {
-                      final i = entry.key;
-                      final contact = entry.value;
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: _buildContactTile(contact, i),
-                      );
-                    }).toList(),
+                    if (_selectedContacts.isEmpty)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFE5E7EB)),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.people_outline,
+                              size: 48,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'No contacts selected',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                color: Color(0xFF6B7280),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Add contacts to receive flight updates',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                color: Color(0xFF9CA3AF),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      ..._selectedContacts.asMap().entries.map((entry) {
+                        final i = entry.key;
+                        final contact = entry.value;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _buildContactTile(contact, i),
+                        );
+                      }).toList(),
                     // Add Contact button
                     GestureDetector(
                       onTap: _pickContact,
@@ -214,7 +378,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                 width: 350,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: _selectedContacts.isEmpty ? null : () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => ConfirmationScreen(
@@ -227,11 +391,13 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1F2937),
+                    backgroundColor: _selectedContacts.isEmpty 
+                        ? const Color(0xFF9CA3AF) 
+                        : const Color(0xFF1F2937),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    elevation: 10,
+                    elevation: _selectedContacts.isEmpty ? 0 : 10,
                     shadowColor: Colors.black.withOpacity(0.1),
                   ),
                   child: Row(
@@ -296,11 +462,23 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
             color: Color(0xFF111827),
           ),
         ),
-        subtitle: Row(
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SvgPicture.string(whatsappSvg, width: 16, height: 16),
-            const SizedBox(width: 4),
-            const Text('WhatsApp', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w400, fontSize: 15, color: Color(0xFF6B7280))),
+            Row(
+              children: [
+                SvgPicture.string(whatsappSvg, width: 16, height: 16),
+                const SizedBox(width: 4),
+                const Text('WhatsApp', style: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w400, fontSize: 15, color: Color(0xFF6B7280))),
+              ],
+            ),
+            if (contact.phoneNumber != null) ...[
+              const SizedBox(height: 2),
+              Text(
+                contact.phoneNumber!,
+                style: const TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w400, fontSize: 13, color: Color(0xFF9CA3AF)),
+              ),
+            ],
           ],
         ),
         trailing: InkWell(

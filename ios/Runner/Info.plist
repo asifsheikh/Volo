@@ -45,6 +45,8 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSContactsUsageDescription</key>
+	<string>This app needs access to contacts to add them for flight tracking notifications.</string>
 
 	<key>FirebaseAppCheckProviderFactory</key>
 	<string>FirebaseAppCheckDebugProviderFactory</string>
