@@ -56,7 +56,7 @@ class HomeScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32.0),
                     child: Text(
-                      'No flights being tracked right now',
+                      'No flights being tracked yet',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Inter',
@@ -70,12 +70,12 @@ class HomeScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32.0),
                     child: Text(
-                      'Tap below to start tracking your upcoming flight',
+                      'Add your first flight to start keeping your loved ones updated',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
-                        fontSize: 15,
+                        fontSize: 16,
                         color: Color(0xFF6B7280),
                       ),
                     ),
@@ -92,11 +92,11 @@ class HomeScreen extends StatelessWidget {
                       },
                       icon: const Icon(Icons.flight_takeoff, color: Colors.white, size: 28),
                       label: const Text(
-                        'Add Flight',
+                        'Add Your First Flight',
                         style: TextStyle(
                           fontFamily: 'Inter',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
                           color: Colors.white,
                         ),
                       ),

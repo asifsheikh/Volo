@@ -131,9 +131,9 @@ class ConfirmationScreen extends StatelessWidget {
                 const SizedBox(height: 40),
                 // Title
                 Text(
-                  "You're all set!",
+                  "You're all set! 🎉",
                   style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w700,
                     fontSize: 28,
                     height: 32 / 28,
                     color: const Color(0xFF1F2937),
@@ -145,7 +145,7 @@ class ConfirmationScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Text(
-                    "We'll keep your selected contacts informed about your flight so you can fly with peace of mind.",
+                    "We'll automatically notify your selected contacts about flight updates, delays, and status changes.",
                     style: GoogleFonts.inter(
                       fontWeight: FontWeight.w400,
                       fontSize: 16,
@@ -181,9 +181,9 @@ class ConfirmationScreen extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Notifying',
+                                'Will be notified',
                                 style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w400,
+                                  fontWeight: FontWeight.w500,
                                   fontSize: 16,
                                   height: 20 / 16,
                                   color: const Color(0xFF4B5563),

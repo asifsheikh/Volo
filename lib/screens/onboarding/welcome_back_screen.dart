@@ -36,19 +36,21 @@ class WelcomeBackScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 40),
                 Text(
-                  'Welcome back, $userName',
+                  'Welcome back, $userName! 👋',
                   style: const TextStyle(
+                    fontFamily: 'Inter',
                     fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     color: Color(0xFF232B36),
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Ready to keep your loved ones updated?',
+                  'Ready to keep your loved ones updated about your flights?',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontFamily: 'Inter',
+                    fontSize: 16,
                     color: Color(0xFF6B7280),
                   ),
                   textAlign: TextAlign.center,
@@ -72,11 +74,12 @@ class WelcomeBackScreen extends StatelessWidget {
                       );
                     },
                     child: const Text(
-                      'Continue',
+                      'Let\'s Go!',
                       style: TextStyle(
+                        fontFamily: 'Inter',
                         fontSize: 18,
                         color: Colors.white,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),

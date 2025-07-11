@@ -83,11 +83,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         });
 
         // Show error message to user
-        String errorMessage = 'Failed to save profile. Please try again.';
+        String errorMessage = 'Something went wrong. Please try again.';
         if (e.toString().contains('permission-denied')) {
           errorMessage = 'Permission denied. Please check your Firestore rules.';
         } else if (e.toString().contains('unavailable')) {
-          errorMessage = 'Network error. Please check your internet connection.';
+          errorMessage = 'Network error. Please check your internet connection and try again.';
         }
         
         ScaffoldMessenger.of(context).showSnackBar(
@@ -151,25 +151,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         const SizedBox(height: 32),
                         // Title
                         const Text(
-                          "Let's get to know you",
+                          "Welcome to Volo! ✈️",
                           style: TextStyle(
                             fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 24,
-                            height: 30 / 24,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 28,
+                            height: 34 / 28,
                             color: Color(0xFF1F2937),
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
                         // Subtitle
                         const Text(
-                          "We'll personalize notifications using your name.",
+                          "Let's set up your profile so we can keep your loved ones updated about your flights.",
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w400,
-                            fontSize: 14,
-                            height: 20 / 14,
+                            fontSize: 16,
+                            height: 24 / 16,
                             color: Color(0xFF4B5563),
                           ),
                           textAlign: TextAlign.center,
@@ -296,10 +296,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     ),
                                   )
                                 : const Text(
-                                    'Continue',
+                                    'Get Started',
                                     style: TextStyle(
                                       fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w400,
+                                      fontWeight: FontWeight.w600,
                                       fontSize: 18,
                                       height: 22 / 18,
                                       color: Colors.white,

@@ -154,7 +154,7 @@ class _ContactPickerDialogState extends State<ContactPickerDialog> {
                     child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                        hintText: 'Search contacts...',
+                        hintText: 'Search by name or phone number...',
                         hintStyle: const TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w400,

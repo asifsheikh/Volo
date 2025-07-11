@@ -369,25 +369,25 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 32),
                       // Title
                       const Text(
-                        'Enter your phone number',
+                        'Welcome to Volo! ✈️',
                         style: TextStyle(
                           fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 24,
-                          height: 30 / 24,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 28,
+                          height: 34 / 28,
                           color: Color(0xFF1F2937),
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       // Subtitle
                       const Text(
-                        "We'll help you get started with Volo",
+                        'Enter your phone number to get started',
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                          height: 20 / 14,
+                          fontSize: 16,
+                          height: 24 / 16,
                           color: Color(0xFF4B5563),
                         ),
                         textAlign: TextAlign.center,
@@ -459,10 +459,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   )
                                 : const Text(
-                                    'Continue',
+                                    'Send OTP',
                                     style: TextStyle(
                                       fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w400,
+                                      fontWeight: FontWeight.w600,
                                       fontSize: 18,
                                       height: 22 / 18,
                                       color: Colors.white,
@@ -474,12 +474,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 16),
                       // Info Text
                       const Text(
-                        "We'll send you an OTP to verify your number",
+                        "We'll send a verification code to your phone number",
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          height: 20 / 12,
+                          fontSize: 14,
+                          height: 20 / 14,
                           color: Color(0xFF6B7280),
                         ),
                         textAlign: TextAlign.center,

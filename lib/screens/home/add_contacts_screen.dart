@@ -55,7 +55,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Permission to access contacts is required to add contacts.'),
+              content: Text('We need access to your contacts to add people to notify.'),
               backgroundColor: Colors.red,
             ),
           );
@@ -76,7 +76,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('No contacts with phone numbers found.'),
+              content: Text('No contacts with phone numbers found in your device.'),
               backgroundColor: Colors.orange,
             ),
           );
@@ -118,7 +118,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('This contact is already added.'),
+                content: Text('This contact is already added to your list.'),
                 backgroundColor: Colors.orange,
               ),
             );
@@ -137,7 +137,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Added ${contactName} to your contacts.'),
+              content: Text('Added ${contactName} to your notification list.'),
               backgroundColor: Colors.green,
             ),
           );
@@ -148,7 +148,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to pick contact. Please try again.'),
+            content: Text('Unable to access contacts. Please try again.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -202,143 +202,161 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                         toThumbnail: args.arrivalThumbnail,
                       ),
                     ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 8, bottom: 18),
-                      child: Text(
-                        'Let your loved ones stay in the loop',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                          color: Color(0xFF9CA3AF),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    // Selected contacts
+                    // Content
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Selected contacts',
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                  color: Color(0xFF374151),
-                                ),
-                              ),
-                              if (_selectedContacts.isNotEmpty)
-                                Text(
-                                  '${_selectedContacts.length} contact${_selectedContacts.length == 1 ? '' : 's'}',
-                                  style: const TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 14,
-                                    color: Color(0xFF6B7280),
-                                  ),
-                                ),
-                            ],
+                          const SizedBox(height: 24),
+                          // Title
+                          const Text(
+                            'Who should we notify?',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                              fontSize: 24,
+                              color: Color(0xFF1F2937),
+                            ),
                           ),
-                          const SizedBox(height: 12),
-                          if (_selectedContacts.isEmpty)
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: const Color(0xFFE5E7EB)),
-                              ),
-                              child: Column(
-                                children: [
-                                  Icon(
-                                    Icons.people_outline,
-                                    size: 48,
-                                    color: Colors.grey[400],
-                                  ),
-                                  const SizedBox(height: 12),
-                                  const Text(
-                                    'No contacts selected',
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
-                                      color: Color(0xFF6B7280),
+                          const SizedBox(height: 8),
+                          // Subtitle
+                          const Text(
+                            'Select the people you want to keep updated about your flight status.',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 16,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          // Selected contacts
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      'Selected contacts',
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                        color: Color(0xFF374151),
+                                      ),
+                                    ),
+                                    if (_selectedContacts.isNotEmpty)
+                                      Text(
+                                        '${_selectedContacts.length} contact${_selectedContacts.length == 1 ? '' : 's'}',
+                                        style: const TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 14,
+                                          color: Color(0xFF6B7280),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                if (_selectedContacts.isEmpty)
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: const Color(0xFFE5E7EB)),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Icon(
+                                          Icons.people_outline,
+                                          size: 48,
+                                          color: Colors.grey[400],
+                                        ),
+                                        const SizedBox(height: 12),
+                                        const Text(
+                                          'No contacts selected',
+                                          style: TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 16,
+                                            color: Color(0xFF6B7280),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        const Text(
+                                          'Add WhatsApp contact so they can receive flight updates',
+                                          style: TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 14,
+                                            color: Color(0xFF9CA3AF),
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                else
+                                  ..._selectedContacts.asMap().entries.map((entry) {
+                                    final i = entry.key;
+                                    final contact = entry.value;
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: _buildContactTile(contact, i),
+                                    );
+                                  }).toList(),
+                                // Add Contact button
+                                GestureDetector(
+                                  onTap: _pickContact,
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 56,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: Color(0xFFE5E7EB)),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: const [
+                                        Icon(Icons.add, color: Color(0xFF1F2937)),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'WhatsApp contact',
+                                          style: TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 16,
+                                            color: Color(0xFF1F2937),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  const Text(
-                                    'Add WhatsApp contact so they can receive flight updates',
+                                ),
+                                const SizedBox(height: 10),
+                                const Center(
+                                  child: Text(
+                                    'Select WhatsApp contact to receive live flight updates',
+                                    textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontFamily: 'Inter',
                                       fontWeight: FontWeight.w400,
-                                      fontSize: 14,
-                                      color: Color(0xFF9CA3AF),
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            )
-                          else
-                            ..._selectedContacts.asMap().entries.map((entry) {
-                              final i = entry.key;
-                              final contact = entry.value;
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: _buildContactTile(contact, i),
-                              );
-                            }).toList(),
-                          // Add Contact button
-                          GestureDetector(
-                            onTap: _pickContact,
-                            child: Container(
-                              width: double.infinity,
-                              height: 56,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Color(0xFFE5E7EB)),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
-                                  Icon(Icons.add, color: Color(0xFF1F2937)),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'WhatsApp contact',
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
-                                      color: Color(0xFF1F2937),
+                                      fontSize: 13,
+                                      color: Color(0xFF6B7280),
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(height: 20), // Add bottom padding for scroll
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          const Center(
-                            child: Text(
-                              'Select WhatsApp contact to receive live flight updates',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 13,
-                                color: Color(0xFF6B7280),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20), // Add bottom padding for scroll
                         ],
                       ),
                     ),

@@ -38,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           content: const Text(
-            'Are you sure you want to sign out?',
+            'Are you sure you want to sign out of your account?',
             style: TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w400,
@@ -104,7 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to sign out. Please try again.'),
+            content: Text('Unable to sign out. Please try again.'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 4),
           ),
@@ -130,7 +130,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           content: const Text(
-            'This action cannot be undone. All your data will be permanently deleted.',
+            'This action cannot be undone. All your flight data and contacts will be permanently deleted.',
             style: TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w400,
@@ -196,7 +196,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to delete account. Please try again.'),
+            content: Text('Unable to delete account. Please try again.'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 4),
           ),

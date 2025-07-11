@@ -339,10 +339,10 @@ class _OtpScreenState extends State<OtpScreen> {
                       const SizedBox(height: 32),
                       // Title
                       const Text(
-                        'Enter the code',
+                        'Enter verification code',
                         style: TextStyle(
                           fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w700,
                           fontSize: 24,
                           height: 30 / 24,
                           color: Color(0xFF1F2937),
@@ -352,12 +352,12 @@ class _OtpScreenState extends State<OtpScreen> {
                       const SizedBox(height: 8),
                       // Subtitle
                       Text(
-                        "We've sent a 6-digit code to\n${widget.phoneNumber}",
+                        'We sent a 6-digit code to ${widget.phoneNumber}',
                         style: const TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                          height: 20 / 14,
+                          fontSize: 16,
+                          height: 24 / 16,
                           color: Color(0xFF4B5563),
                         ),
                         textAlign: TextAlign.center,
@@ -432,10 +432,10 @@ class _OtpScreenState extends State<OtpScreen> {
                                     ),
                                   )
                                 : const Text(
-                                    'Verify',
+                                    'Verify & Continue',
                                     style: TextStyle(
                                       fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w400,
+                                      fontWeight: FontWeight.w600,
                                       fontSize: 18,
                                       height: 22 / 18,
                                       color: Colors.white,
@@ -462,10 +462,10 @@ class _OtpScreenState extends State<OtpScreen> {
                             GestureDetector(
                               onTap: _resendOTP,
                               child: const Text(
-                                'Resend',
+                                'Resend code',
                                 style: TextStyle(
                                   fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w400,
+                                  fontWeight: FontWeight.w500,
                                   fontSize: 14,
                                   color: Color(0xFF1F2937),
                                   decoration: TextDecoration.underline,
@@ -474,7 +474,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             )
                           else
                             Text(
-                              'Resend in $_resendCountdown',
+                              'Resend in $_resendCountdown seconds',
                               style: const TextStyle(
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w400,
@@ -489,10 +489,10 @@ class _OtpScreenState extends State<OtpScreen> {
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: const Text(
-                          'Change number',
+                          'Use different number',
                           style: TextStyle(
                             fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
+                            fontWeight: FontWeight.w500,
                             fontSize: 14,
                             color: Color(0xFF1F2937),
                             decoration: TextDecoration.underline,

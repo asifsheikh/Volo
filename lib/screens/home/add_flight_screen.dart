@@ -253,7 +253,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     if (departureCode.isEmpty || arrivalCode.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter both departure and arrival cities'),
+          content: Text('Please select both departure and arrival cities'),
           backgroundColor: Color(0xFFDC2626),
         ),
       );
@@ -313,40 +313,56 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                     children: [
                       const SizedBox(height: 8),
                       _buildLabeledField(
-                        label: 'Flight Number',
+                        label: 'Flight Number (Optional)',
                         optional: true,
                         icon: Icons.flight,
                         controller: _flightNumberController,
-                        hintText: 'e.g. UA4',
+                        hintText: 'e.g. UA1234',
                       ),
                       const SizedBox(height: 24),
                       _buildDateField(),
                       const SizedBox(height: 24),
                       _buildTypeAheadField(
-                        label: 'Departure City',
+                        label: 'From',
                         icon: Icons.flight_takeoff,
                         controller: _departureCityController,
-                        hintText: 'Delhi (DEL)',
+                        hintText: 'Search city or airport code',
                         onSelected: _onDepartureAirportSelected,
                         isLoading: _isLoadingAirports,
                       ),
                       const SizedBox(height: 24),
                       _buildTypeAheadField(
-                        label: 'Arrival City',
+                        label: 'To',
                         icon: Icons.flight_land,
                         controller: _arrivalCityController,
-                        hintText: 'Berlin (BER)',
+                        hintText: 'Search city or airport code',
                         onSelected: _onArrivalAirportSelected,
                         isLoading: _isLoadingAirports,
                       ),
                       const SizedBox(height: 24),
-                      Text(
-                        'Enter city names or airport codes. Flight number helps us find exact matches.',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          color: Color(0xFF6B7280),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF3F4F6),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFE5E7EB)),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.info_outline, color: Color(0xFF6B7280), size: 20),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Flight number helps us find exact matches. You can search by city name or airport code (like DEL for Delhi).',
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 14,
+                                  color: Color(0xFF6B7280),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -384,10 +400,10 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                       Icon(Icons.search, color: Colors.white, size: 20),
                       SizedBox(width: 12),
                       Text(
-                        'Search Flights',
+                        'Find Flights',
                         style: TextStyle(
                           fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w600,
                           fontSize: 16,
                           color: Colors.white,
                         ),

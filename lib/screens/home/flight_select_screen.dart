@@ -50,7 +50,7 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> {
           splashRadius: 24,
         ),
         title: const Text(
-          'Pick Your Flight',
+          'Choose Your Flight',
           style: TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w700,
@@ -73,7 +73,7 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> {
             } else if (snapshot.hasError) {
               return _buildError(snapshot.error.toString());
             } else if (!snapshot.hasData || (snapshot.data!.bestFlights.isEmpty && snapshot.data!.otherFlights.isEmpty)) {
-              return _buildError('No flights found. Try different search criteria.');
+              return _buildError('No flights found');
             }
             final response = snapshot.data!;
             final flights = [...response.bestFlights, ...response.otherFlights];
@@ -102,7 +102,7 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> {
               Icon(Icons.error_outline, size: 56, color: Color(0xFF9CA3AF)),
               const SizedBox(height: 16),
               Text(
-                'Oops!',
+                'No flights found',
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w700,
@@ -114,7 +114,7 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: Text(
-                  message,
+                  'Try adjusting your search criteria or check your dates.',
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w400,
