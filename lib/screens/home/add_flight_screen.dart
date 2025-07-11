@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'dart:async';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import '../../services/flight_api_service.dart';
 import 'flight_results_screen.dart';
 import 'flight_select_screen.dart';
@@ -72,10 +73,6 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   String? _selectedArrivalCity;
   
   List<Airport> _allAirports = [];
-  List<Airport> _filteredDepartureAirports = [];
-  List<Airport> _filteredArrivalAirports = [];
-  Timer? _departureDebounceTimer;
-  Timer? _arrivalDebounceTimer;
   bool _isLoadingAirports = false;
 
   @override
@@ -89,8 +86,6 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     _flightNumberController.dispose();
     _departureCityController.dispose();
     _arrivalCityController.dispose();
-    _departureDebounceTimer?.cancel();
-    _arrivalDebounceTimer?.cancel();
     super.dispose();
   }
 
@@ -122,16 +117,9 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     }
   }
 
-  void _filterDepartureAirports(String query) {
-    print('🔍 Filtering departure airports for: "$query"');
-    print('📊 Total airports available: ${_allAirports.length}');
-    
+  Future<List<Airport>> _getAirportSuggestions(String query) async {
     if (query.length < 2) {
-      setState(() {
-        _filteredDepartureAirports = [];
-      });
-      print('❌ Query too short, clearing results');
-      return;
+      return [];
     }
 
     final lowercaseQuery = query.toLowerCase();
@@ -143,39 +131,28 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
       final iataLower = airport.iata.toLowerCase();
       
       bool matches = false;
-      int score = 0;
       
       // Exact IATA code match (highest priority)
       if (iataLower == lowercaseQuery) {
         matches = true;
-        score = 1000;
-        print('🎯 Exact IATA match: ${airport.displayName}');
       }
       // IATA code starts with query
       else if (iataLower.startsWith(lowercaseQuery)) {
         matches = true;
-        score = 900;
-        print('🎯 IATA starts with: ${airport.displayName}');
       }
       // City name starts with query
       else if (cityLower.startsWith(lowercaseQuery)) {
         matches = true;
-        score = 800;
-        print('🎯 City starts with: ${airport.displayName}');
       }
       // Airport name starts with query
       else if (airportLower.startsWith(lowercaseQuery)) {
         matches = true;
-        score = 700;
-        print('🎯 Airport starts with: ${airport.displayName}');
       }
       // Contains query in any field
       else if (cityLower.contains(lowercaseQuery) || 
                airportLower.contains(lowercaseQuery) || 
                iataLower.contains(lowercaseQuery)) {
         matches = true;
-        score = 100;
-        print('✅ Contains match: ${airport.displayName}');
       }
       
       if (matches) {
@@ -183,105 +160,14 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
       }
     }
     
-    // Sort by score (highest first) and take top 8
+    // Sort by relevance and take top 8
     filtered.sort((a, b) {
       final aScore = _calculateScore(a, lowercaseQuery);
       final bScore = _calculateScore(b, lowercaseQuery);
       return bScore.compareTo(aScore);
     });
     
-    final result = filtered.take(8).toList();
-
-    print('🎯 Found ${result.length} matching departure airports');
-    if (result.isNotEmpty) {
-      print('📝 First result: ${result.first.displayName}');
-    }
-
-    setState(() {
-      _filteredDepartureAirports = result;
-    });
-    print('🔄 Updated filtered departure airports count: ${_filteredDepartureAirports.length}');
-  }
-
-  void _filterArrivalAirports(String query) {
-    print('🔍 Filtering arrival airports for: "$query"');
-    print('📊 Total airports available: ${_allAirports.length}');
-    
-    if (query.length < 2) {
-      setState(() {
-        _filteredArrivalAirports = [];
-      });
-      print('❌ Query too short, clearing results');
-      return;
-    }
-
-    final lowercaseQuery = query.toLowerCase();
-    final List<Airport> filtered = [];
-    
-    for (final airport in _allAirports) {
-      final cityLower = airport.city.toLowerCase();
-      final airportLower = airport.airport.toLowerCase();
-      final iataLower = airport.iata.toLowerCase();
-      
-      bool matches = false;
-      int score = 0;
-      
-      // Exact IATA code match (highest priority)
-      if (iataLower == lowercaseQuery) {
-        matches = true;
-        score = 1000;
-        print('🎯 Exact IATA match: ${airport.displayName}');
-      }
-      // IATA code starts with query
-      else if (iataLower.startsWith(lowercaseQuery)) {
-        matches = true;
-        score = 900;
-        print('🎯 IATA starts with: ${airport.displayName}');
-      }
-      // City name starts with query
-      else if (cityLower.startsWith(lowercaseQuery)) {
-        matches = true;
-        score = 800;
-        print('🎯 City starts with: ${airport.displayName}');
-      }
-      // Airport name starts with query
-      else if (airportLower.startsWith(lowercaseQuery)) {
-        matches = true;
-        score = 700;
-        print('🎯 Airport starts with: ${airport.displayName}');
-      }
-      // Contains query in any field
-      else if (cityLower.contains(lowercaseQuery) || 
-               airportLower.contains(lowercaseQuery) || 
-               iataLower.contains(lowercaseQuery)) {
-        matches = true;
-        score = 100;
-        print('✅ Contains match: ${airport.displayName}');
-      }
-      
-      if (matches) {
-        filtered.add(airport);
-      }
-    }
-    
-    // Sort by score (highest first) and take top 8
-    filtered.sort((a, b) {
-      final aScore = _calculateScore(a, lowercaseQuery);
-      final bScore = _calculateScore(b, lowercaseQuery);
-      return bScore.compareTo(aScore);
-    });
-    
-    final result = filtered.take(8).toList();
-
-    print('🎯 Found ${result.length} matching arrival airports');
-    if (result.isNotEmpty) {
-      print('📝 First result: ${result.first.displayName}');
-    }
-
-    setState(() {
-      _filteredArrivalAirports = result;
-    });
-    print('🔄 Updated filtered arrival airports count: ${_filteredArrivalAirports.length}');
+    return filtered.take(8).toList();
   }
 
   int _calculateScore(Airport airport, String query) {
@@ -309,29 +195,10 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     return 0;
   }
 
-  void _onDepartureCityChanged(String value) {
-    print('📝 Departure City changed to: "$value"');
-    _departureDebounceTimer?.cancel();
-    _departureDebounceTimer = Timer(const Duration(milliseconds: 300), () {
-      print('⏰ Debounce timer fired, filtering for: "$value"');
-      _filterDepartureAirports(value);
-    });
-  }
-
-  void _onArrivalCityChanged(String value) {
-    print('📝 Arrival City changed to: "$value"');
-    _arrivalDebounceTimer?.cancel();
-    _arrivalDebounceTimer = Timer(const Duration(milliseconds: 300), () {
-      print('⏰ Debounce timer fired, filtering for: "$value"');
-      _filterArrivalAirports(value);
-    });
-  }
-
   void _onDepartureAirportSelected(Airport airport) {
     setState(() {
       _departureCityController.text = airport.displayName;
       _selectedDepartureCity = airport.displayName;
-      _filteredDepartureAirports = [];
     });
   }
 
@@ -339,7 +206,6 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     setState(() {
       _arrivalCityController.text = airport.displayName;
       _selectedArrivalCity = airport.displayName;
-      _filteredArrivalAirports = [];
     });
   }
 
@@ -456,24 +322,20 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                       const SizedBox(height: 24),
                       _buildDateField(),
                       const SizedBox(height: 24),
-                      _buildAutocompleteField(
+                      _buildTypeAheadField(
                         label: 'Departure City',
                         icon: Icons.flight_takeoff,
                         controller: _departureCityController,
                         hintText: 'Delhi (DEL)',
-                        suggestions: _filteredDepartureAirports,
-                        onChanged: _onDepartureCityChanged,
                         onSelected: _onDepartureAirportSelected,
                         isLoading: _isLoadingAirports,
                       ),
                       const SizedBox(height: 24),
-                      _buildAutocompleteField(
+                      _buildTypeAheadField(
                         label: 'Arrival City',
                         icon: Icons.flight_land,
                         controller: _arrivalCityController,
                         hintText: 'Berlin (BER)',
-                        suggestions: _filteredArrivalAirports,
-                        onChanged: _onArrivalCityChanged,
                         onSelected: _onArrivalAirportSelected,
                         isLoading: _isLoadingAirports,
                       ),
@@ -541,13 +403,11 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     );
   }
 
-  Widget _buildAutocompleteField({
+  Widget _buildTypeAheadField({
     required String label,
     required IconData icon,
     required TextEditingController controller,
     required String hintText,
-    required List<Airport> suggestions,
-    required ValueChanged<String> onChanged,
     required Function(Airport) onSelected,
     required bool isLoading,
   }) {
@@ -576,116 +436,91 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
           ],
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 58,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Color(0xFFE5E7EB)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 2,
-                offset: Offset(0, 1),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              const SizedBox(width: 16),
-              Icon(icon, color: Color(0xFF9CA3AF), size: 20),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextFormField(
-                  controller: controller,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: hintText,
-                    hintStyle: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                      color: Color(0xFFADAEBC),
-                    ),
-                    suffixIcon: isLoading
-                        ? Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF9CA3AF)),
-                              ),
-                            ),
-                          )
-                        : null,
-                  ),
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 16,
-                    color: Color(0xFF1F2937),
-                  ),
-                  onChanged: onChanged,
+        TypeAheadField<Airport>(
+          controller: controller,
+          builder: (context, controller, focusNode) {
+            return TextField(
+              controller: controller,
+              focusNode: focusNode,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                hintText: hintText,
+                hintStyle: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 16,
+                  color: Color(0xFFADAEBC),
                 ),
-              ),
-            ],
-          ),
-        ),
-        if (suggestions.isNotEmpty) ...[
-          Container(
-            margin: const EdgeInsets.only(top: 2),
-            constraints: BoxConstraints(maxHeight: 200),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Color(0xFFE5E7EB)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ListView.builder(
-              shrinkWrap: true,
-              padding: EdgeInsets.zero,
-              itemCount: suggestions.length,
-              itemBuilder: (context, index) {
-                final airport = suggestions[index];
-                return ListTile(
-                  dense: true,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  title: Text(
-                    airport.displayName,
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: Color(0xFF1F2937),
-                    ),
-                  ),
-                  subtitle: airport.airport.toLowerCase() != airport.city.toLowerCase()
-                      ? Text(
-                          airport.airport,
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            color: Color(0xFF6B7280),
+                prefixIcon: Icon(icon, color: Color(0xFF9CA3AF), size: 20),
+                suffixIcon: isLoading
+                    ? Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF9CA3AF)),
                           ),
-                        )
-                      : null,
-                  onTap: () {
-                    onSelected(airport);
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+                        ),
+                      )
+                    : null,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Color(0xFF1F2937), width: 2),
+                ),
+                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              ),
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                fontSize: 16,
+                color: Color(0xFF1F2937),
+              ),
+            );
+          },
+          suggestionsCallback: (pattern) async {
+            return await _getAirportSuggestions(pattern);
+          },
+          itemBuilder: (context, Airport airport) {
+            return ListTile(
+              dense: true,
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              title: Text(
+                airport.displayName,
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  color: Color(0xFF1F2937),
+                ),
+              ),
+              subtitle: airport.airport.toLowerCase() != airport.city.toLowerCase()
+                  ? Text(
+                      airport.airport,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                        color: Color(0xFF6B7280),
+                      ),
+                    )
+                  : null,
+            );
+          },
+          onSelected: (Airport airport) {
+            onSelected(airport);
+          },
+        ),
       ],
     );
   }
@@ -788,7 +623,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
         Row(
           children: [
             Text(
-              'Departure Date',
+              'Date',
               style: TextStyle(
                 fontFamily: 'Inter',
                 fontWeight: FontWeight.w400,
@@ -826,13 +661,13 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
             child: Row(
               children: [
                 const SizedBox(width: 16),
-                Icon(Icons.calendar_today, color: Color(0xFF9CA3AF), size: 16),
-                const SizedBox(width: 16),
+                Icon(Icons.calendar_today, color: Color(0xFF9CA3AF), size: 20),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     _selectedDate != null
-                        ? DateFormat('MMMM d, yyyy').format(_selectedDate!)
-                        : 'Departure Date',
+                        ? DateFormat('MMM dd, yyyy').format(_selectedDate!)
+                        : 'Select date',
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w400,
@@ -843,25 +678,6 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                 ),
               ],
             ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String label, bool isActive) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, color: isActive ? Color(0xFF1F2937) : Color(0xFF9CA3AF), size: 20),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w400,
-            fontSize: 12,
-            color: isActive ? Color(0xFF1F2937) : Color(0xFF9CA3AF),
           ),
         ),
       ],
