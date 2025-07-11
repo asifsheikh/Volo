@@ -292,7 +292,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   const Text(
-                                    'Add contacts to receive flight updates',
+                                    'Add WhatsApp contact so they can receive flight updates',
                                     style: TextStyle(
                                       fontFamily: 'Inter',
                                       fontWeight: FontWeight.w400,
