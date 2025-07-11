@@ -3,10 +3,12 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 
 class ContactPickerDialog extends StatefulWidget {
   final List<Contact> contacts;
+  final List<String> selectedPhoneNumbers;
 
   const ContactPickerDialog({
     Key? key,
     required this.contacts,
+    this.selectedPhoneNumbers = const [],
   }) : super(key: key);
 
   @override
@@ -260,33 +262,38 @@ class _ContactPickerDialogState extends State<ContactPickerDialog> {
         final contact = _filteredContacts[index];
         final name = _getContactName(contact);
         final phone = _getContactPhone(contact);
+        final isSelected = widget.selectedPhoneNumbers.contains(phone);
         
         return Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => Navigator.of(context).pop(contact),
+            onTap: isSelected ? null : () => Navigator.of(context).pop(contact),
             borderRadius: BorderRadius.circular(12),
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isSelected ? const Color(0xFFF9FAFB) : Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFF3F4F6)),
+                border: Border.all(
+                  color: isSelected ? const Color(0xFFE5E7EB) : const Color(0xFFF3F4F6),
+                ),
               ),
               child: Row(
                 children: [
                   // Avatar
                   CircleAvatar(
                     radius: 24,
-                    backgroundColor: _getAvatarColor(name),
+                    backgroundColor: isSelected 
+                        ? const Color(0xFFD1D5DB) 
+                        : _getAvatarColor(name),
                     child: Text(
                       _getInitials(name),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
-                        color: Colors.white,
+                        color: isSelected ? const Color(0xFF6B7280) : Colors.white,
                       ),
                     ),
                   ),
@@ -298,34 +305,48 @@ class _ContactPickerDialogState extends State<ContactPickerDialog> {
                       children: [
                         Text(
                           name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w600,
                             fontSize: 16,
-                            color: Color(0xFF111827),
+                            color: isSelected ? const Color(0xFF9CA3AF) : const Color(0xFF111827),
                           ),
                         ),
                         if (phone.isNotEmpty) ...[
                           const SizedBox(height: 2),
                           Text(
                             phone,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w400,
                               fontSize: 14,
-                              color: Color(0xFF6B7280),
+                              color: isSelected ? const Color(0xFFD1D5DB) : const Color(0xFF6B7280),
                             ),
                           ),
                         ],
                       ],
                     ),
                   ),
-                  // Arrow
-                  const Icon(
-                    Icons.arrow_forward_ios,
-                    color: Color(0xFF9CA3AF),
-                    size: 16,
-                  ),
+                  // Status Icon
+                  if (isSelected)
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    )
+                  else
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      color: Color(0xFF9CA3AF),
+                      size: 16,
+                    ),
                 ],
               ),
             ),

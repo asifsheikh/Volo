@@ -84,12 +84,21 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
         return;
       }
 
+      // Get list of already selected phone numbers
+      final selectedPhoneNumbers = _selectedContacts
+          .where((contact) => contact.phoneNumber != null)
+          .map((contact) => contact.phoneNumber!)
+          .toList();
+
       // Show modern contact picker dialog
       final Contact? selectedContact = await showDialog<Contact>(
         context: context,
         barrierDismissible: true,
         builder: (BuildContext context) {
-          return ContactPickerDialog(contacts: contactsWithPhones);
+          return ContactPickerDialog(
+            contacts: contactsWithPhones,
+            selectedPhoneNumbers: selectedPhoneNumbers,
+          );
         },
       );
 
