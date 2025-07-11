@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'city_connection_header.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'confirmation_screen.dart';
+import '../../widgets/contact_picker_dialog.dart';
 
 // Data model for a contact
 class ContactModel {
@@ -83,39 +84,12 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
         return;
       }
 
-      // Show contact picker dialog
+      // Show modern contact picker dialog
       final Contact? selectedContact = await showDialog<Contact>(
         context: context,
+        barrierDismissible: true,
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Select a Contact'),
-            content: SizedBox(
-              width: double.maxFinite,
-              height: 300,
-              child: ListView.builder(
-                itemCount: contactsWithPhones.length,
-                itemBuilder: (context, index) {
-                  final contact = contactsWithPhones[index];
-                  final name = contact.displayName.isNotEmpty 
-                      ? contact.displayName 
-                      : '${contact.name.first} ${contact.name.last}'.trim();
-                  final phone = contact.phones.first.number;
-                  
-                  return ListTile(
-                    title: Text(name),
-                    subtitle: Text(phone),
-                    onTap: () => Navigator.of(context).pop(contact),
-                  );
-                },
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Cancel'),
-              ),
-            ],
-          );
+          return ContactPickerDialog(contacts: contactsWithPhones);
         },
       );
 
