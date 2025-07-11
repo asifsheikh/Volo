@@ -58,8 +58,6 @@ class FlightApiService {
       }
     } else {
       // --- REAL API RESPONSE ---
-      // Uncomment this block to use the real API
-      /*
       try {
         final queryParameters = {
           'engine': 'google_flights',
@@ -78,7 +76,7 @@ class FlightApiService {
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
           if (data['error'] != null) {
-            throw Exception('API Error:  [31m${data['error']} [0m');
+            throw Exception('API Error: ${data['error']}');
           }
           final searchResponse = FlightSearchResponse.fromJson(data);
           // Filter by flight number if provided
@@ -94,8 +92,6 @@ class FlightApiService {
         print('❌ [REAL] Flight search error: $e');
         rethrow;
       }
-      */
-      throw UnimplementedError('Set useMockApi = true to use mock data, or uncomment the real API block to enable real API calls.');
     }
   }
 }
