@@ -132,23 +132,48 @@ class FlightSearchResponse {
     );
   }
 
-  /// Filter flights by flight number
+  /// Filter flights by flight number (supports partial matches)
   void filterByFlightNumber(String searchFlightNumber) {
-    final normalizedSearch = _normalizeFlightNumber(searchFlightNumber);
+    print('🔍 [FILTER] Searching for flight number: "$searchFlightNumber"');
     
+    // Count flights before filtering
+    final initialBestFlights = bestFlights.length;
+    final initialOtherFlights = otherFlights.length;
+    
+    // Filter best flights
     bestFlights.removeWhere((flight) {
-      final flightNumbers = flight.flights.map((f) => _normalizeFlightNumber(f.flightNumber)).toList();
-      return !flightNumbers.any((number) => number.contains(normalizedSearch));
+      final hasMatch = flight.containsFlightNumber(searchFlightNumber);
+      
+      if (hasMatch) {
+        print('✅ [FILTER] Found match in best flight: ${flight.flightNumbersString} (${flight.completeRoute})');
+      }
+      
+      return !hasMatch;
     });
     
+    // Filter other flights
     otherFlights.removeWhere((flight) {
-      final flightNumbers = flight.flights.map((f) => _normalizeFlightNumber(f.flightNumber)).toList();
-      return !flightNumbers.any((number) => number.contains(normalizedSearch));
+      final hasMatch = flight.containsFlightNumber(searchFlightNumber);
+      
+      if (hasMatch) {
+        print('✅ [FILTER] Found match in other flight: ${flight.flightNumbersString} (${flight.completeRoute})');
+      }
+      
+      return !hasMatch;
     });
-  }
-
-  String _normalizeFlightNumber(String flightNumber) {
-    return flightNumber.replaceAll(' ', '').toUpperCase();
+    
+    // Log filtering results
+    final remainingBestFlights = bestFlights.length;
+    final remainingOtherFlights = otherFlights.length;
+    
+    print('📊 [FILTER] Results:');
+    print('   - Best flights: $initialBestFlights → $remainingBestFlights');
+    print('   - Other flights: $initialOtherFlights → $remainingOtherFlights');
+    print('   - Total matches: ${remainingBestFlights + remainingOtherFlights}');
+    
+    if (remainingBestFlights + remainingOtherFlights == 0) {
+      print('⚠️ [FILTER] No flights found matching "$searchFlightNumber"');
+    }
   }
 }
 
@@ -236,6 +261,28 @@ class FlightOption {
           ?.map((item) => Map<String, dynamic>.from(item as Map))
           .toList(),
     );
+  }
+
+  /// Check if this flight option contains the given flight number (supports partial matches)
+  bool containsFlightNumber(String searchFlightNumber) {
+    final normalizedSearch = searchFlightNumber.replaceAll(' ', '').toUpperCase();
+    return flights.any((flight) {
+      final normalizedFlightNumber = flight.flightNumber.replaceAll(' ', '').toUpperCase();
+      return normalizedFlightNumber.contains(normalizedSearch);
+    });
+  }
+
+  /// Get all flight numbers in this trip as a formatted string
+  String get flightNumbersString {
+    return flights.map((f) => f.flightNumber).join(' · ');
+  }
+
+  /// Get the complete route (first departure to last arrival)
+  String get completeRoute {
+    if (flights.isEmpty) return '';
+    final first = flights.first;
+    final last = flights.last;
+    return '${first.departureAirport.id} → ${last.arrivalAirport.id}';
   }
 }
 
