@@ -8,13 +8,11 @@ import '../../services/profile_picture_service.dart';
 class ProfileScreen extends StatefulWidget {
   final String username;
   final String phoneNumber;
-  final String profileImageAsset;
 
   const ProfileScreen({
     Key? key,
     required this.username,
     required this.phoneNumber,
-    this.profileImageAsset = 'assets/profile_placeholder.png',
   }) : super(key: key);
 
   @override
@@ -307,7 +305,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               backgroundColor: Colors.white,
                               backgroundImage: _profilePictureUrl != null
                                   ? NetworkImage(_profilePictureUrl!)
-                                  : AssetImage(widget.profileImageAsset) as ImageProvider,
+                                  : null,
+                              child: _profilePictureUrl == null
+                                  ? Icon(
+                                      Icons.person,
+                                      size: 48,
+                                      color: Color(0xFF9CA3AF),
+                                    )
+                                  : null,
                             ),
                             Positioned(
                               bottom: 0,

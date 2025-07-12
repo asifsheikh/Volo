@@ -75,7 +75,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       backgroundColor: Colors.white,
                       backgroundImage: _profilePictureUrl != null
                           ? NetworkImage(_profilePictureUrl!)
-                          : AssetImage('assets/profile_placeholder.png') as ImageProvider,
+                          : null,
+                      child: _profilePictureUrl == null
+                          ? Icon(
+                              Icons.person,
+                              size: 28,
+                              color: Color(0xFF9CA3AF),
+                            )
+                          : null,
                     ),
                   ),
                 ],

@@ -42,7 +42,6 @@ flutter:
   assets:
     - assets/volo_app_icon.png
     - assets/app_icon.png
-    - assets/profile_placeholder.png
     - assets/test.png
     - assets/onboarding_illustration3.png
     - assets/airports_global.json
