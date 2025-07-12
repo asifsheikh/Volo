@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 
 import 'dart:developer' as developer;
 import '../../services/firebase_service.dart';
+import '../../services/profile_picture_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String username;
@@ -21,6 +23,53 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _isLoading = false;
+  String? _profilePictureUrl;
+  bool _isUpdatingProfilePicture = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfilePicture();
+  }
+
+  /// Load user's profile picture from Firestore
+  Future<void> _loadProfilePicture() async {
+    try {
+      final String? url = await ProfilePictureService.getUserProfilePictureUrl();
+      if (mounted) {
+        setState(() {
+          _profilePictureUrl = url;
+        });
+      }
+    } catch (e) {
+      developer.log('ProfileScreen: Error loading profile picture: $e', name: 'VoloProfile');
+    }
+  }
+
+  /// Handle profile picture update
+  Future<void> _updateProfilePicture() async {
+    if (_isUpdatingProfilePicture) return;
+
+    setState(() {
+      _isUpdatingProfilePicture = true;
+    });
+
+    try {
+      final bool success = await ProfilePictureService.updateProfilePicture(context);
+      if (success && mounted) {
+        // Reload profile picture
+        await _loadProfilePicture();
+      }
+    } catch (e) {
+      developer.log('ProfileScreen: Error updating profile picture: $e', name: 'VoloProfile');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isUpdatingProfilePicture = false;
+        });
+      }
+    }
+  }
 
   /// Handle sign out
   Future<void> _signOut() async {
@@ -256,7 +305,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             CircleAvatar(
                               radius: 48,
                               backgroundColor: Colors.white,
-                              backgroundImage: AssetImage(widget.profileImageAsset),
+                              backgroundImage: _profilePictureUrl != null
+                                  ? NetworkImage(_profilePictureUrl!)
+                                  : AssetImage(widget.profileImageAsset) as ImageProvider,
                             ),
                             Positioned(
                               bottom: 0,
@@ -265,12 +316,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 color: Colors.transparent,
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(16),
-                                  onTap: () {}, // For now, does nothing
+                                  onTap: _isUpdatingProfilePicture ? null : _updateProfilePicture,
                                   child: Container(
                                     width: 32,
                                     height: 32,
                                     decoration: BoxDecoration(
-                                      color: Color(0xFF008080),
+                                      color: _isUpdatingProfilePicture 
+                                          ? Color(0xFF9CA3AF)
+                                          : Color(0xFF008080),
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
@@ -285,11 +338,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
                                       ],
                                     ),
-                                    child: const Icon(
-                                      Icons.camera_alt,
-                                      color: Colors.white,
-                                      size: 18,
-                                    ),
+                                    child: _isUpdatingProfilePicture
+                                        ? const SizedBox(
+                                            width: 16,
+                                            height: 16,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                            ),
+                                          )
+                                        : const Icon(
+                                            Icons.camera_alt,
+                                            color: Colors.white,
+                                            size: 18,
+                                          ),
                                   ),
                                 ),
                               ),

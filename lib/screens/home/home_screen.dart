@@ -3,12 +3,40 @@ import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 import 'dart:core';
 import '../../services/firebase_service.dart';
+import '../../services/profile_picture_service.dart';
 import 'add_flight_screen.dart';
 import '../profile/profile_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final String username;
   const HomeScreen({Key? key, required this.username}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String? _profilePictureUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfilePicture();
+  }
+
+  /// Load user's profile picture from Firestore
+  Future<void> _loadProfilePicture() async {
+    try {
+      final String? url = await ProfilePictureService.getUserProfilePictureUrl();
+      if (mounted) {
+        setState(() {
+          _profilePictureUrl = url;
+        });
+      }
+    } catch (e) {
+      developer.log('HomeScreen: Error loading profile picture: $e', name: 'VoloProfile');
+    }
+  }
 
 
 
@@ -30,7 +58,7 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Hey, $username 👋',
+                    'Hey, ${widget.username} 👋',
                     style: const TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w400,
@@ -45,7 +73,9 @@ class HomeScreen extends StatelessWidget {
                     child: CircleAvatar(
                       radius: 28,
                       backgroundColor: Colors.white,
-                      backgroundImage: AssetImage('assets/profile_placeholder.png'),
+                      backgroundImage: _profilePictureUrl != null
+                          ? NetworkImage(_profilePictureUrl!)
+                          : AssetImage('assets/profile_placeholder.png') as ImageProvider,
                     ),
                   ),
                 ],
@@ -151,10 +181,13 @@ class HomeScreen extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ProfileScreen(
-          username: username,
+          username: widget.username,
           phoneNumber: phoneNumber,
         ),
       ),
-    );
+    ).then((_) {
+      // Refresh profile picture when returning from profile screen
+      _loadProfilePicture();
+    });
   }
 } 
