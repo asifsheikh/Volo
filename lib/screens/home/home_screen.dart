@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'dart:developer' as developer;
+import 'dart:core';
 import '../../services/firebase_service.dart';
 import 'add_flight_screen.dart';
 import '../profile/profile_screen.dart';
@@ -8,6 +9,8 @@ import '../profile/profile_screen.dart';
 class HomeScreen extends StatelessWidget {
   final String username;
   const HomeScreen({Key? key, required this.username}) : super(key: key);
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +30,11 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Hi, $username',
+                    'Hey, $username 👋',
                     style: const TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w400,
-                      fontSize: 32,
+                      fontSize: 28,
                       color: Color(0xFF1F2937),
                     ),
                   ),
