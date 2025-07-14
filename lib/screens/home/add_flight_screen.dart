@@ -473,7 +473,6 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
         TypeAheadField<Airport>(
           controller: controller,
           hideOnEmpty: true,
-          minCharsForSuggestions: 2,
           builder: (context, controller, focusNode) {
             return TextField(
               controller: controller,
