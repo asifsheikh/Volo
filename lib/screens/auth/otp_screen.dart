@@ -21,7 +21,12 @@ import '../onboarding/welcome_back_screen.dart';
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
   final String? verificationId;
-  const OtpScreen({Key? key, required this.phoneNumber, this.verificationId}) : super(key: key);
+  final int? resendToken;
+  const OtpScreen({
+    Key? key, required 
+    this.phoneNumber, 
+    this.verificationId, 
+    this.resendToken}) : super(key: key);
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -43,9 +48,6 @@ class _OtpScreenState extends State<OtpScreen> {
     super.initState();
     // Initialize verification ID from widget
     _currentVerificationId = widget.verificationId;
-    developer.log('OtpScreen: Initialized', name: 'VoloAuth');
-    developer.log('  - Phone number: ${widget.phoneNumber}', name: 'VoloAuth');
-    developer.log('  - Verification ID: ${widget.verificationId}', name: 'VoloAuth');
   }
 
   /// Converts Firebase error codes to user-friendly error messages
@@ -56,8 +58,6 @@ class _OtpScreenState extends State<OtpScreen> {
   /// [e] - The FirebaseAuthException containing the error details
   /// Returns a user-friendly error message string
   String _getUserFriendlyErrorMessage(FirebaseAuthException e) {
-    developer.log('OtpScreen: Getting user-friendly error message for code: ${e.code}', name: 'VoloAuth');
-    
     switch (e.code) {
       // OTP verification specific errors
       case 'invalid-verification-code':

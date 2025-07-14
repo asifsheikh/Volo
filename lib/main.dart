@@ -29,41 +29,31 @@ void main() async {
     systemNavigationBarIconBrightness: Brightness.dark,
   ));
   
-  developer.log('App: Starting Firebase initialization', name: 'VoloAuth');
   try {
     // Initialize Firebase Core with platform-specific configuration
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    developer.log('App: Firebase initialized successfully', name: 'VoloAuth');
     
-    // Initialize Firebase Service with correct database
+    // Initialize Firebase Service
     await FirebaseService.initialize();
-    developer.log('App: Firebase Service initialized successfully', name: 'VoloAuth');
     
-    // Initialize Firebase App Check with production-ready configuration
+    // Initialize Firebase App Check
     if (kDebugMode) {
-      // Use debug providers for development
       await FirebaseAppCheck.instance.activate(
         androidProvider: AndroidProvider.debug,
         appleProvider: AppleProvider.debug,
       );
-      developer.log('App: Firebase App Check initialized with DEBUG providers', name: 'VoloAuth');
     } else {
-      // Use production providers for release builds
       await FirebaseAppCheck.instance.activate(
         androidProvider: AndroidProvider.playIntegrity,
         appleProvider: AppleProvider.deviceCheck,
       );
-      developer.log('App: Firebase App Check initialized with PRODUCTION providers', name: 'VoloAuth');
     }
   } catch (e) {
-    // Log and rethrow Firebase initialization errors
     developer.log('App: Firebase initialization failed: $e', name: 'VoloAuth');
     rethrow;
   }
-  
-  developer.log('App: Starting MyApp', name: 'VoloAuth');
   
   runApp(const MyApp());
 }

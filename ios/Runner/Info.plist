@@ -48,8 +48,19 @@
 	<key>NSContactsUsageDescription</key>
 	<string>This app needs access to contacts to add them for flight tracking notifications.</string>
 
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+
 	<key>FirebaseAppCheckProviderFactory</key>
 	<string>FirebaseAppCheckDebugProviderFactory</string>
+	
+	<!-- reCAPTCHA Configuration -->
+	<key>RecaptchaSiteKey</key>
+	<string>6LfOA04pAAAAAL9ttkwIz40hC63_7IsaU2MgcwVH</string>
+	<key>RecaptchaDomain</key>
+	<string>volo-app-1.firebaseapp.com</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -66,6 +77,14 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>app-1-318768314662-ios-cb7f7024924cb5ea45e9e7</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>reCAPTCHA</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.google.recaptcha.ios</string>
 			</array>
 		</dict>
 	</array>

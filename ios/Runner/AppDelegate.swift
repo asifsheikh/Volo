@@ -2,6 +2,7 @@ import Flutter
 import UIKit
 import Firebase
 import FirebaseAuth
+import FirebaseAppCheck // <--- Keep this import!
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -9,6 +10,24 @@ import FirebaseAuth
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+
+    // --- RE-ADD THIS ENTIRE BLOCK! ---
+    #if targetEnvironment(simulator)
+      let providerFactory = AppCheckDebugProviderFactory()
+      print("AppDelegate: Setting AppCheckDebugProviderFactory for simulator.")
+    #else
+      // IMPORTANT: For production, this MUST be a real attestation provider
+      // like AppAttestProviderFactory or DeviceCheckProviderFactory.
+      // For now, if you're only testing debug builds, keeping DebugProviderFactory is fine,
+      // but ensure you plan for production security.
+      let providerFactory = AppCheckDebugProviderFactory()
+    #endif
+
+    // Set the provider factory BEFORE configuring FirebaseApp.
+    // This is crucial for FirebaseAuth to pick it up correctly.
+    AppCheck.setAppCheckProviderFactory(providerFactory)
+    // --- END OF BLOCK TO RE-ADD ---
+    
     // Configure Firebase before registering plugins
     FirebaseApp.configure()
     
