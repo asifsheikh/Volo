@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 
 import 'dart:developer' as developer;
@@ -584,78 +585,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           onTap: () {},
                         ),
-                        const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
-                        ListTile(
-                          leading: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Color(0x33008080),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.psychology,
-                                color: Color(0xFF008080),
-                                size: 20,
+                        // Debug-only options
+                        if (kDebugMode) ...[
+                          const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                          ListTile(
+                            leading: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: Color(0x33008080),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Center(
+                                child: Icon(
+                                  Icons.psychology,
+                                  color: Color(0xFF008080),
+                                  size: 20,
+                                ),
                               ),
                             ),
-                          ),
-                          title: const Text(
-                            'AI Demo',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFF333333),
-                            ),
-                          ),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) => const AIDemoScreen()),
-                            );
-                          },
-                        ),
-                        const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
-                        ListTile(
-                          leading: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Color(0x33008080),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.settings,
-                                color: Color(0xFF008080),
-                                size: 20,
+                            title: const Text(
+                              'AI Demo',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w400,
+                                fontSize: 18,
+                                color: Color(0xFF333333),
                               ),
                             ),
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (context) => const AIDemoScreen()),
+                              );
+                            },
                           ),
-                          title: const Text(
-                            'Flight Data Source',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFF333333),
+                          const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                          ListTile(
+                            leading: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: Color(0x33008080),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Center(
+                                child: Icon(
+                                  Icons.settings,
+                                  color: Color(0xFF008080),
+                                  size: 20,
+                                ),
+                              ),
                             ),
-                          ),
-                          subtitle: Text(
-                            FlightApiService.getCurrentDataSource(),
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14,
-                              color: Color(0xFF6B7280),
+                            title: const Text(
+                              'Remote Configs',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w400,
+                                fontSize: 18,
+                                color: Color(0xFF333333),
+                              ),
                             ),
+                            onTap: () {
+                              // Show remote config status in a dialog
+                              _showRemoteConfigStatus();
+                            },
                           ),
-                          onTap: () {
-                            // Show remote config status in a dialog
-                            _showRemoteConfigStatus();
-                          },
-                        ),
+                        ],
                       ],
                     ),
                   ),
