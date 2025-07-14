@@ -643,14 +643,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                             ),
-                            title: const Text(
-                              'AI Demo',
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 18,
-                                color: Color(0xFF333333),
-                              ),
+                            title: Row(
+                              children: [
+                                const Text(
+                                  'AI Demo',
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 18,
+                                    color: Color(0xFF333333),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFF6B35),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Text(
+                                    'DEBUG',
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 10,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             onTap: () {
                               Navigator.of(context).push(
@@ -675,14 +696,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                             ),
-                            title: const Text(
-                              'Remote Configs',
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 18,
-                                color: Color(0xFF333333),
-                              ),
+                            title: Row(
+                              children: [
+                                const Text(
+                                  'Remote Configs',
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 18,
+                                    color: Color(0xFF333333),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFF6B35),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Text(
+                                    'DEBUG',
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 10,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             onTap: () {
                               // Show remote config status in a dialog
