@@ -4,6 +4,8 @@ import 'dart:io';
 import 'dart:developer' as developer;
 import '../../services/firebase_service.dart';
 import '../../services/profile_picture_service.dart';
+import '../../services/flight_api_service.dart';
+import '../../services/remote_config_service.dart';
 import '../ai/ai_demo_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -251,6 +253,117 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       }
     }
+  }
+
+  /// Show remote config status in a dialog
+  void _showRemoteConfigStatus() async {
+    final status = FlightApiService.getRemoteConfigStatus();
+    final dataSource = FlightApiService.getCurrentDataSource();
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Remote Config Status',
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Data Source: $dataSource',
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                  color: Color(0xFF333333),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'use_mock_flight_data: ${status['use_mock_flight_data']}',
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 14,
+                  color: Color(0xFF6B7280),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Status: ${status['status']}',
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 14,
+                  color: Color(0xFF6B7280),
+                ),
+              ),
+              if (status['last_fetch_time'] != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'Last Fetch: ${status['last_fetch_time']}',
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 12,
+                    color: Color(0xFF9CA3AF),
+                  ),
+                ),
+              ],
+              if (status['error'] != null) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'Error: ${status['error']}',
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 12,
+                    color: Color(0xFFEF4444),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                // Refresh remote config
+                Navigator.of(context).pop();
+                await RemoteConfigService().refresh();
+                // Show updated status
+                _showRemoteConfigStatus();
+              },
+              child: const Text(
+                'Refresh',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF008080),
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text(
+                'OK',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF008080),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -501,6 +614,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Navigator.of(context).push(
                               MaterialPageRoute(builder: (context) => const AIDemoScreen()),
                             );
+                          },
+                        ),
+                        const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                        ListTile(
+                          leading: Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: Color(0x33008080),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.settings,
+                                color: Color(0xFF008080),
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                          title: const Text(
+                            'Flight Data Source',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 18,
+                              color: Color(0xFF333333),
+                            ),
+                          ),
+                          subtitle: Text(
+                            FlightApiService.getCurrentDataSource(),
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 14,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                          onTap: () {
+                            // Show remote config status in a dialog
+                            _showRemoteConfigStatus();
                           },
                         ),
                       ],

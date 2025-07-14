@@ -1,12 +1,29 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'remote_config_service.dart';
+import 'dart:developer' as developer;
 
 class FlightApiService {
-  /// Toggle this flag to switch between mock and real API
-  static const bool useMockApi = true;
   static const String _baseUrl = 'https://serpapi.com/search.json';
   static const String _apiKey = 'e9f50763e5d701bdb20b8b0619488341b02f382fb648c80c336b92eb004635f2';
+  
+  /// Get whether to use mock API based on remote config
+  static bool get _useMockApi {
+    return RemoteConfigService().getUseMockFlightData();
+  }
+  
+  /// Get current data source for debugging
+  static String getCurrentDataSource() {
+    return _useMockApi ? 'Mock Data' : 'Real API';
+  }
+  
+  /// Get remote config status for debugging
+  static Map<String, dynamic> getRemoteConfigStatus() {
+    return RemoteConfigService().getAllConfigValues();
+  }
+  
+
 
   /// Search for flights using either Mock Data or the real API
   static Future<FlightSearchResponse> searchFlights({
@@ -15,13 +32,15 @@ class FlightApiService {
     required String date,
     String? flightNumber,
   }) async {
-    if (useMockApi) {
+    // Get the current remote config value
+    final useMockData = _useMockApi;
+    
+    developer.log('Searching flights: $departureIata → $arrivalIata on $date', name: 'VoloFlightAPI');
+    
+    if (useMockData) {
       // --- MOCK API RESPONSE ---
       try {
-        print('🔍 [MOCK] Searching flights: $departureIata → $arrivalIata on $date');
-        if (flightNumber != null) {
-          print('✈️ [MOCK] Filtering by flight number: $flightNumber');
-        }
+        developer.log('🔴 Using MOCK flight data', name: 'VoloFlightAPI');
         // Load mock data from JSON file
         final String jsonString = await rootBundle.loadString('assets/mock_flights_response.json');
         final Map<String, dynamic> data = json.decode(jsonString);
@@ -50,15 +69,17 @@ class FlightApiService {
         if (flightNumber != null && flightNumber.isNotEmpty) {
           searchResponse.filterByFlightNumber(flightNumber);
         }
-        print('✅ [MOCK] Found ${searchResponse.bestFlights.length} flights');
+        developer.log('✅ [MOCK] Found ${searchResponse.bestFlights.length} flights', name: 'VoloFlightAPI');
         return searchResponse;
       } catch (e) {
-        print('❌ [MOCK] Flight search error: $e');
+        developer.log('❌ [MOCK] Flight search error: $e', name: 'VoloFlightAPI');
         rethrow;
       }
     } else {
       // --- REAL API RESPONSE ---
       try {
+        developer.log('🟢 Using REAL flight API', name: 'VoloFlightAPI');
+        
         final queryParameters = {
           'engine': 'google_flights',
           'departure_id': departureIata,
@@ -67,29 +88,44 @@ class FlightApiService {
           'type': '2', // One-way trip
           'api_key': _apiKey,
         };
+        
         final uri = Uri.parse(_baseUrl).replace(queryParameters: queryParameters);
-        print('🔍 [REAL] Searching flights: $departureIata → $arrivalIata on $date');
-        if (flightNumber != null) {
-          print('✈️ [REAL] Filtering by flight number: $flightNumber');
-        }
+
         final response = await http.get(uri);
+        developer.log('🟢 API Response Status: ${response.statusCode}', name: 'VoloFlightAPI');
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
+          developer.log('🟢 API Response received successfully', name: 'VoloFlightAPI');
+          
           if (data['error'] != null) {
+            developer.log('❌ API Error: ${data['error']}', name: 'VoloFlightAPI');
             throw Exception('API Error: ${data['error']}');
           }
+          
+          // Check if we have any flights
+          final bestFlights = data['best_flights'] as List<dynamic>? ?? [];
+          final otherFlights = data['other_flights'] as List<dynamic>? ?? [];
+          
+          developer.log('🟢 API returned ${bestFlights.length} best flights and ${otherFlights.length} other flights', name: 'VoloFlightAPI');
+          
+          if (bestFlights.isEmpty && otherFlights.isEmpty) {
+            developer.log('⚠️ No flights found in API response', name: 'VoloFlightAPI');
+            throw Exception('No flights found for the specified route and date. Try adjusting your search criteria.');
+          }
+          
           final searchResponse = FlightSearchResponse.fromJson(data);
           // Filter by flight number if provided
           if (flightNumber != null && flightNumber.isNotEmpty) {
             searchResponse.filterByFlightNumber(flightNumber);
           }
-          print('✅ [REAL] Found ${searchResponse.bestFlights.length} flights');
+          developer.log('✅ [REAL] Found ${searchResponse.bestFlights.length} flights', name: 'VoloFlightAPI');
           return searchResponse;
         } else {
           throw Exception('HTTP Error: ${response.statusCode}');
         }
       } catch (e) {
-        print('❌ [REAL] Flight search error: $e');
+        developer.log('❌ [REAL] Flight search error: $e', name: 'VoloFlightAPI');
+        // Re-throw the original error so the user sees the actual API error
         rethrow;
       }
     }
@@ -134,46 +170,25 @@ class FlightSearchResponse {
 
   /// Filter flights by flight number (supports partial matches)
   void filterByFlightNumber(String searchFlightNumber) {
-    print('🔍 [FILTER] Searching for flight number: "$searchFlightNumber"');
-    
     // Count flights before filtering
     final initialBestFlights = bestFlights.length;
     final initialOtherFlights = otherFlights.length;
     
     // Filter best flights
     bestFlights.removeWhere((flight) {
-      final hasMatch = flight.containsFlightNumber(searchFlightNumber);
-      
-      if (hasMatch) {
-        print('✅ [FILTER] Found match in best flight: ${flight.flightNumbersString} (${flight.completeRoute})');
-      }
-      
-      return !hasMatch;
+      return !flight.containsFlightNumber(searchFlightNumber);
     });
     
     // Filter other flights
     otherFlights.removeWhere((flight) {
-      final hasMatch = flight.containsFlightNumber(searchFlightNumber);
-      
-      if (hasMatch) {
-        print('✅ [FILTER] Found match in other flight: ${flight.flightNumbersString} (${flight.completeRoute})');
-      }
-      
-      return !hasMatch;
+      return !flight.containsFlightNumber(searchFlightNumber);
     });
     
     // Log filtering results
     final remainingBestFlights = bestFlights.length;
     final remainingOtherFlights = otherFlights.length;
     
-    print('📊 [FILTER] Results:');
-    print('   - Best flights: $initialBestFlights → $remainingBestFlights');
-    print('   - Other flights: $initialOtherFlights → $remainingOtherFlights');
-    print('   - Total matches: ${remainingBestFlights + remainingOtherFlights}');
-    
-    if (remainingBestFlights + remainingOtherFlights == 0) {
-      print('⚠️ [FILTER] No flights found matching "$searchFlightNumber"');
-    }
+    developer.log('Filtered flights: ${initialBestFlights + initialOtherFlights} → ${remainingBestFlights + remainingOtherFlights}', name: 'VoloFlightAPI');
   }
 }
 

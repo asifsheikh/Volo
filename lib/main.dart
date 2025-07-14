@@ -6,6 +6,7 @@ import 'firebase_options.dart';
 import 'core/auth_wrapper.dart';
 import 'services/firebase_service.dart';
 import 'services/ai_service.dart';
+import 'services/remote_config_service.dart';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 
@@ -51,6 +52,16 @@ void main() async {
         appleProvider: AppleProvider.deviceCheck,
       );
     }
+    
+    // Initialize Remote Config Service
+    developer.log('Main: Starting Remote Config initialization...', name: 'VoloAuth');
+    await RemoteConfigService().initialize();
+    developer.log('Main: Remote Config initialization completed', name: 'VoloAuth');
+    
+    // Log the current value for debugging
+    final remoteConfig = RemoteConfigService();
+    final useMockData = remoteConfig.getUseMockFlightData();
+    developer.log('Main: Remote Config use_mock_flight_data = $useMockData', name: 'VoloAuth');
     
     // Initialize AI Service AFTER App Check, passing the App Check instance
     await AIService().initialize(appCheck: FirebaseAppCheck.instance);

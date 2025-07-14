@@ -194,6 +194,23 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     
     return 0;
   }
+  
+  /// Extract IATA code from airport display text
+  /// Examples:
+  /// "Delhi (DEL) – Indira Gandhi International Airport" → "DEL"
+  /// "New York (JFK)" → "JFK"
+  String _extractIataCode(String displayText) {
+    // Look for pattern like "(XXX)" where XXX is the IATA code
+    final regex = RegExp(r'\(([A-Z]{3})\)');
+    final match = regex.firstMatch(displayText);
+    if (match != null) {
+      return match.group(1) ?? '';
+    }
+    
+    // If no match found, return the original text (fallback)
+    print('⚠️ Could not extract IATA code from: $displayText');
+    return displayText;
+  }
 
   void _onDepartureAirportSelected(Airport airport) {
     setState(() {
@@ -248,9 +265,11 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   }
 
   Future<void> _searchFlights() async {
-    final departureCode = _departureCityController.text.trim();
-    final arrivalCode = _arrivalCityController.text.trim();
-    if (departureCode.isEmpty || arrivalCode.isEmpty) {
+    // Extract IATA codes from the selected airports
+    final departureIata = _extractIataCode(_departureCityController.text.trim());
+    final arrivalIata = _extractIataCode(_arrivalCityController.text.trim());
+    
+    if (departureIata.isEmpty || arrivalIata.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select both departure and arrival cities'),
@@ -259,17 +278,19 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
       );
       return;
     }
+    
+    print('🔍 Search: $departureIata → $arrivalIata');
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => FlightSelectScreen(
           searchFuture: FlightApiService.searchFlights(
-            departureIata: departureCode,
-            arrivalIata: arrivalCode,
+            departureIata: departureIata,
+            arrivalIata: arrivalIata,
             date: DateFormat('yyyy-MM-dd').format(_selectedDate!),
             flightNumber: _flightNumberController.text.isNotEmpty ? _flightNumberController.text : null,
           ),
-          departureCity: departureCode,
-          arrivalCity: arrivalCode,
+          departureCity: _departureCityController.text.trim(),
+          arrivalCity: _arrivalCityController.text.trim(),
           date: DateFormat('yyyy-MM-dd').format(_selectedDate!),
         ),
       ),
