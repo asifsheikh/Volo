@@ -654,19 +654,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     color: Color(0xFF333333),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 6),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFFF6B35),
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: const Text(
                                     'DEBUG',
                                     style: TextStyle(
                                       fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 8,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -707,19 +707,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     color: Color(0xFF333333),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 6),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFFF6B35),
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: const Text(
                                     'DEBUG',
                                     style: TextStyle(
                                       fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 8,
                                       color: Colors.white,
                                     ),
                                   ),
