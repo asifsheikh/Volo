@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:developer' as developer;
 import '../../services/firebase_service.dart';
 import '../../services/profile_picture_service.dart';
+import '../ai/ai_demo_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String username;
@@ -469,6 +470,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                           onTap: () {},
+                        ),
+                        const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                        ListTile(
+                          leading: Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: Color(0x33008080),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.psychology,
+                                color: Color(0xFF008080),
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                          title: const Text(
+                            'AI Demo',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 18,
+                              color: Color(0xFF333333),
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (context) => const AIDemoScreen()),
+                            );
+                          },
                         ),
                       ],
                     ),

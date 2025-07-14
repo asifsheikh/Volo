@@ -5,6 +5,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'firebase_options.dart';
 import 'core/auth_wrapper.dart';
 import 'services/firebase_service.dart';
+import 'services/ai_service.dart';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 
@@ -38,7 +39,7 @@ void main() async {
     // Initialize Firebase Service
     await FirebaseService.initialize();
     
-    // Initialize Firebase App Check
+    // Initialize Firebase App Check FIRST (before AI Service)
     if (kDebugMode) {
       await FirebaseAppCheck.instance.activate(
         androidProvider: AndroidProvider.debug,
@@ -50,6 +51,10 @@ void main() async {
         appleProvider: AppleProvider.deviceCheck,
       );
     }
+    
+    // Initialize AI Service AFTER App Check, passing the App Check instance
+    await AIService().initialize(appCheck: FirebaseAppCheck.instance);
+    
   } catch (e) {
     developer.log('App: Firebase initialization failed: $e', name: 'VoloAuth');
     rethrow;
