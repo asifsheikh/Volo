@@ -118,9 +118,6 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   }
 
   Future<List<Airport>> _getAirportSuggestions(String query) async {
-    if (query.length < 2) {
-      return [];
-    }
 
     final lowercaseQuery = query.toLowerCase();
     final List<Airport> filtered = [];
@@ -475,6 +472,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
         const SizedBox(height: 8),
         TypeAheadField<Airport>(
           controller: controller,
+          hideOnEmpty: true,
+          minCharsForSuggestions: 2,
           builder: (context, controller, focusNode) {
             return TextField(
               controller: controller,
@@ -526,6 +525,10 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
             );
           },
           suggestionsCallback: (pattern) async {
+            // Only show suggestions if user has typed at least 2 characters
+            if (pattern.length < 2) {
+              return [];
+            }
             return await _getAirportSuggestions(pattern);
           },
           itemBuilder: (context, Airport airport) {
