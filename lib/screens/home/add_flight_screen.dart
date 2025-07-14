@@ -329,7 +329,141 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 24), // More space below title
+                      // --- Smart Options: Upload Ticket / Scan Pass ---
+                      SizedBox(
+                        width: 350,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 169,
+                              height: 54,
+                              child: OutlinedButton(
+                                onPressed: () {},
+                                style: OutlinedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  shadowColor: Colors.black.withOpacity(0.05),
+                                  elevation: 1,
+                                  padding: EdgeInsets.zero,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.upload, color: Color(0xFF4B5563), size: 16),
+                                    const SizedBox(width: 6),
+                                    const Text(
+                                      'Upload Ticket',
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 14,
+                                        height: 1.2,
+                                        color: Color(0xFF374151),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            SizedBox(
+                              width: 169,
+                              height: 54,
+                              child: OutlinedButton(
+                                onPressed: () {},
+                                style: OutlinedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  shadowColor: Colors.black.withOpacity(0.05),
+                                  elevation: 1,
+                                  padding: EdgeInsets.zero,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.camera_alt, color: Color(0xFF4B5563), size: 16),
+                                    const SizedBox(width: 6),
+                                    const Text(
+                                      'Scan Pass',
+                                      style: TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 14,
+                                        height: 1.2,
+                                        color: Color(0xFF374151),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      // --- Helper text ---
+                      SizedBox(
+                        width: 330,
+                        child: Text(
+                          "We'll automatically extract flight details from your ticket or boarding pass.",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                            height: 1.33,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 22),
+                      // --- Divider with 'or enter manually' ---
+                      SizedBox(
+                        width: 350,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                color: Color(0xFFD1D5DB),
+                                thickness: 1,
+                                endIndent: 12,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: const Text(
+                                'or enter manually',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 12,
+                                  height: 1.33,
+                                  color: Color(0xFF9CA3AF),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Divider(
+                                color: Color(0xFFD1D5DB),
+                                thickness: 1,
+                                indent: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 28),
                       _buildLabeledField(
                         label: 'Flight Number (Optional)',
                         optional: true,
