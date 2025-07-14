@@ -5,7 +5,6 @@ import 'dart:io';
 import 'dart:developer' as developer;
 import '../../services/firebase_service.dart';
 import '../../services/profile_picture_service.dart';
-import '../../services/flight_api_service.dart';
 import '../../services/remote_config_service.dart';
 import '../ai/ai_demo_screen.dart';
 
@@ -256,89 +255,129 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  /// Show remote config status in a dialog
+  /// Show remote config values in a clean, read-only dialog
   void _showRemoteConfigStatus() async {
-    final status = FlightApiService.getRemoteConfigStatus();
-    final dataSource = FlightApiService.getCurrentDataSource();
+    final remoteConfig = RemoteConfigService();
+    final configValues = remoteConfig.getDisplayConfigValues();
 
     await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(
-            'Remote Config Status',
+            'Remote Config Values',
             style: TextStyle(
               fontFamily: 'Inter',
               fontWeight: FontWeight.w600,
               fontSize: 18,
             ),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Data Source: $dataSource',
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                  color: Color(0xFF333333),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'use_mock_flight_data: ${status['use_mock_flight_data']}',
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFF6B7280),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Status: ${status['status']}',
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFF6B7280),
-                ),
-              ),
-              if (status['last_fetch_time'] != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  'Last Fetch: ${status['last_fetch_time']}',
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                    color: Color(0xFF9CA3AF),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Status indicator
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: configValues['status'] == 'initialized' 
+                        ? const Color(0xFFD1FAE5) 
+                        : const Color(0xFFFEE2E2),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    configValues['status'] == 'initialized' ? 'Active' : 'Not Initialized',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      color: configValues['status'] == 'initialized' 
+                          ? const Color(0xFF065F46) 
+                          : const Color(0xFFDC2626),
+                    ),
                   ),
                 ),
-              ],
-              if (status['error'] != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  'Error: ${status['error']}',
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                    color: Color(0xFFEF4444),
+                const SizedBox(height: 16),
+                
+                // Config values list
+                ...configValues.entries
+                    .where((entry) => entry.key != 'status' && 
+                                     entry.key != 'last_fetch_time' && 
+                                     entry.key != 'last_fetch_status' &&
+                                     entry.key != 'all_parameters' &&
+                                     entry.key != 'default_value' &&
+                                     entry.key != 'string_value' &&
+                                     entry.key != 'parameter_exists' &&
+                                     entry.key != 'error')
+                    .map((entry) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              entry.key,
+                              style: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                                color: Color(0xFF374151),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF3F4F6),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                entry.value.toString(),
+                                style: const TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                  color: Color(0xFF1F2937),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
+                
+                // Last fetch time (if available)
+                if (configValues['last_fetch_time'] != null) ...[
+                  const SizedBox(height: 16),
+                  const Divider(height: 1, color: Color(0xFFE5E7EB)),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Last Updated: ${configValues['last_fetch_time']}',
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      color: Color(0xFF9CA3AF),
+                    ),
                   ),
-                ),
+                ],
               ],
-            ],
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () async {
                 // Refresh remote config
                 Navigator.of(context).pop();
-                await RemoteConfigService().refresh();
-                // Show updated status
+                await remoteConfig.refresh();
+                // Show updated values
                 _showRemoteConfigStatus();
               },
               child: const Text(
@@ -353,11 +392,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: const Text(
-                'OK',
+                'Close',
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF008080),
+                  color: Color(0xFF6B7280),
                 ),
               ),
             ),

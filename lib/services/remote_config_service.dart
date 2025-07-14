@@ -152,4 +152,27 @@ class RemoteConfigService {
       };
     }
   }
+  
+  /// Get clean config values for UI display (read-only)
+  Map<String, dynamic> getDisplayConfigValues() {
+    if (!_isInitialized) {
+      return {
+        'use_mock_flight_data': RemoteConfigDefaults.useMockFlightData,
+        'status': 'not_initialized',
+      };
+    }
+
+    try {
+      return {
+        'use_mock_flight_data': getUseMockFlightData(),
+        'status': 'initialized',
+        'last_fetch_time': _remoteConfig.lastFetchTime?.toIso8601String(),
+      };
+    } catch (e) {
+      return {
+        'use_mock_flight_data': RemoteConfigDefaults.useMockFlightData,
+        'status': 'error_getting_values',
+      };
+    }
+  }
 } 
