@@ -497,16 +497,6 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                         ),
                       ),
                       const SizedBox(height: 28),
-                      _buildLabeledField(
-                        label: 'Flight Number (Optional)',
-                        optional: true,
-                        icon: Icons.flight,
-                        controller: _flightNumberController,
-                        hintText: 'e.g. UA1234',
-                      ),
-                      const SizedBox(height: 24),
-                      _buildDateField(),
-                      const SizedBox(height: 24),
                       _buildTypeAheadField(
                         label: 'From',
                         icon: Icons.flight_takeoff,
@@ -527,8 +517,17 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                         isAirportSelected: _selectedArrivalAirport != null,
                       ),
                       const SizedBox(height: 24),
-                      // Remove card effect disclaimer, use subtle text
-                      const SizedBox(height: 8),
+                      _buildDateField(),
+                      const SizedBox(height: 24),
+                      _buildLabeledField(
+                        label: 'Flight Number (Optional)',
+                        optional: true,
+                        icon: Icons.flight,
+                        controller: _flightNumberController,
+                        hintText: 'e.g. UA1234',
+                      ),
+                      const SizedBox(height: 16),
+                      // Helper text for flight number and general guidance
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
