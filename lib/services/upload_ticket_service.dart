@@ -224,9 +224,36 @@ class UploadTicketService {
         return false;
       }
 
+      // Show loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Row(
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(width: 16),
+                const Text(
+                  'Processing ticket...',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+
       // Store file data
       _uploadedFileData = fileData;
       _uploadedFileName = fileName ?? 'uploaded_file';
+
+      // Close loading dialog
+      Navigator.of(context).pop();
 
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -242,6 +269,11 @@ class UploadTicketService {
 
     } catch (e) {
       developer.log('UploadTicketService: Error uploading ticket: $e', name: 'VoloUpload');
+      
+      // Close loading dialog if open
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
