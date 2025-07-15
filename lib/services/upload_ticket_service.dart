@@ -229,6 +229,10 @@ class UploadTicketService {
         return false;
       }
 
+      // Store file data
+      _uploadedFileData = fileData;
+      _uploadedFileName = fileName ?? 'uploaded_file';
+
       // Show comprehensive loading dialog
       showDialog(
         context: context,
@@ -236,43 +240,37 @@ class UploadTicketService {
         builder: (BuildContext context) {
           return _ProcessingTicketDialog(
             fileName: fileName ?? 'uploaded_file',
+            processingFunction: () async {
+              if (fileData == null) {
+                throw Exception('File data is null');
+              }
+              return await _extractionService.extractFlightInfo(fileData, fileName ?? 'uploaded_file');
+            },
+            onSuccess: (flightData) {
+              // Show success message
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Successfully extracted flight information from ${_uploadedFileName}'),
+                  backgroundColor: Colors.green,
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+              
+              developer.log('UploadTicketService: Flight info extracted successfully: $flightData', name: 'VoloUpload');
+              
+              if (onSuccess != null) {
+                onSuccess(flightData);
+              }
+            },
+            onCancel: () {
+              // User cancelled the operation
+              developer.log('UploadTicketService: User cancelled ticket processing', name: 'VoloUpload');
+            },
           );
         },
       );
 
-      // Store file data
-      _uploadedFileData = fileData;
-      _uploadedFileName = fileName ?? 'uploaded_file';
-
-      // Extract flight information using AI
-      final Map<String, dynamic>? flightData = await _extractionService.extractFlightInfo(fileData, fileName ?? 'uploaded_file');
-
-      // Close loading dialog
-      Navigator.of(context).pop();
-
-      if (flightData != null) {
-        // Success - populate form fields
-        if (onSuccess != null) {
-          onSuccess(flightData);
-        }
-
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Successfully extracted flight information from ${_uploadedFileName}'),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-
-        developer.log('UploadTicketService: Flight info extracted successfully: $flightData', name: 'VoloUpload');
-        return true;
-
-      } else {
-        // Show error dialog for failed extraction
-        _showExtractionErrorDialog(context);
-        return false;
-      }
+      return true;
 
     } catch (e) {
       developer.log('UploadTicketService: Error uploading ticket: $e', name: 'VoloUpload');
@@ -283,69 +281,72 @@ class UploadTicketService {
       }
       
       // Show error dialog
-      _showExtractionErrorDialog(context);
-      return false;
-    }
-  }
-
-  /// Show error dialog for failed ticket extraction
-  static void _showExtractionErrorDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.error_outline, color: Color(0xFFDC2626), size: 24),
-              SizedBox(width: 8),
-              Text(
-                'Failed to Parse Ticket',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                  color: Color(0xFF111827),
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Row(
+              children: [
+                Icon(Icons.error_outline, color: Color(0xFFDC2626), size: 24),
+                SizedBox(width: 8),
+                Text(
+                  'Upload Failed',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    color: Color(0xFF111827),
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              'Failed to upload file: ${e.toString()}',
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                fontSize: 16,
+                color: Color(0xFF4B5563),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'OK',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    color: Color(0xFF008080),
+                  ),
                 ),
               ),
             ],
-          ),
-          content: const Text(
-            'We couldn\'t extract flight information from this file. Please make sure you\'ve uploaded a valid flight ticket or boarding pass.',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w400,
-              fontSize: 16,
-              color: Color(0xFF4B5563),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text(
-                'OK',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                  color: Color(0xFF008080),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
+          );
+        },
+      );
+      return false;
+    }
   }
 }
 
 /// Comprehensive loading dialog for ticket processing
 class _ProcessingTicketDialog extends StatefulWidget {
   final String fileName;
+  final Future<Map<String, dynamic>?> Function() processingFunction;
+  final Function(Map<String, dynamic>) onSuccess;
+  final Function() onCancel;
 
-  const _ProcessingTicketDialog({required this.fileName});
+  const _ProcessingTicketDialog({
+    required this.fileName,
+    required this.processingFunction,
+    required this.onSuccess,
+    required this.onCancel,
+  });
 
   @override
   State<_ProcessingTicketDialog> createState() => _ProcessingTicketDialogState();
@@ -354,13 +355,19 @@ class _ProcessingTicketDialog extends StatefulWidget {
 class _ProcessingTicketDialogState extends State<_ProcessingTicketDialog> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  
+  // Step status tracking
   int _currentStep = 0;
-  final List<String> _processingSteps = [
-    'Validating file format...',
-    'Analyzing ticket content...',
-    'Extracting flight information...',
-    'Processing data...',
-    'Finalizing results...',
+  bool _isProcessing = true;
+  bool _hasFailed = false;
+  String? _failureMessage;
+  
+  final List<ProcessingStep> _processingSteps = [
+    ProcessingStep('Validating file format...', 'Validating file format'),
+    ProcessingStep('Analyzing ticket content...', 'Analyzing ticket content'),
+    ProcessingStep('Extracting flight information...', 'Extracting flight information'),
+    ProcessingStep('Processing data...', 'Processing data'),
+    ProcessingStep('Finalizing results...', 'Finalizing results'),
   ];
 
   @override
@@ -374,7 +381,7 @@ class _ProcessingTicketDialogState extends State<_ProcessingTicketDialog> with T
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
     _animationController.forward();
-    _startProcessingSteps();
+    _startProcessing();
   }
 
   @override
@@ -383,38 +390,74 @@ class _ProcessingTicketDialogState extends State<_ProcessingTicketDialog> with T
     super.dispose();
   }
 
-  void _startProcessingSteps() {
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        setState(() {
-          _currentStep = 1;
-        });
+  Future<void> _startProcessing() async {
+    try {
+      // Step 1: Validating file format
+      await _updateStep(0, StepStatus.completed);
+      await _updateStep(1, StepStatus.active);
+      
+      // Step 2: Analyzing ticket content
+      await Future.delayed(const Duration(milliseconds: 800));
+      await _updateStep(1, StepStatus.completed);
+      await _updateStep(2, StepStatus.active);
+      
+      // Step 3: Extracting flight information (this is where the actual AI processing happens)
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      // Call the actual processing function
+      final result = await widget.processingFunction();
+      
+      if (result != null) {
+        // Success - complete remaining steps
+        await _updateStep(2, StepStatus.completed);
+        await _updateStep(3, StepStatus.active);
+        await Future.delayed(const Duration(milliseconds: 600));
+        await _updateStep(3, StepStatus.completed);
+        await _updateStep(4, StepStatus.active);
+        await Future.delayed(const Duration(milliseconds: 400));
+        await _updateStep(4, StepStatus.completed);
+        
+        // Success - close dialog and populate form
+        if (mounted) {
+          Navigator.of(context).pop();
+          widget.onSuccess(result);
+        }
+      } else {
+        // Failed at extraction step
+        await _updateStep(2, StepStatus.failed, 'Failed to extract flight information');
+        _handleFailure('Unable to extract flight information from this file. Please make sure you\'ve uploaded a valid flight ticket or boarding pass.');
       }
-    });
+      
+    } catch (e) {
+      // Failed at current step
+      await _updateStep(_currentStep, StepStatus.failed, e.toString());
+      _handleFailure('Processing failed: ${e.toString()}');
+    }
+  }
 
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      if (mounted) {
-        setState(() {
-          _currentStep = 2;
-        });
-      }
-    });
+  Future<void> _updateStep(int stepIndex, StepStatus status, [String? errorMessage]) async {
+    if (mounted) {
+      setState(() {
+        _processingSteps[stepIndex].status = status;
+        _processingSteps[stepIndex].errorMessage = errorMessage;
+        _currentStep = stepIndex;
+      });
+    }
+  }
 
-    Future.delayed(const Duration(milliseconds: 2500), () {
-      if (mounted) {
-        setState(() {
-          _currentStep = 3;
-        });
-      }
-    });
+  void _handleFailure(String message) {
+    if (mounted) {
+      setState(() {
+        _isProcessing = false;
+        _hasFailed = true;
+        _failureMessage = message;
+      });
+    }
+  }
 
-    Future.delayed(const Duration(milliseconds: 3500), () {
-      if (mounted) {
-        setState(() {
-          _currentStep = 4;
-        });
-      }
-    });
+  void _handleCancel() {
+    widget.onCancel();
+    Navigator.of(context).pop();
   }
 
   @override
@@ -434,12 +477,14 @@ class _ProcessingTicketDialogState extends State<_ProcessingTicketDialog> with T
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF008080).withOpacity(0.1),
+                    color: _hasFailed 
+                      ? const Color(0xFFDC2626).withOpacity(0.1)
+                      : const Color(0xFF008080).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
-                    Icons.upload_file,
-                    color: Color(0xFF008080),
+                  child: Icon(
+                    _hasFailed ? Icons.error_outline : Icons.upload_file,
+                    color: _hasFailed ? const Color(0xFFDC2626) : const Color(0xFF008080),
                     size: 24,
                   ),
                 ),
@@ -448,13 +493,13 @@ class _ProcessingTicketDialogState extends State<_ProcessingTicketDialog> with T
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Processing Ticket',
+                      Text(
+                        _hasFailed ? 'Processing Failed' : 'Processing Ticket',
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w700,
                           fontSize: 18,
-                          color: Color(0xFF111827),
+                          color: _hasFailed ? const Color(0xFFDC2626) : const Color(0xFF111827),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -476,19 +521,27 @@ class _ProcessingTicketDialogState extends State<_ProcessingTicketDialog> with T
             ),
             const SizedBox(height: 24),
             
-            // Processing animation
+            // Processing animation or failure icon
             Container(
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: const Color(0xFF008080).withOpacity(0.1),
+                color: _hasFailed 
+                  ? const Color(0xFFDC2626).withOpacity(0.1)
+                  : const Color(0xFF008080).withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF008080)),
-                  strokeWidth: 3,
-                ),
+              child: Center(
+                child: _hasFailed
+                  ? const Icon(
+                      Icons.error_outline,
+                      color: Color(0xFFDC2626),
+                      size: 40,
+                    )
+                  : const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF008080)),
+                      strokeWidth: 3,
+                    ),
               ),
             ),
             const SizedBox(height: 24),
@@ -499,9 +552,7 @@ class _ProcessingTicketDialogState extends State<_ProcessingTicketDialog> with T
               child: Column(
                 children: _processingSteps.asMap().entries.map((entry) {
                   final int index = entry.key;
-                  final String step = entry.value;
-                  final bool isActive = index == _currentStep;
-                  final bool isCompleted = index < _currentStep;
+                  final ProcessingStep step = entry.value;
                   
                   return Container(
                     margin: const EdgeInsets.only(bottom: 12),
@@ -512,40 +563,37 @@ class _ProcessingTicketDialogState extends State<_ProcessingTicketDialog> with T
                           height: 20,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: isCompleted 
-                              ? const Color(0xFF10B981)
-                              : isActive 
-                                ? const Color(0xFF008080)
-                                : Colors.grey[300],
+                            color: _getStepColor(step.status),
                           ),
-                          child: isCompleted
-                            ? const Icon(
-                                Icons.check,
-                                color: Colors.white,
-                                size: 12,
-                              )
-                            : isActive
-                              ? const Icon(
-                                  Icons.radio_button_checked,
-                                  color: Colors.white,
-                                  size: 12,
-                                )
-                              : null,
+                          child: _getStepIcon(step.status),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Text(
-                            step,
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                              fontSize: 14,
-                              color: isActive 
-                                ? const Color(0xFF111827)
-                                : isCompleted
-                                  ? const Color(0xFF10B981)
-                                  : const Color(0xFF6B7280),
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                step.displayText,
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: step.status == StepStatus.active ? FontWeight.w600 : FontWeight.w400,
+                                  fontSize: 14,
+                                  color: _getStepTextColor(step.status),
+                                ),
+                              ),
+                              if (step.errorMessage != null) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  step.errorMessage!,
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 12,
+                                    color: Color(0xFFDC2626),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
                       ],
@@ -558,19 +606,63 @@ class _ProcessingTicketDialogState extends State<_ProcessingTicketDialog> with T
             
             // Progress indicator
             LinearProgressIndicator(
-              value: (_currentStep + 1) / _processingSteps.length,
+              value: _hasFailed ? 0.0 : (_currentStep + 1) / _processingSteps.length,
               backgroundColor: Colors.grey[200],
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF008080)),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                _hasFailed ? const Color(0xFFDC2626) : const Color(0xFF008080)
+              ),
             ),
             const SizedBox(height: 8),
             
-            Text(
-              '${_currentStep + 1} of ${_processingSteps.length} steps',
-              style: const TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                fontSize: 12,
-                color: Color(0xFF6B7280),
+            if (!_hasFailed) ...[
+              Text(
+                '${_currentStep + 1} of ${_processingSteps.length} steps',
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 12,
+                  color: Color(0xFF6B7280),
+                ),
+              ),
+            ],
+            
+            if (_hasFailed && _failureMessage != null) ...[
+              const SizedBox(height: 16),
+              Text(
+                _failureMessage!,
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 14,
+                  color: Color(0xFF4B5563),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+            
+            const SizedBox(height: 24),
+            
+            // Cancel/OK button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _handleCancel,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _hasFailed ? const Color(0xFFDC2626) : const Color(0xFF6B7280),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  _hasFailed ? 'OK' : 'Cancel',
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                  ),
+                ),
               ),
             ),
           ],
@@ -578,4 +670,68 @@ class _ProcessingTicketDialogState extends State<_ProcessingTicketDialog> with T
       ),
     );
   }
+
+  Color _getStepColor(StepStatus status) {
+    switch (status) {
+      case StepStatus.pending:
+        return Colors.grey[300]!;
+      case StepStatus.active:
+        return const Color(0xFF008080);
+      case StepStatus.completed:
+        return const Color(0xFF10B981);
+      case StepStatus.failed:
+        return const Color(0xFFDC2626);
+    }
+  }
+
+  Widget? _getStepIcon(StepStatus status) {
+    switch (status) {
+      case StepStatus.pending:
+        return null;
+      case StepStatus.active:
+        return const Icon(
+          Icons.radio_button_checked,
+          color: Colors.white,
+          size: 12,
+        );
+      case StepStatus.completed:
+        return const Icon(
+          Icons.check,
+          color: Colors.white,
+          size: 12,
+        );
+      case StepStatus.failed:
+        return const Icon(
+          Icons.close,
+          color: Colors.white,
+          size: 12,
+        );
+    }
+  }
+
+  Color _getStepTextColor(StepStatus status) {
+    switch (status) {
+      case StepStatus.pending:
+        return const Color(0xFF6B7280);
+      case StepStatus.active:
+        return const Color(0xFF111827);
+      case StepStatus.completed:
+        return const Color(0xFF10B981);
+      case StepStatus.failed:
+        return const Color(0xFFDC2626);
+    }
+  }
+}
+
+// Step status enum
+enum StepStatus { pending, active, completed, failed }
+
+// Processing step class
+class ProcessingStep {
+  String displayText;
+  String originalText;
+  StepStatus status;
+  String? errorMessage;
+
+  ProcessingStep(this.originalText, this.displayText, {this.status = StepStatus.pending, this.errorMessage});
 } 
