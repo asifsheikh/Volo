@@ -47,6 +47,10 @@
 	<true/>
 	<key>NSContactsUsageDescription</key>
 	<string>This app needs access to contacts to add them for flight tracking notifications.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to scan flight tickets and boarding passes.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs photo library access to upload flight tickets and boarding passes.</string>
 
 	<key>UIBackgroundModes</key>
 	<array>

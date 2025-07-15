@@ -409,7 +409,24 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                             child: SizedBox(
                               height: 58,
                               child: OutlinedButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  try {
+                                    final result = await UploadTicketService.scanPass(
+                                      context,
+                                      onSuccess: _populateFormFromTicket,
+                                    );
+                                    print('Scan Pass result: $result');
+                                  } catch (e) {
+                                    print('Scan Pass error: $e');
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Failed to scan ticket: $e'),
+                                        backgroundColor: Colors.red,
+                                        duration: const Duration(seconds: 3),
+                                      ),
+                                    );
+                                  }
+                                },
                                 style: OutlinedButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
@@ -535,7 +552,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                           SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'Flight number helps us find exact matches. You can search by city name or airport code (like DEL for Delhi).',
+                              'Flight number helps us find exact matches.',
                               style: TextStyle(
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w400,

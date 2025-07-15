@@ -220,6 +220,213 @@ class UploadTicketService {
     }
   }
 
+  /// Capture image from camera
+  static Future<Uint8List?> _captureImageFromCamera() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 2048,
+        maxHeight: 2048,
+        imageQuality: 90,
+      );
+
+      if (image != null) {
+        final File file = File(image.path);
+        final Uint8List bytes = await file.readAsBytes();
+        return bytes;
+      }
+      
+      return null;
+    } catch (e) {
+      developer.log('UploadTicketService: Error capturing image from camera: $e', name: 'VoloUpload');
+      return null;
+    }
+  }
+
+  /// Scan pass using camera
+  static Future<bool> scanPass(BuildContext context, {TicketExtractionCallback? onSuccess}) async {
+    try {
+      // Show camera options dialog first
+      final bool? shouldProceed = await _showCameraOptionsDialog(context);
+      
+      if (shouldProceed != true) {
+        return false; // User cancelled
+      }
+
+      // Capture image from camera
+      final Uint8List? imageData = await _captureImageFromCamera();
+      
+      if (imageData == null) {
+        return false; // User cancelled or camera failed
+      }
+
+      // Store file data
+      _uploadedFileData = imageData;
+      _uploadedFileName = 'scanned_ticket.jpg';
+
+      // Show comprehensive loading dialog and process the image
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return _ProcessingTicketDialog(
+            fileName: 'scanned_ticket.jpg',
+            processingFunction: () async {
+              return await _extractionService.extractFlightInfo(imageData, 'scanned_ticket.jpg');
+            },
+            onSuccess: (ticketData) {
+              // Handle extraction success
+              _handleExtractionSuccess(context, ticketData, onSuccess);
+            },
+            onCancel: () {
+              // User cancelled the operation
+              developer.log('UploadTicketService: User cancelled ticket processing', name: 'VoloUpload');
+            },
+          );
+        },
+      );
+
+      return true;
+
+    } catch (e) {
+      developer.log('UploadTicketService: Error scanning pass: $e', name: 'VoloUpload');
+      
+      // Show error dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: const Row(
+              children: [
+                Icon(Icons.error_outline, color: Color(0xFFDC2626), size: 24),
+                SizedBox(width: 8),
+                Text(
+                  'Scan Failed',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    color: Color(0xFF111827),
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              'Failed to scan ticket: ${e.toString()}',
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                fontSize: 16,
+                color: Color(0xFF4B5563),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'OK',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    color: Color(0xFF008080),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+      return false;
+    }
+  }
+
+  /// Show camera options dialog
+  static Future<bool?> _showCameraOptionsDialog(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF008080).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.camera_alt,
+                  color: Color(0xFF008080),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Scan Ticket',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 20,
+                  color: Color(0xFF111827),
+                ),
+              ),
+            ],
+          ),
+          content: const Text(
+            'The camera will open to scan your ticket. You can take a photo and then choose "Use Photo" or "Retake" in the camera app.',
+            style: TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w400,
+              fontSize: 16,
+              color: Color(0xFF4B5563),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                  color: Color(0xFF6B7280),
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF008080),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              child: const Text(
+                'Open Camera',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   /// Pick file from file system
   static Future<Uint8List?> _pickFileFromSystem() async {
     try {
@@ -399,6 +606,8 @@ class UploadTicketService {
     }
   }
 }
+
+
 
 /// Comprehensive loading dialog for ticket processing
 class _ProcessingTicketDialog extends StatefulWidget {
