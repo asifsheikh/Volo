@@ -73,6 +73,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   DateTime? _selectedDate;
   String? _selectedDepartureCity;
   String? _selectedArrivalCity;
+  Airport? _selectedDepartureAirport;
+  Airport? _selectedArrivalAirport;
   
   List<Airport> _allAirports = [];
   bool _isLoadingAirports = false;
@@ -193,6 +195,30 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     
     return 0;
   }
+
+  /// Get popular airports for empty field suggestions
+  List<Airport> _getPopularAirports() {
+    final popularIataCodes = [
+      'JFK', 'LAX', 'LHR', 'CDG', 'DEL', 'BOM', 'SIN', 'HKG', 'DXB', 'FRA',
+      'AMS', 'MAD', 'BCN', 'MIA', 'ORD', 'ATL', 'DFW', 'DEN', 'SFO', 'SEA'
+    ];
+    
+    final List<Airport> popularAirports = [];
+    for (final iata in popularIataCodes) {
+      final airport = _allAirports.where((a) => a.iata == iata).firstOrNull;
+      if (airport != null) {
+        popularAirports.add(airport);
+      }
+    }
+    
+    return popularAirports;
+  }
+
+  /// Show popular airports when field is tapped and empty
+  void _showPopularAirports(BuildContext context, TextEditingController controller, Function(Airport) onSelected) {
+    // This will be handled by the suggestionsCallback when pattern is empty
+    // The TypeAheadField will automatically show suggestions
+  }
   
   /// Extract IATA code from airport display text
   /// Examples:
@@ -215,6 +241,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     setState(() {
       _departureCityController.text = airport.displayName;
       _selectedDepartureCity = airport.displayName;
+      _selectedDepartureAirport = airport; // Track the selected airport object
     });
   }
 
@@ -222,13 +249,14 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     setState(() {
       _arrivalCityController.text = airport.displayName;
       _selectedArrivalCity = airport.displayName;
+      _selectedArrivalAirport = airport; // Track the selected airport object
     });
   }
 
   bool get _isFormValid {
     return _selectedDate != null &&
-        _selectedDepartureCity != null &&
-        _selectedArrivalCity != null;
+        _selectedDepartureAirport != null &&
+        _selectedArrivalAirport != null;
   }
 
   void _pickDate() async {
@@ -264,19 +292,19 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   }
 
   Future<void> _searchFlights() async {
-    // Extract IATA codes from the selected airports
-    final departureIata = _extractIataCode(_departureCityController.text.trim());
-    final arrivalIata = _extractIataCode(_arrivalCityController.text.trim());
-    
-    if (departureIata.isEmpty || arrivalIata.isEmpty) {
+    // Use the selected airport objects directly
+    if (_selectedDepartureAirport == null || _selectedArrivalAirport == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please select both departure and arrival cities'),
+          content: Text('Please select both departure and arrival airports'),
           backgroundColor: Color(0xFFDC2626),
         ),
       );
       return;
     }
+    
+    final departureIata = _selectedDepartureAirport!.iata;
+    final arrivalIata = _selectedArrivalAirport!.iata;
     
     print('🔍 Search: $departureIata → $arrivalIata');
     Navigator.of(context).push(
@@ -486,6 +514,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                         hintText: 'Search city or airport code',
                         onSelected: _onDepartureAirportSelected,
                         isLoading: _isLoadingAirports,
+                        isAirportSelected: _selectedDepartureAirport != null,
                       ),
                       const SizedBox(height: 24),
                       _buildTypeAheadField(
@@ -495,6 +524,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                         hintText: 'Search city or airport code',
                         onSelected: _onArrivalAirportSelected,
                         isLoading: _isLoadingAirports,
+                        isAirportSelected: _selectedArrivalAirport != null,
                       ),
                       const SizedBox(height: 24),
                       // Remove card effect disclaimer, use subtle text
@@ -578,6 +608,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     required String hintText,
     required Function(Airport) onSelected,
     required bool isLoading,
+    required bool isAirportSelected, // New parameter to track if airport is selected
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -606,60 +637,93 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
         const SizedBox(height: 8),
         TypeAheadField<Airport>(
           controller: controller,
-          hideOnEmpty: true,
+          hideOnEmpty: true, // Hide suggestions when empty to prevent "No items found"
           builder: (context, controller, focusNode) {
-            return TextField(
-              controller: controller,
-              focusNode: focusNode,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white,
-                hintText: hintText,
-                hintStyle: TextStyle(
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Color(0xFFE5E7EB)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 2,
+                    offset: Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: TextField(
+                controller: controller,
+                focusNode: focusNode,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.transparent,
+                  hintText: hintText,
+                  hintStyle: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                    color: Color(0xFFADAEBC),
+                  ),
+                  prefixIcon: Icon(icon, color: Color(0xFF9CA3AF), size: 20),
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isLoading)
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF9CA3AF)),
+                            ),
+                          ),
+                        ),
+                      // Success indicator (green checkmark)
+                      if (isAirportSelected && !isLoading)
+                        Container(
+                          margin: EdgeInsets.only(right: 8),
+                          child: Icon(
+                            Icons.check_circle,
+                            color: Color(0xFF10B981),
+                            size: 20,
+                          ),
+                        ),
+                      // Dropdown indicator
+                      Container(
+                        margin: EdgeInsets.only(right: 12),
+                        child: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: isAirportSelected ? Color(0xFF10B981) : Color(0xFF9CA3AF),
+                          size: 24,
+                        ),
+                      ),
+                    ],
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                ),
+                style: TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w400,
                   fontSize: 16,
-                  color: Color(0xFFADAEBC),
+                  color: Color(0xFF1F2937),
                 ),
-                prefixIcon: Icon(icon, color: Color(0xFF9CA3AF), size: 20),
-                suffixIcon: isLoading
-                    ? Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF9CA3AF)),
-                          ),
-                        ),
-                      )
-                    : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Color(0xFFE5E7EB)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Color(0xFFE5E7EB)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Color(0xFF1F2937), width: 2),
-                ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              ),
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                fontSize: 16,
-                color: Color(0xFF1F2937),
+                onTap: () {
+                  // Show suggestions when field is tapped
+                  if (controller.text.isEmpty) {
+                    // If empty, show popular airports
+                    _showPopularAirports(context, controller, onSelected);
+                  }
+                },
               ),
             );
           },
           suggestionsCallback: (pattern) async {
-            // Only show suggestions if user has typed at least 2 characters
-            if (pattern.length < 2) {
+            // Only show suggestions if user has typed at least 1 character
+            if (pattern.length < 1) {
               return [];
             }
             return await _getAirportSuggestions(pattern);
@@ -694,6 +758,29 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
             onSelected(airport);
           },
         ),
+        // Helper text for fields that need attention
+        if (!isAirportSelected && controller.text.isNotEmpty && !isLoading) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(
+                Icons.info_outline,
+                color: Color(0xFF6B7280),
+                size: 14,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'Please select a specific airport',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 12,
+                  color: Color(0xFF6B7280),
+                ),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }
@@ -857,6 +944,29 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     );
   }
 
+  /// Find airport object by city name and IATA code (only exact matches)
+  Airport? _findAirportByCityAndIata(String city, String iata) {
+    final normalizedCity = city.toLowerCase().trim();
+    final normalizedIata = iata.toUpperCase().trim();
+    
+    developer.log('AddFlightScreen: Looking for airport - City: "$city", IATA: "$iata"', name: 'VoloUpload');
+    
+    // Only try exact matches - no auto-selection for city names
+    for (final airport in _allAirports) {
+      final airportCity = airport.city.toLowerCase().trim();
+      final airportIata = airport.iata.toUpperCase().trim();
+      
+      // Check if city and IATA code match exactly
+      if (airportCity == normalizedCity && airportIata == normalizedIata) {
+        developer.log('AddFlightScreen: Found exact match: ${airport.displayName}', name: 'VoloUpload');
+        return airport;
+      }
+    }
+    
+    developer.log('AddFlightScreen: Could not find exact airport match for $city ($iata)', name: 'VoloUpload');
+    return null;
+  }
+
   /// Populate form fields from extracted ticket data
   void _populateFormFromTicket(Map<String, dynamic> ticketData) {
     try {
@@ -883,22 +993,68 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
       final String? departureCity = ticketData['departureCity'] as String?;
       final String? departureAirport = ticketData['departureAirport'] as String?;
       if (departureCity != null && departureAirport != null) {
-        final String departureDisplay = '$departureCity ($departureAirport)';
-        setState(() {
-          _departureCityController.text = departureDisplay;
-          _selectedDepartureCity = departureDisplay;
-        });
+        // Check if departureAirport is a valid IATA code (3 uppercase letters)
+        final bool isDepartureValidIata = RegExp(r'^[A-Z]{3}$').hasMatch(departureAirport.toUpperCase().trim());
+        
+        if (isDepartureValidIata) {
+          // If it's a valid IATA code, try to find the airport
+          final Airport? departureAirportObj = _findAirportByCityAndIata(departureCity, departureAirport);
+          if (departureAirportObj != null) {
+            // Use the airport object to populate (same as dropdown selection)
+            _onDepartureAirportSelected(departureAirportObj);
+            developer.log('AddFlightScreen: Found departure airport: ${departureAirportObj.displayName}', name: 'VoloUpload');
+          } else {
+            // Valid IATA but not found in database, pre-populate with city name
+            setState(() {
+              _departureCityController.text = departureCity;
+              _selectedDepartureCity = departureCity;
+              _selectedDepartureAirport = null; // Clear airport object since we only have city name
+            });
+            developer.log('AddFlightScreen: Pre-populated departure with city: $departureCity (IATA not found)', name: 'VoloUpload');
+          }
+        } else {
+          // Not a valid IATA code, pre-populate with city name only
+          setState(() {
+            _departureCityController.text = departureCity;
+            _selectedDepartureCity = departureCity;
+            _selectedDepartureAirport = null; // Clear airport object since we only have city name
+          });
+          developer.log('AddFlightScreen: Pre-populated departure with city: $departureCity (not valid IATA)', name: 'VoloUpload');
+        }
       }
 
       // Extract arrival information
       final String? arrivalCity = ticketData['arrivalCity'] as String?;
       final String? arrivalAirport = ticketData['arrivalAirport'] as String?;
       if (arrivalCity != null && arrivalAirport != null) {
-        final String arrivalDisplay = '$arrivalCity ($arrivalAirport)';
-        setState(() {
-          _arrivalCityController.text = arrivalDisplay;
-          _selectedArrivalCity = arrivalDisplay;
-        });
+        // Check if arrivalAirport is a valid IATA code (3 uppercase letters)
+        final bool isArrivalValidIata = RegExp(r'^[A-Z]{3}$').hasMatch(arrivalAirport.toUpperCase().trim());
+        
+        if (isArrivalValidIata) {
+          // If it's a valid IATA code, try to find the airport
+          final Airport? arrivalAirportObj = _findAirportByCityAndIata(arrivalCity, arrivalAirport);
+          if (arrivalAirportObj != null) {
+            // Use the airport object to populate (same as dropdown selection)
+            _onArrivalAirportSelected(arrivalAirportObj);
+            developer.log('AddFlightScreen: Found arrival airport: ${arrivalAirportObj.displayName}', name: 'VoloUpload');
+          } else {
+            // Valid IATA but not found in database, pre-populate with city name
+            setState(() {
+              _arrivalCityController.text = arrivalCity;
+              _selectedArrivalCity = arrivalCity;
+              _selectedArrivalAirport = null; // Clear airport object since we only have city name
+            });
+            developer.log('AddFlightScreen: Pre-populated arrival with city: $arrivalCity (IATA not found)', name: 'VoloUpload');
+          }
+        } else {
+          // Not a valid IATA code, pre-populate with city name only
+          setState(() {
+            _arrivalCityController.text = arrivalCity;
+            _selectedArrivalCity = arrivalCity;
+            _selectedArrivalAirport = null; // Clear airport object since we only have city name
+          });
+          developer.log('AddFlightScreen: Pre-populated arrival with city: $arrivalCity (not valid IATA)', name: 'VoloUpload');
+        }
       }
 
       developer.log('AddFlightScreen: Form populated with ticket data: $ticketData', name: 'VoloUpload');

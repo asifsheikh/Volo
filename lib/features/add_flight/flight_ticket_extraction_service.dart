@@ -87,12 +87,17 @@ IMPORTANT: Return ONLY a valid JSON object with the following structure:
   "flightNumber": "string (e.g., UA1234, AA5678, QR001)",
   "departureDate": "YYYY-MM-DD format (e.g., 2024-01-15)",
   "departureCity": "string (e.g., New York, London, Tokyo)",
-  "departureAirport": "string (3-letter IATA code, e.g., JFK, LHR, NRT)",
+  "departureAirport": "string (3-letter IATA code, e.g., JFK, LHR, NRT) - if no airport code is visible, use the city name",
   "arrivalCity": "string (e.g., Los Angeles, Paris, Dubai)",
-  "arrivalAirport": "string (3-letter IATA code, e.g., LAX, CDG, DXB)"
+  "arrivalAirport": "string (3-letter IATA code, e.g., LAX, CDG, DXB) - if no airport code is visible, use the city name"
 }
 
-If any information is not found or is unclear, return an empty string for that field, and set "isValidTicket" to false.
+IMPORTANT NOTES:
+- If you see a 3-letter airport code (like JFK, LHR, DEL), use that for departureAirport/arrivalAirport
+- If you only see city names without airport codes, use the city name for departureAirport/arrivalAirport
+- For major cities, you can infer common airport codes (e.g., New York → JFK, London → LHR, Delhi → DEL)
+- If any information is not found or is unclear, return an empty string for that field, and set "isValidTicket" to false.
+
 Return ONLY the JSON object, no additional text or explanations.
 ''';
   }
@@ -157,13 +162,27 @@ Return ONLY the JSON object, no additional text or explanations.
       return false;
     }
 
-    // Validate airport codes (should be 3 uppercase letters)
+    // Validate airport codes (can be 3 uppercase letters OR city names)
+    final departureAirport = data['departureAirport'].toString().trim();
+    final arrivalAirport = data['arrivalAirport'].toString().trim();
+    
+    // Check if they are valid IATA codes (3 uppercase letters)
     RegExp iataCodePattern = RegExp(r'^[A-Z]{3}$');
-    if (!iataCodePattern.hasMatch(data['departureAirport'].toString().toUpperCase()) || 
-        !iataCodePattern.hasMatch(data['arrivalAirport'].toString().toUpperCase())) {
-      print('Invalid airport code format. Expected 3 uppercase letters.');
+    final isDepartureValidIata = iataCodePattern.hasMatch(departureAirport.toUpperCase());
+    final isArrivalValidIata = iataCodePattern.hasMatch(arrivalAirport.toUpperCase());
+    
+    // If not valid IATA codes, they should be city names (not empty and reasonable length)
+    if (!isDepartureValidIata && (departureAirport.isEmpty || departureAirport.length < 2)) {
+      print('Invalid departure airport format. Expected 3-letter IATA code or city name.');
       return false;
     }
+    
+    if (!isArrivalValidIata && (arrivalAirport.isEmpty || arrivalAirport.length < 2)) {
+      print('Invalid arrival airport format. Expected 3-letter IATA code or city name.');
+      return false;
+    }
+    
+    print('Airport validation: Departure="$departureAirport" (valid IATA: $isDepartureValidIata), Arrival="$arrivalAirport" (valid IATA: $isArrivalValidIata)');
 
     return true;
   }
