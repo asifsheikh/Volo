@@ -5,7 +5,7 @@ import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import '../../services/flight_api_service.dart';
-import '../../services/upload_ticket_service.dart';
+import 'upload_ticket_service.dart';
 import '../../screens/home/flight_results_screen.dart';
 import '../../screens/home/flight_select_screen.dart';
 

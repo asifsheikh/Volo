@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:developer' as developer;
-import '../features/add_flight/flight_ticket_extraction_service.dart';
-import '../features/add_flight/flight_selection_dialog.dart';
+import 'flight_ticket_extraction_service.dart';
+import 'flight_selection_dialog.dart';
 
 /// Callback type for successful ticket extraction
 typedef TicketExtractionCallback = void Function(Map<String, dynamic> flightData);
