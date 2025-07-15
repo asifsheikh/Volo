@@ -332,14 +332,11 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                     children: [
                       const SizedBox(height: 24), // More space below title
                       // --- Smart Options: Upload Ticket / Scan Pass ---
-                      SizedBox(
-                        width: 350,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: 169,
-                              height: 54,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SizedBox(
+                              height: 58,
                               child: OutlinedButton(
                                 onPressed: () async {
                                   await UploadTicketService.uploadTicket(context);
@@ -374,10 +371,11 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            SizedBox(
-                              width: 169,
-                              height: 54,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: SizedBox(
+                              height: 58,
                               child: OutlinedButton(
                                 onPressed: () {},
                                 style: OutlinedButton.styleFrom(
@@ -410,8 +408,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 14),
                       // --- Helper text ---
