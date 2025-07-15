@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:developer' as developer;
 import '../features/add_flight/flight_ticket_extraction_service.dart';
+import '../features/add_flight/flight_selection_dialog.dart';
 
 /// Callback type for successful ticket extraction
 typedef TicketExtractionCallback = void Function(Map<String, dynamic> flightData);
@@ -25,6 +26,83 @@ class UploadTicketService {
   static void clearUploadedFile() {
     _uploadedFileData = null;
     _uploadedFileName = null;
+  }
+
+  /// Handle successful ticket extraction with multi-flight support
+  static void _handleExtractionSuccess(BuildContext context, Map<String, dynamic> ticketData, TicketExtractionCallback? onSuccess) {
+    final String ticketType = ticketData['ticketType'] ?? 'one-way';
+    
+    // Check if this is a multi-flight ticket
+    if (_extractionService.hasMultipleFlights(ticketData)) {
+      // Show flight selection dialog
+      final List<Map<String, dynamic>> flights = _extractionService.getAllFlights(ticketData);
+      
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return FlightSelectionDialog(
+            flights: flights,
+            ticketType: ticketType,
+            originalFlightCount: ticketData['originalFlightCount'], // Pass original count for deduplication info
+            onFlightSelected: (selectedFlight) {
+              // Show success message
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Successfully extracted flight information from ${_uploadedFileName}'),
+                  backgroundColor: Colors.green,
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+              
+              developer.log('UploadTicketService: Flight selected from multi-flight ticket: $selectedFlight', name: 'VoloUpload');
+              
+              if (onSuccess != null) {
+                onSuccess(selectedFlight);
+              }
+            },
+          );
+        },
+      );
+    } else {
+      // Single flight ticket (one-way with or without layovers)
+      final Map<String, dynamic>? firstFlight = _extractionService.getFirstFlight(ticketData);
+      
+      if (firstFlight != null) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Successfully extracted flight information from ${_uploadedFileName}'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+        
+        developer.log('UploadTicketService: Flight info extracted successfully: $firstFlight', name: 'VoloUpload');
+        
+        if (onSuccess != null) {
+          onSuccess(firstFlight);
+        }
+      } else {
+        // Fallback: use the first flight from the flights array
+        final List<Map<String, dynamic>> flights = _extractionService.getAllFlights(ticketData);
+        if (flights.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Successfully extracted flight information from ${_uploadedFileName}'),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+          
+          developer.log('UploadTicketService: Flight info extracted successfully (fallback): ${flights.first}', name: 'VoloUpload');
+          
+          if (onSuccess != null) {
+            onSuccess(flights.first);
+          }
+        }
+      }
+    }
   }
 
   /// Show file source selection bottom sheet (reusing profile picture dialog style)
@@ -246,21 +324,9 @@ class UploadTicketService {
               }
               return await _extractionService.extractFlightInfo(fileData, fileName ?? 'uploaded_file');
             },
-            onSuccess: (flightData) {
-              // Show success message
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Successfully extracted flight information from ${_uploadedFileName}'),
-                  backgroundColor: Colors.green,
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-              
-              developer.log('UploadTicketService: Flight info extracted successfully: $flightData', name: 'VoloUpload');
-              
-              if (onSuccess != null) {
-                onSuccess(flightData);
-              }
+            onSuccess: (ticketData) {
+              // Handle multi-flight tickets
+              _handleExtractionSuccess(context, ticketData, onSuccess);
             },
             onCancel: () {
               // User cancelled the operation
