@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import '../../services/flight_api_service.dart';
 import '../../services/upload_ticket_service.dart';
-import 'flight_results_screen.dart';
-import 'flight_select_screen.dart';
+import '../../screens/home/flight_results_screen.dart';
+import '../../screens/home/flight_select_screen.dart';
 
 class Airport {
   final String city;
@@ -339,7 +340,10 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                               height: 58,
                               child: OutlinedButton(
                                 onPressed: () async {
-                                  await UploadTicketService.uploadTicket(context);
+                                  await UploadTicketService.uploadTicket(
+                                    context,
+                                    onSuccess: _populateFormFromTicket,
+                                  );
                                 },
                                 style: OutlinedButton.styleFrom(
                                   backgroundColor: Colors.white,
@@ -851,5 +855,55 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
         ),
       ],
     );
+  }
+
+  /// Populate form fields from extracted ticket data
+  void _populateFormFromTicket(Map<String, dynamic> ticketData) {
+    try {
+      // Extract flight number
+      final String? flightNumber = ticketData['flightNumber'] as String?;
+      if (flightNumber != null && flightNumber.isNotEmpty) {
+        setState(() {
+          _flightNumberController.text = flightNumber;
+        });
+      }
+
+      // Extract and set departure date
+      final String? departureDateStr = ticketData['departureDate'] as String?;
+      if (departureDateStr != null) {
+        final DateTime? parsedDate = DateTime.tryParse(departureDateStr);
+        if (parsedDate != null) {
+          setState(() {
+            _selectedDate = parsedDate;
+          });
+        }
+      }
+
+      // Extract departure information
+      final String? departureCity = ticketData['departureCity'] as String?;
+      final String? departureAirport = ticketData['departureAirport'] as String?;
+      if (departureCity != null && departureAirport != null) {
+        final String departureDisplay = '$departureCity ($departureAirport)';
+        setState(() {
+          _departureCityController.text = departureDisplay;
+          _selectedDepartureCity = departureDisplay;
+        });
+      }
+
+      // Extract arrival information
+      final String? arrivalCity = ticketData['arrivalCity'] as String?;
+      final String? arrivalAirport = ticketData['arrivalAirport'] as String?;
+      if (arrivalCity != null && arrivalAirport != null) {
+        final String arrivalDisplay = '$arrivalCity ($arrivalAirport)';
+        setState(() {
+          _arrivalCityController.text = arrivalDisplay;
+          _selectedArrivalCity = arrivalDisplay;
+        });
+      }
+
+      developer.log('AddFlightScreen: Form populated with ticket data: $ticketData', name: 'VoloUpload');
+    } catch (e) {
+      developer.log('AddFlightScreen: Error populating form from ticket data: $e', name: 'VoloUpload');
+    }
   }
 } 

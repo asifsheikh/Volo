@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_ai/firebase_ai.dart' show ChatSession;
-import '../../services/ai_service.dart';
+import 'ai_demo_service.dart';
 
 class AIDemoScreen extends StatefulWidget {
   const AIDemoScreen({super.key});
@@ -10,7 +10,7 @@ class AIDemoScreen extends StatefulWidget {
 }
 
 class _AIDemoScreenState extends State<AIDemoScreen> {
-  final AIService _aiService = AIService();
+  final AIDemoService _aiService = AIDemoService();
   final TextEditingController _promptController = TextEditingController();
   final TextEditingController _chatController = TextEditingController();
   
@@ -82,8 +82,8 @@ class _AIDemoScreenState extends State<AIDemoScreen> {
     }
   }
 
-  void _startChat() {
-    _chatSession = _aiService.startChat();
+  Future<void> _startChat() async {
+    _chatSession = await _aiService.startChat();
     _chatHistory.clear();
     setState(() {});
   }

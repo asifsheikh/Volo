@@ -1,19 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_app_check/firebase_app_check.dart'; // Import App Check
 import 'dart:developer' as developer;
+import 'dart:async';
 import '../services/firebase_service.dart';
 import '../screens/auth/welcome_screen.dart';
 import '../screens/home/home_screen.dart';
 
-/// Authentication wrapper that handles routing based on user authentication state
-/// 
-/// This widget:
-/// 1. Listens to Firebase authentication state changes
-/// 2. Checks if user has completed onboarding
-/// 3. Routes to appropriate screen based on state:
-///    - Not authenticated → Welcome screen
-///    - Authenticated but not onboarded → Welcome screen (start fresh)
-///    - Authenticated and onboarded → Home screen
 class AuthWrapper extends StatefulWidget {
   const AuthWrapper({Key? key}) : super(key: key);
 
@@ -26,25 +19,47 @@ class _AuthWrapperState extends State<AuthWrapper> {
   bool _isOnboarded = false;
   User? _currentUser;
 
+  // Add a StreamSubscription to manage the authStateChanges listener
+  // so we can cancel it when the widget is disposed.
+  StreamSubscription<User?>? _authStateSubscription;
+
   @override
   void initState() {
     super.initState();
-    _checkAuthState();
+    // Start listening to App Check token changes first
+    _waitForAppCheckAndAuthState();
   }
 
-  /// Check authentication state and onboarding status
-  Future<void> _checkAuthState() async {
+  // Dispose of the subscription when the widget is removed
+  @override
+  void dispose() {
+    _authStateSubscription?.cancel();
+    super.dispose();
+  }
+
+  /// Wait for App Check to be ready, then check authentication state
+  Future<void> _waitForAppCheckAndAuthState() async {
     try {
-      // Listen to authentication state changes
-      FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      // Step 1: Wait for an App Check token to be available.
+      // This will ensure App Check has initialized and propagated its state.
+      // We can use the 'getToken' method which will implicitly activate
+      // the App Check attestation if it hasn't already.
+      // Setting `forceRefresh: true` ensures we try to get a new token.
+      developer.log('AuthWrapper: Waiting for App Check token...', name: 'VoloAuth');
+      await FirebaseAppCheck.instance.getToken(true);
+      developer.log('AuthWrapper: App Check token obtained, proceeding to auth state.', name: 'VoloAuth');
+
+      // Step 2: Now that App Check is ready, set up the authStateChanges listener
+      _authStateSubscription = FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+        developer.log('AuthWrapper: Auth state changed: ${user == null ? "Logged out" : "Logged in"}', name: 'VoloAuth');
         if (user != null) {
           // User is authenticated, check onboarding status
           final isOnboarded = await FirebaseService.isUserOnboarded();
-          
+
           // Double-check: if user profile doesn't exist, they're not onboarded
           final userProfile = await FirebaseService.getUserProfile();
           final hasProfile = userProfile != null;
-          
+
           if (mounted) {
             setState(() {
               _currentUser = user;
@@ -64,6 +79,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
         }
       });
     } catch (e) {
+      developer.log('AuthWrapper: Error during App Check or Auth state check: $e', name: 'VoloAuth');
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -74,6 +90,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    // ... (rest of your build method, _buildLoadingScreen, _buildHomeScreen remain the same)
     // Show loading screen while checking authentication state
     if (_isLoading) {
       return _buildLoadingScreen();
@@ -91,6 +108,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
     return _buildHomeScreen();
   }
 
+  // ... (Your _buildLoadingScreen and _buildHomeScreen methods)
   /// Build loading screen while checking authentication state
   Widget _buildLoadingScreen() {
     return Scaffold(
@@ -146,7 +164,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return _buildLoadingScreen();
         }
-        
+
         // If no data or error, user is not properly onboarded
         if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
           // User profile doesn't exist, they haven't completed onboarding
@@ -154,16 +172,16 @@ class _AuthWrapperState extends State<AuthWrapper> {
           FirebaseService.signOut();
           return const WelcomeScreen();
         }
-        
+
         // User profile exists, get display name
         String displayName = 'User';
         final firstName = snapshot.data!['firstName'] as String?;
         if (firstName != null && firstName.isNotEmpty) {
           displayName = firstName;
         }
-        
+
         return HomeScreen(username: displayName);
       },
     );
   }
-} 
+}

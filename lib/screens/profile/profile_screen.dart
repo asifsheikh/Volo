@@ -6,7 +6,7 @@ import 'dart:developer' as developer;
 import '../../services/firebase_service.dart';
 import '../../services/profile_picture_service.dart';
 import '../../services/remote_config_service.dart';
-import '../ai/ai_demo_screen.dart';
+import '../../features/ai_demo/ai_demo_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String username;

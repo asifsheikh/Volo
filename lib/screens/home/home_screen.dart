@@ -4,7 +4,7 @@ import 'dart:developer' as developer;
 import 'dart:core';
 import '../../services/firebase_service.dart';
 import '../../services/profile_picture_service.dart';
-import 'add_flight_screen.dart';
+import '../../features/add_flight/add_flight_screen.dart';
 import '../profile/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {

@@ -5,7 +5,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'firebase_options.dart';
 import 'core/auth_wrapper.dart';
 import 'services/firebase_service.dart';
-import 'services/ai_service.dart';
+
 import 'services/remote_config_service.dart';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
@@ -63,8 +63,7 @@ void main() async {
     final useMockData = remoteConfig.getUseMockFlightData();
     developer.log('Main: Remote Config use_mock_flight_data = $useMockData', name: 'VoloAuth');
     
-    // Initialize AI Service AFTER App Check, passing the App Check instance
-    await AIService().initialize(appCheck: FirebaseAppCheck.instance);
+
     
   } catch (e) {
     developer.log('App: Firebase initialization failed: $e', name: 'VoloAuth');
