@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:developer' as developer;
 import 'flight_ticket_extraction_service.dart';
 import 'flight_selection_dialog.dart';
+import 'package:lottie/lottie.dart';
 
 /// Callback type for successful ticket extraction
 typedef TicketExtractionCallback = void Function(Map<String, dynamic> flightData);
@@ -800,12 +801,6 @@ class _ProcessingTicketDialogState extends State<_ProcessingTicketDialog> with T
             Container(
               width: 80,
               height: 80,
-              decoration: BoxDecoration(
-                color: _hasFailed 
-                  ? const Color(0xFFDC2626).withOpacity(0.1)
-                  : const Color(0xFF008080).withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
               child: Center(
                 child: _hasFailed
                   ? const Icon(
@@ -813,9 +808,12 @@ class _ProcessingTicketDialogState extends State<_ProcessingTicketDialog> with T
                       color: Color(0xFFDC2626),
                       size: 40,
                     )
-                  : const CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF008080)),
-                      strokeWidth: 3,
+                  : Lottie.asset(
+                      'assets/animations/file_searching.json',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.contain,
+                      repeat: true,
                     ),
               ),
             ),

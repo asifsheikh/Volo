@@ -33,6 +33,7 @@ dependencies:
   image_picker: ^1.0.7
   file_picker: ^8.0.0+1
   google_generative_ai: ^0.4.7
+  lottie: ^3.3.1
 
 dev_dependencies:
   flutter_test:
@@ -44,10 +45,11 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/volo_app_icon.png
     - assets/app_icon.png
-    - assets/test.png
     - assets/onboarding_illustration3.png
+    - assets/test.png
+    - assets/volo_app_icon.png
+    - assets/animations/file_searching.json
     - assets/airports_global.json
     - assets/mock_flights_response.json
 
