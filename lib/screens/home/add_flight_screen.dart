@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import '../../services/flight_api_service.dart';
+import '../../services/upload_ticket_service.dart';
 import 'flight_results_screen.dart';
 import 'flight_select_screen.dart';
 
@@ -340,7 +341,9 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                               width: 169,
                               height: 54,
                               child: OutlinedButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  await UploadTicketService.uploadTicket(context);
+                                },
                                 style: OutlinedButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
