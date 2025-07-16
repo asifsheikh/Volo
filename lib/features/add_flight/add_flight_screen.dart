@@ -4,10 +4,12 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:provider/provider.dart';
 import '../../services/flight_api_service.dart';
 import 'upload_ticket_service.dart';
 import '../../screens/home/flight_results_screen.dart';
 import '../../screens/home/flight_select_screen.dart';
+import 'controller/add_flight_controller.dart';
 
 class Airport {
   final String city;
@@ -67,9 +69,6 @@ class AddFlightScreen extends StatefulWidget {
 
 class _AddFlightScreenState extends State<AddFlightScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _flightNumberController = TextEditingController();
-  final TextEditingController _departureCityController = TextEditingController();
-  final TextEditingController _arrivalCityController = TextEditingController();
   DateTime? _selectedDate;
   String? _selectedDepartureCity;
   String? _selectedArrivalCity;
@@ -87,9 +86,6 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
 
   @override
   void dispose() {
-    _flightNumberController.dispose();
-    _departureCityController.dispose();
-    _arrivalCityController.dispose();
     super.dispose();
   }
 
@@ -238,25 +234,18 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   }
 
   void _onDepartureAirportSelected(Airport airport) {
-    setState(() {
-      _departureCityController.text = airport.displayName;
-      _selectedDepartureCity = airport.displayName;
-      _selectedDepartureAirport = airport; // Track the selected airport object
-    });
+    final controller = context.read<AddFlightController>();
+    controller.onDepartureAirportSelected(airport);
   }
 
   void _onArrivalAirportSelected(Airport airport) {
-    setState(() {
-      _arrivalCityController.text = airport.displayName;
-      _selectedArrivalCity = airport.displayName;
-      _selectedArrivalAirport = airport; // Track the selected airport object
-    });
+    final controller = context.read<AddFlightController>();
+    controller.onArrivalAirportSelected(airport);
   }
 
   bool get _isFormValid {
-    return _selectedDate != null &&
-        _selectedDepartureAirport != null &&
-        _selectedArrivalAirport != null;
+    final controller = context.read<AddFlightController>();
+    return controller.isFormValid;
   }
 
   void _pickDate() async {
@@ -285,15 +274,16 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
       },
     );
     if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-      });
+      final controller = context.read<AddFlightController>();
+      controller.setSelectedDate(picked);
     }
   }
 
   Future<void> _searchFlights() async {
+    final controller = context.read<AddFlightController>();
+    
     // Use the selected airport objects directly
-    if (_selectedDepartureAirport == null || _selectedArrivalAirport == null) {
+    if (controller.selectedDepartureAirport == null || controller.selectedArrivalAirport == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select both departure and arrival airports'),
@@ -303,8 +293,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
       return;
     }
     
-    final departureIata = _selectedDepartureAirport!.iata;
-    final arrivalIata = _selectedArrivalAirport!.iata;
+    final departureIata = controller.selectedDepartureAirport!.iata;
+    final arrivalIata = controller.selectedArrivalAirport!.iata;
     
     print('🔍 Search: $departureIata → $arrivalIata');
     Navigator.of(context).push(
@@ -313,12 +303,12 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
           searchFuture: FlightApiService.searchFlights(
             departureIata: departureIata,
             arrivalIata: arrivalIata,
-            date: DateFormat('yyyy-MM-dd').format(_selectedDate!),
-            flightNumber: _flightNumberController.text.isNotEmpty ? _flightNumberController.text : null,
+            date: DateFormat('yyyy-MM-dd').format(controller.selectedDate!),
+            flightNumber: controller.flightNumberController.text.isNotEmpty ? controller.flightNumberController.text : null,
           ),
-          departureCity: _departureCityController.text.trim(),
-          arrivalCity: _arrivalCityController.text.trim(),
-          date: DateFormat('yyyy-MM-dd').format(_selectedDate!),
+          departureCity: controller.departureCityController.text.trim(),
+          arrivalCity: controller.arrivalCityController.text.trim(),
+          date: DateFormat('yyyy-MM-dd').format(controller.selectedDate!),
         ),
       ),
     );
@@ -514,34 +504,46 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                         ),
                       ),
                       const SizedBox(height: 28),
-                      _buildTypeAheadField(
-                        label: 'From',
-                        icon: Icons.flight_takeoff,
-                        controller: _departureCityController,
-                        hintText: 'Search city or airport code',
-                        onSelected: _onDepartureAirportSelected,
-                        isLoading: _isLoadingAirports,
-                        isAirportSelected: _selectedDepartureAirport != null,
+                      Consumer<AddFlightController>(
+                        builder: (context, controller, child) {
+                          return _buildTypeAheadField(
+                            label: 'From',
+                            icon: Icons.flight_takeoff,
+                            controller: controller.departureCityController,
+                            hintText: 'Search city or airport code',
+                            onSelected: _onDepartureAirportSelected,
+                            isLoading: _isLoadingAirports,
+                            isAirportSelected: controller.selectedDepartureAirport != null,
+                          );
+                        },
                       ),
                       const SizedBox(height: 24),
-                      _buildTypeAheadField(
-                        label: 'To',
-                        icon: Icons.flight_land,
-                        controller: _arrivalCityController,
-                        hintText: 'Search city or airport code',
-                        onSelected: _onArrivalAirportSelected,
-                        isLoading: _isLoadingAirports,
-                        isAirportSelected: _selectedArrivalAirport != null,
+                      Consumer<AddFlightController>(
+                        builder: (context, controller, child) {
+                          return _buildTypeAheadField(
+                            label: 'To',
+                            icon: Icons.flight_land,
+                            controller: controller.arrivalCityController,
+                            hintText: 'Search city or airport code',
+                            onSelected: _onArrivalAirportSelected,
+                            isLoading: _isLoadingAirports,
+                            isAirportSelected: controller.selectedArrivalAirport != null,
+                          );
+                        },
                       ),
                       const SizedBox(height: 24),
                       _buildDateField(),
                       const SizedBox(height: 24),
-                      _buildLabeledField(
-                        label: 'Flight Number (Optional)',
-                        optional: true,
-                        icon: Icons.flight,
-                        controller: _flightNumberController,
-                        hintText: 'e.g. UA1234',
+                      Consumer<AddFlightController>(
+                        builder: (context, controller, child) {
+                          return _buildLabeledField(
+                            label: 'Flight Number (Optional)',
+                            optional: true,
+                            icon: Icons.flight,
+                            controller: controller.flightNumberController,
+                            hintText: 'e.g. UA1234',
+                          );
+                        },
                       ),
                       const SizedBox(height: 16),
                       // Helper text for flight number and general guidance
@@ -573,42 +575,46 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
               width: double.infinity,
               color: const Color(0xFFE5E7EB),
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-              child: SizedBox(
-                width: 350,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: _isFormValid
-                      ? () {
-                          if (_formKey.currentState!.validate()) {
-                            _searchFlights();
-                          }
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1F2937),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 10,
-                    shadowColor: Colors.black.withOpacity(0.1),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.search, color: Colors.white, size: 20),
-                      SizedBox(width: 12),
-                      Text(
-                        'Find Flights',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                          color: Colors.white,
+              child: Consumer<AddFlightController>(
+                builder: (context, controller, child) {
+                  return SizedBox(
+                    width: 350,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: controller.isFormValid
+                          ? () {
+                              if (_formKey.currentState!.validate()) {
+                                _searchFlights();
+                              }
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1F2937),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
+                        elevation: 10,
+                        shadowColor: Colors.black.withOpacity(0.1),
                       ),
-                    ],
-                  ),
-                ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.search, color: Colors.white, size: 20),
+                          SizedBox(width: 12),
+                          Text(
+                            'Find Flights',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -940,16 +946,20 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                 Icon(Icons.calendar_today, color: Color(0xFF9CA3AF), size: 20),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    _selectedDate != null
-                        ? DateFormat('MMM dd, yyyy').format(_selectedDate!)
-                        : 'Select date',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                      color: _selectedDate != null ? Color(0xFF1F2937) : Color(0xFFADAEBC),
-                    ),
+                  child: Consumer<AddFlightController>(
+                    builder: (context, controller, child) {
+                      return Text(
+                        controller.selectedDate != null
+                            ? DateFormat('MMM dd, yyyy').format(controller.selectedDate!)
+                            : 'Select date',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
+                          color: controller.selectedDate != null ? Color(0xFF1F2937) : Color(0xFFADAEBC),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -986,12 +996,12 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   /// Populate form fields from extracted ticket data
   void _populateFormFromTicket(Map<String, dynamic> ticketData) {
     try {
+      final controller = context.read<AddFlightController>();
+      
       // Extract flight number
       final String? flightNumber = ticketData['flightNumber'] as String?;
       if (flightNumber != null && flightNumber.isNotEmpty) {
-        setState(() {
-          _flightNumberController.text = flightNumber;
-        });
+        controller.flightNumberController.text = flightNumber;
       }
 
       // Extract and set departure date
@@ -999,9 +1009,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
       if (departureDateStr != null) {
         final DateTime? parsedDate = DateTime.tryParse(departureDateStr);
         if (parsedDate != null) {
-          setState(() {
-            _selectedDate = parsedDate;
-          });
+          controller.setSelectedDate(parsedDate);
         }
       }
 
@@ -1021,20 +1029,18 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
             developer.log('AddFlightScreen: Found departure airport: ${departureAirportObj.displayName}', name: 'VoloUpload');
           } else {
             // Valid IATA but not found in database, pre-populate with city name
-            setState(() {
-              _departureCityController.text = departureCity;
-              _selectedDepartureCity = departureCity;
-              _selectedDepartureAirport = null; // Clear airport object since we only have city name
-            });
+            controller.departureCityController.text = departureCity;
+            controller.selectedDepartureCity = departureCity;
+            controller.selectedDepartureAirport = null; // Clear airport object since we only have city name
+            controller.notifyListeners();
             developer.log('AddFlightScreen: Pre-populated departure with city: $departureCity (IATA not found)', name: 'VoloUpload');
           }
         } else {
           // Not a valid IATA code, pre-populate with city name only
-          setState(() {
-            _departureCityController.text = departureCity;
-            _selectedDepartureCity = departureCity;
-            _selectedDepartureAirport = null; // Clear airport object since we only have city name
-          });
+          controller.departureCityController.text = departureCity;
+          controller.selectedDepartureCity = departureCity;
+          controller.selectedDepartureAirport = null; // Clear airport object since we only have city name
+          controller.notifyListeners();
           developer.log('AddFlightScreen: Pre-populated departure with city: $departureCity (not valid IATA)', name: 'VoloUpload');
         }
       }
@@ -1055,20 +1061,18 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
             developer.log('AddFlightScreen: Found arrival airport: ${arrivalAirportObj.displayName}', name: 'VoloUpload');
           } else {
             // Valid IATA but not found in database, pre-populate with city name
-            setState(() {
-              _arrivalCityController.text = arrivalCity;
-              _selectedArrivalCity = arrivalCity;
-              _selectedArrivalAirport = null; // Clear airport object since we only have city name
-            });
+            controller.arrivalCityController.text = arrivalCity;
+            controller.selectedArrivalCity = arrivalCity;
+            controller.selectedArrivalAirport = null; // Clear airport object since we only have city name
+            controller.notifyListeners();
             developer.log('AddFlightScreen: Pre-populated arrival with city: $arrivalCity (IATA not found)', name: 'VoloUpload');
           }
         } else {
           // Not a valid IATA code, pre-populate with city name only
-          setState(() {
-            _arrivalCityController.text = arrivalCity;
-            _selectedArrivalCity = arrivalCity;
-            _selectedArrivalAirport = null; // Clear airport object since we only have city name
-          });
+          controller.arrivalCityController.text = arrivalCity;
+          controller.selectedArrivalCity = arrivalCity;
+          controller.selectedArrivalAirport = null; // Clear airport object since we only have city name
+          controller.notifyListeners();
           developer.log('AddFlightScreen: Pre-populated arrival with city: $arrivalCity (not valid IATA)', name: 'VoloUpload');
         }
       }

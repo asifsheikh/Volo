@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'dart:developer' as developer;
 import 'dart:core';
 import '../../services/firebase_service.dart';
 import '../../services/profile_picture_service.dart';
 import '../../features/add_flight/add_flight_screen.dart';
+import '../../features/add_flight/controller/add_flight_controller.dart';
 import '../profile/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -127,7 +129,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => const AddFlightScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => ChangeNotifierProvider(
+                              create: (context) => AddFlightController(),
+                              child: const AddFlightScreen(),
+                            ),
+                          ),
                         );
                       },
                       icon: const Icon(Icons.flight_takeoff, color: Colors.white, size: 28),
