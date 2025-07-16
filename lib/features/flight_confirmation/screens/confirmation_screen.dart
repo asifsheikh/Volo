@@ -143,11 +143,26 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                     ],
                                   ),
                                 ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.flight_takeoff,
-                                    color: Colors.white,
-                                    size: 48,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.flight_takeoff,
+                                        color: Colors.white,
+                                        size: 48,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        widget.args.departureAirportCode.toUpperCase(),
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 32,
+                                          color: Colors.white,
+                                          letterSpacing: 1.5,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -181,11 +196,26 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                     ],
                                   ),
                                 ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.flight_land,
-                                    color: Colors.white,
-                                    size: 48,
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                        Icons.flight_land,
+                                        color: Colors.white,
+                                        size: 48,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        widget.args.arrivalAirportCode.toUpperCase(),
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 32,
+                                          color: Colors.white,
+                                          letterSpacing: 1.5,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),

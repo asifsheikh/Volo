@@ -4,8 +4,10 @@ class ConfirmationArgs {
   final List<String> contactNames;
   final List<String> contactAvatars;
   final dynamic selectedFlight; // Replace with your Flight model when available
+  final String departureAirportCode;
   final String departureImage;
   final String departureThumbnail;
+  final String arrivalAirportCode;
   final String arrivalImage;
   final String arrivalThumbnail;
   
@@ -15,8 +17,10 @@ class ConfirmationArgs {
     required this.contactNames,
     required this.contactAvatars,
     this.selectedFlight,
+    required this.departureAirportCode,
     required this.departureImage,
     required this.departureThumbnail,
+    required this.arrivalAirportCode,
     required this.arrivalImage,
     required this.arrivalThumbnail,
   });

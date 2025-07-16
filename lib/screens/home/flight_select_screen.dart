@@ -357,9 +357,11 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> {
                           args: AddContactsScreenArgs(
                             selectedFlight: option,
                             departureCity: depCity,
+                            departureAirportCode: depIata,
                             departureImage: depImage,
                             departureThumbnail: depThumb,
                             arrivalCity: arrCity,
+                            arrivalAirportCode: arrIata,
                             arrivalImage: arrImage,
                             arrivalThumbnail: arrThumb,
                           ),

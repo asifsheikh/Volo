@@ -11,18 +11,22 @@ import 'package:google_fonts/google_fonts.dart';
 class AddContactsScreenArgs {
   final dynamic selectedFlight; // Replace with your Flight model
   final String departureCity;
+  final String departureAirportCode;
   final String departureImage;
   final String departureThumbnail;
   final String arrivalCity;
+  final String arrivalAirportCode;
   final String arrivalImage;
   final String arrivalThumbnail;
   
   AddContactsScreenArgs({
     required this.selectedFlight,
     required this.departureCity,
+    required this.departureAirportCode,
     required this.departureImage,
     required this.departureThumbnail,
     required this.arrivalCity,
+    required this.arrivalAirportCode,
     required this.arrivalImage,
     required this.arrivalThumbnail,
   });
@@ -195,11 +199,26 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                                 ],
                               ),
                             ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.flight_takeoff,
-                                color: Colors.white,
-                                size: 48,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.flight_takeoff,
+                                    color: Colors.white,
+                                    size: 48,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    args.departureAirportCode.toUpperCase(),
+                                    style: GoogleFonts.inter(
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 32,
+                                      color: Colors.white,
+                                      letterSpacing: 1.5,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -233,11 +252,26 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                                 ],
                               ),
                             ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.flight_land,
-                                color: Colors.white,
-                                size: 48,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.flight_land,
+                                    color: Colors.white,
+                                    size: 48,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    args.arrivalAirportCode.toUpperCase(),
+                                    style: GoogleFonts.inter(
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 32,
+                                      color: Colors.white,
+                                      letterSpacing: 1.5,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -508,8 +542,10 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                                     toCity: args.arrivalCity,
                                     contactNames: _selectedContacts.map((c) => c.name).toList(),
                                     contactAvatars: _selectedContacts.map((c) => c.avatar ?? '').toList(),
+                                    departureAirportCode: args.departureAirportCode,
                                     departureImage: args.departureImage,
                                     departureThumbnail: args.departureThumbnail,
+                                    arrivalAirportCode: args.arrivalAirportCode,
                                     arrivalImage: args.arrivalImage,
                                     arrivalThumbnail: args.arrivalThumbnail,
                                   ),
