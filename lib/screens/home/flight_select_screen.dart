@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/flight_api_service.dart';
-import 'add_contacts_screen.dart';
+import '../../features/add_contacts/screens/add_contacts_screen.dart';
 
 class FlightSelectScreen extends StatefulWidget {
   final Future<FlightSearchResponse> searchFuture;
