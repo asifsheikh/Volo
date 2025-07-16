@@ -200,7 +200,9 @@ class ConfirmationScreen extends StatelessWidget {
                               // Overlapped contact avatars
                               SizedBox(
                                 height: 40,
+                                width: 40 + (contactNames.take(4).length - 1) * 6.0 + (contactNames.length > 4 ? 40 : 0),
                                 child: Stack(
+                                  clipBehavior: Clip.none,
                                   children: [
                                     // Show first 4 contacts with overlap
                                     ...contactNames.take(4).toList().asMap().entries.map((entry) {

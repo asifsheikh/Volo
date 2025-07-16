@@ -164,7 +164,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
           style: TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w700,
-            fontSize: 24,
+            fontSize: 20,
             color: Color(0xFF111827),
           ),
         ),
@@ -177,9 +177,20 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    // Banner
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    // Journey Banner Card
+                    Container(
+                      margin: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
                       child: CityConnectionHeader(
                         fromCity: args.departureCity,
                         fromThumbnail: args.departureThumbnail,
@@ -194,7 +205,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 8),
                           
                           // Title
                           const Text(
@@ -202,23 +213,24 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w700,
-                              fontSize: 24,
+                              fontSize: 20,
                               color: Color(0xFF111827),
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 6),
                           
                           // Subtitle
                           const Text(
-                            'Add contacts who should receive flight updates and notifications.',
+                            'Add your loved ones\' WhatsApp contacts',
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w400,
-                              fontSize: 16,
+                              fontSize: 15,
                               color: Color(0xFF6B7280),
+                              height: 1.4,
                             ),
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 28),
                           
                           // Add Contact Button
                           SizedBox(
@@ -226,27 +238,28 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                             height: 56,
                             child: ElevatedButton.icon(
                               onPressed: _pickContact,
-                              icon: const Icon(Icons.person_add, color: Colors.white, size: 24),
+                              icon: const Icon(Icons.add, color: Color(0xFF374151), size: 24),
                               label: const Text(
                                 'Add Contact',
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   fontWeight: FontWeight.w600,
                                   fontSize: 16,
-                                  color: Colors.white,
+                                  color: Color(0xFF374151),
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF1F2937),
+                                backgroundColor: Colors.white,
+                                side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
-                                elevation: 8,
-                                shadowColor: Colors.black.withOpacity(0.1),
+                                elevation: 0,
+                                shadowColor: Colors.transparent,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 28),
                           
                           // Selected Contacts List
                           if (_selectedContacts.isNotEmpty) ...[
