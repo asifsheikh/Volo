@@ -224,26 +224,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                         ],
                       ),
                       
-                      // Back button (top left) - matching add contacts screen
-                      Positioned(
-                        top: MediaQuery.of(context).padding.top + 16,
-                        left: 16,
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ),
-                      ),
+
                       
                       // City names at bottom of banner
                       Positioned(
@@ -567,6 +548,34 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                     Colors.yellow,
                   ],
                 ),
+              ),
+            ),
+          ),
+          
+          // Back button (top left) - positioned above everything
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 16,
+            left: 16,
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.95),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
               ),
             ),
           ),
