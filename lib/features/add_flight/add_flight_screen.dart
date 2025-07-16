@@ -81,115 +81,16 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   @override
   void initState() {
     super.initState();
-    _loadAirports();
+    // Use controller to load airports
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = context.read<AddFlightController>();
+      controller.loadAirports(context);
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
-  }
-
-  Future<void> _loadAirports() async {
-    setState(() {
-      _isLoadingAirports = true;
-    });
-
-    try {
-      final String jsonString = await DefaultAssetBundle.of(context)
-          .loadString('assets/airports_global.json');
-      
-      final List<dynamic> jsonList = json.decode(jsonString);
-      
-      setState(() {
-        _allAirports = jsonList.map((json) => Airport.fromJson(json)).toList();
-        _isLoadingAirports = false;
-      });
-      
-      print('Loaded ${_allAirports.length} airports');
-      if (_allAirports.isNotEmpty) {
-        print('Sample airport: ${_allAirports.first.displayName}');
-      }
-    } catch (e) {
-      print('Error loading airports: $e');
-      setState(() {
-        _isLoadingAirports = false;
-      });
-    }
-  }
-
-  Future<List<Airport>> _getAirportSuggestions(String query) async {
-
-    final lowercaseQuery = query.toLowerCase();
-    final List<Airport> filtered = [];
-    
-    for (final airport in _allAirports) {
-      final cityLower = airport.city.toLowerCase();
-      final airportLower = airport.airport.toLowerCase();
-      final iataLower = airport.iata.toLowerCase();
-      
-      bool matches = false;
-      
-      // Exact IATA code match (highest priority)
-      if (iataLower == lowercaseQuery) {
-        matches = true;
-      }
-      // IATA code starts with query
-      else if (iataLower.startsWith(lowercaseQuery)) {
-        matches = true;
-      }
-      // City name starts with query
-      else if (cityLower.startsWith(lowercaseQuery)) {
-        matches = true;
-      }
-      // Airport name starts with query
-      else if (airportLower.startsWith(lowercaseQuery)) {
-        matches = true;
-      }
-      // Contains query in any field
-      else if (cityLower.contains(lowercaseQuery) || 
-               airportLower.contains(lowercaseQuery) || 
-               iataLower.contains(lowercaseQuery)) {
-        matches = true;
-      }
-      
-      if (matches) {
-        filtered.add(airport);
-      }
-    }
-    
-    // Sort by relevance and take top 8
-    filtered.sort((a, b) {
-      final aScore = _calculateScore(a, lowercaseQuery);
-      final bScore = _calculateScore(b, lowercaseQuery);
-      return bScore.compareTo(aScore);
-    });
-    
-    return filtered.take(8).toList();
-  }
-
-  int _calculateScore(Airport airport, String query) {
-    final cityLower = airport.city.toLowerCase();
-    final airportLower = airport.airport.toLowerCase();
-    final iataLower = airport.iata.toLowerCase();
-    
-    // Exact IATA code match (highest priority)
-    if (iataLower == query) return 1000;
-    
-    // IATA code starts with query
-    if (iataLower.startsWith(query)) return 900;
-    
-    // City name starts with query
-    if (cityLower.startsWith(query)) return 800;
-    
-    // Airport name starts with query
-    if (airportLower.startsWith(query)) return 700;
-    
-    // Contains query in any field
-    if (cityLower.contains(query) || airportLower.contains(query) || iataLower.contains(query)) {
-      return 100;
-    }
-    
-    return 0;
   }
 
   /// Get popular airports for empty field suggestions
@@ -512,7 +413,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                             controller: controller.departureCityController,
                             hintText: 'Search city or airport code',
                             onSelected: _onDepartureAirportSelected,
-                            isLoading: _isLoadingAirports,
+                            isLoading: controller.isLoadingAirports,
                             isAirportSelected: controller.selectedDepartureAirport != null,
                           );
                         },
@@ -526,7 +427,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                             controller: controller.arrivalCityController,
                             hintText: 'Search city or airport code',
                             onSelected: _onArrivalAirportSelected,
-                            isLoading: _isLoadingAirports,
+                            isLoading: controller.isLoadingAirports,
                             isAirportSelected: controller.selectedArrivalAirport != null,
                           );
                         },
@@ -632,178 +533,181 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     required bool isLoading,
     required bool isAirportSelected, // New parameter to track if airport is selected
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
+    return Consumer<AddFlightController>(
+      builder: (context, flightController, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                fontSize: 14,
-                color: Color(0xFF4B5563),
-              ),
-            ),
-            Text(' *',
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                fontSize: 14,
-                color: Color(0xFF9CA3AF),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        TypeAheadField<Airport>(
-          controller: controller,
-          hideOnEmpty: true, // Hide suggestions when empty to prevent "No items found"
-          builder: (context, controller, focusNode) {
-            return Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Color(0xFFE5E7EB)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 2,
-                    offset: Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: TextField(
-                controller: controller,
-                focusNode: focusNode,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.transparent,
-                  hintText: hintText,
-                  hintStyle: TextStyle(
+            Row(
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w400,
-                    fontSize: 16,
-                    color: Color(0xFFADAEBC),
+                    fontSize: 14,
+                    color: Color(0xFF4B5563),
                   ),
-                  prefixIcon: Icon(icon, color: Color(0xFF9CA3AF), size: 20),
-                  suffixIcon: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (isLoading)
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF9CA3AF)),
-                            ),
-                          ),
-                        ),
-                      // Success indicator (green checkmark)
-                      if (isAirportSelected && !isLoading)
-                        Container(
-                          margin: EdgeInsets.only(right: 8),
-                          child: Icon(
-                            Icons.check_circle,
-                            color: Color(0xFF10B981),
-                            size: 20,
-                          ),
-                        ),
-                      // Dropdown indicator
-                      Container(
-                        margin: EdgeInsets.only(right: 12),
-                        child: Icon(
-                          Icons.keyboard_arrow_down,
-                          color: isAirportSelected ? Color(0xFF10B981) : Color(0xFF9CA3AF),
-                          size: 24,
-                        ),
+                ),
+                Text(' *',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14,
+                    color: Color(0xFF9CA3AF),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            TypeAheadField<Airport>(
+              controller: controller,
+              hideOnEmpty: true, // Hide suggestions when empty to prevent "No items found"
+              builder: (context, controller, focusNode) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Color(0xFFE5E7EB)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 2,
+                        offset: Offset(0, 1),
                       ),
                     ],
                   ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                ),
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 16,
-                  color: Color(0xFF1F2937),
-                ),
-                onTap: () {
-                  // Show suggestions when field is tapped
-                  if (controller.text.isEmpty) {
-                    // If empty, show popular airports
-                    _showPopularAirports(context, controller, onSelected);
-                  }
-                },
-              ),
-            );
-          },
-          suggestionsCallback: (pattern) async {
-            // Only show suggestions if user has typed at least 1 character
-            if (pattern.length < 1) {
-              return [];
-            }
-            return await _getAirportSuggestions(pattern);
-          },
-          itemBuilder: (context, Airport airport) {
-            return ListTile(
-              dense: true,
-              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              title: Text(
-                airport.displayName,
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  color: Color(0xFF1F2937),
-                ),
-              ),
-              subtitle: airport.airport.toLowerCase() != airport.city.toLowerCase()
-                  ? Text(
-                      airport.airport,
-                      style: TextStyle(
+                  child: TextField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.transparent,
+                      hintText: hintText,
+                      hintStyle: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
-                        fontSize: 12,
-                        color: Color(0xFF6B7280),
+                        fontSize: 16,
+                        color: Color(0xFFADAEBC),
                       ),
-                    )
-                  : null,
-            );
-          },
-          onSelected: (Airport airport) {
-            onSelected(airport);
-          },
-        ),
-        // Helper text for fields that need attention
-        if (!isAirportSelected && controller.text.isNotEmpty && !isLoading) ...[
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(
-                Icons.info_outline,
-                color: Color(0xFF6B7280),
-                size: 14,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                'Please select a specific airport',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 12,
-                  color: Color(0xFF6B7280),
-                ),
+                      prefixIcon: Icon(icon, color: Color(0xFF9CA3AF), size: 20),
+                      suffixIcon: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (isLoading)
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF9CA3AF)),
+                                ),
+                              ),
+                            ),
+                          // Success indicator (green checkmark)
+                          if (isAirportSelected && !isLoading)
+                            Container(
+                              margin: EdgeInsets.only(right: 8),
+                              child: Icon(
+                                Icons.check_circle,
+                                color: Color(0xFF10B981),
+                                size: 20,
+                              ),
+                            ),
+                          // Dropdown indicator
+                          Container(
+                            margin: EdgeInsets.only(right: 12),
+                            child: Icon(
+                              Icons.keyboard_arrow_down,
+                              color: isAirportSelected ? Color(0xFF10B981) : Color(0xFF9CA3AF),
+                              size: 24,
+                            ),
+                          ),
+                        ],
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    ),
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      color: Color(0xFF1F2937),
+                    ),
+                    onTap: () {
+                      // Show suggestions when field is tapped
+                      if (controller.text.isEmpty) {
+                        // If empty, show popular airports
+                        _showPopularAirports(context, controller, onSelected);
+                      }
+                    },
+                  ),
+                );
+              },
+              suggestionsCallback: (pattern) async {
+                if (pattern.length < 1) {
+                  return [];
+                }
+                return await flightController.getAirportSuggestions(pattern);
+              },
+              itemBuilder: (context, Airport airport) {
+                return ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  title: Text(
+                    airport.displayName,
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      color: Color(0xFF1F2937),
+                    ),
+                  ),
+                  subtitle: airport.airport.toLowerCase() != airport.city.toLowerCase()
+                      ? Text(
+                          airport.airport,
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                            color: Color(0xFF6B7280),
+                          ),
+                        )
+                      : null,
+                );
+              },
+              onSelected: (Airport airport) {
+                onSelected(airport);
+              },
+            ),
+            // Helper text for fields that need attention
+            if (!isAirportSelected && controller.text.isNotEmpty && !isLoading) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: Color(0xFF6B7280),
+                    size: 14,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Please select a specific airport',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      color: Color(0xFF6B7280),
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-        ],
-      ],
+          ],
+        );
+      },
     );
   }
 
