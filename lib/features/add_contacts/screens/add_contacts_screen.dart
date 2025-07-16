@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import '../../../screens/home/city_connection_header.dart';
-import '../../../screens/home/confirmation_screen.dart';
+import '../../../features/flight_confirmation/screens/confirmation_screen.dart';
+import '../../../features/flight_confirmation/models/confirmation_args.dart';
 import '../widgets/contact_picker_dialog.dart';
 import '../models/contact_model.dart';
 
@@ -387,10 +388,12 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (context) => ConfirmationScreen(
-                                fromCity: args.departureCity,
-                                toCity: args.arrivalCity,
-                                contactNames: _selectedContacts.map((c) => c.name).toList(),
-                                contactAvatars: _selectedContacts.map((c) => c.avatar ?? '').toList(),
+                                args: ConfirmationArgs(
+                                  fromCity: args.departureCity,
+                                  toCity: args.arrivalCity,
+                                  contactNames: _selectedContacts.map((c) => c.name).toList(),
+                                  contactAvatars: _selectedContacts.map((c) => c.avatar ?? '').toList(),
+                                ),
                               ),
                             ),
                           );

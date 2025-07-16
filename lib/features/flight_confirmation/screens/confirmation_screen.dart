@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../models/confirmation_args.dart';
 
 class ConfirmationScreen extends StatelessWidget {
-  final String fromCity;
-  final String toCity;
-  final List<String> contactNames;
-  final List<String> contactAvatars;
+  final ConfirmationArgs args;
 
   const ConfirmationScreen({
     Key? key,
-    required this.fromCity,
-    required this.toCity,
-    required this.contactNames,
-    required this.contactAvatars,
+    required this.args,
   }) : super(key: key);
 
   // Helper method to generate initials from contact name
@@ -100,7 +95,7 @@ class ConfirmationScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        '${fromCity.toUpperCase()} → ${toCity.toUpperCase()}',
+                        '${args.fromCity.toUpperCase()} → ${args.toCity.toUpperCase()}',
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.w400,
                           fontSize: 20,
@@ -200,12 +195,12 @@ class ConfirmationScreen extends StatelessWidget {
                               // Overlapped contact avatars
                               SizedBox(
                                 height: 40,
-                                width: 40 + (contactNames.take(4).length - 1) * 6.0 + (contactNames.length > 4 ? 40 : 0),
+                                width: 40 + (args.contactNames.take(4).length - 1) * 6.0 + (args.contactNames.length > 4 ? 40 : 0),
                                 child: Stack(
                                   clipBehavior: Clip.none,
                                   children: [
                                     // Show first 4 contacts with overlap
-                                    ...contactNames.take(4).toList().asMap().entries.map((entry) {
+                                    ...args.contactNames.take(4).toList().asMap().entries.map((entry) {
                                       final index = entry.key;
                                       final name = entry.value;
                                       final offset = index * 6.0; // Reduced overlap amount
@@ -242,7 +237,7 @@ class ConfirmationScreen extends StatelessWidget {
                                       );
                                     }).toList(),
                                     // Show "+X more" indicator if there are more than 4 contacts
-                                    if (contactNames.length > 4)
+                                    if (args.contactNames.length > 4)
                                       Positioned(
                                         left: 4 * 6.0, // Position after the 4th contact
                                         child: Container(
@@ -262,7 +257,7 @@ class ConfirmationScreen extends StatelessWidget {
                                           ),
                                           child: Center(
                                             child: Text(
-                                              '+${contactNames.length - 4}',
+                                              '+${args.contactNames.length - 4}',
                                               style: const TextStyle(
                                                 fontFamily: 'Inter',
                                                 fontWeight: FontWeight.w600,
@@ -283,7 +278,7 @@ class ConfirmationScreen extends StatelessWidget {
                                   children: [
                                     Flexible(
                                       child: Text(
-                                        _getFirstNames(contactNames).join(' & '),
+                                        _getFirstNames(args.contactNames).join(' & '),
                                         style: GoogleFonts.inter(
                                           fontWeight: FontWeight.w400,
                                           fontSize: 16,
