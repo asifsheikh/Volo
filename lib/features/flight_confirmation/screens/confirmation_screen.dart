@@ -339,117 +339,51 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Will be notified',
-                                    style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
-                                      height: 20 / 16,
-                                      color: const Color(0xFF4B5563),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Icon(Icons.favorite, color: Color(0xFF9CA3AF), size: 18),
-                                ],
+                              // Generic people icon
+                              Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF3F4F6),
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                                child: const Icon(
+                                  Icons.people,
+                                  color: Color(0xFF6B7280),
+                                  size: 24,
+                                ),
                               ),
                               const SizedBox(height: 16),
+                              
+                              // Contact names
+                              Text(
+                                _formatContactNames(widget.args.contactNames),
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18,
+                                  height: 24 / 18,
+                                  color: const Color(0xFF1F2937),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 12),
+                              
+                              // WhatsApp notification text
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  // Overlapped contact avatars
-                                  SizedBox(
-                                    height: 40,
-                                    width: 40 + (widget.args.contactNames.take(4).length - 1) * 6.0 + (widget.args.contactNames.length > 4 ? 40 : 0),
-                                    child: Stack(
-                                      clipBehavior: Clip.none,
-                                      children: [
-                                        // Show first 4 contacts with overlap
-                                        ...widget.args.contactNames.take(4).toList().asMap().entries.map((entry) {
-                                          final index = entry.key;
-                                          final name = entry.value;
-                                          final offset = index * 6.0;
-                                          return Positioned(
-                                            left: offset,
-                                            child: Container(
-                                              width: 40,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                border: Border.all(color: Colors.white, width: 2),
-                                                borderRadius: BorderRadius.circular(20),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black.withOpacity(0.1),
-                                                    blurRadius: 4,
-                                                    offset: const Offset(0, 2),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: CircleAvatar(
-                                                radius: 20,
-                                                backgroundColor: const Color(0xFF1F2937),
-                                                child: Text(
-                                                  _getInitials(name),
-                                                  style: const TextStyle(
-                                                    fontFamily: 'Inter',
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 14,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        }).toList(),
-                                        // Show "+X more" indicator if there are more than 4 contacts
-                                        if (widget.args.contactNames.length > 4)
-                                          Positioned(
-                                            left: 4 * 6.0,
-                                            child: Container(
-                                              width: 40,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                border: Border.all(color: Colors.white, width: 2),
-                                                borderRadius: BorderRadius.circular(20),
-                                                color: const Color(0xFF6B7280),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black.withOpacity(0.1),
-                                                    blurRadius: 4,
-                                                    offset: const Offset(0, 2),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  '+${widget.args.contactNames.length - 4}',
-                                                  style: const TextStyle(
-                                                    fontFamily: 'Inter',
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 12,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                      ],
-                                    ),
+                                  const Icon(
+                                    Icons.message,
+                                    color: Color(0xFF25D366),
+                                    size: 18,
                                   ),
-                                  const SizedBox(width: 16),
-                                  // Contact names
-                                  Expanded(
-                                    child: Text(
-                                      _getFirstNames(widget.args.contactNames).join(' & '),
-                                      style: GoogleFonts.inter(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 16,
-                                        height: 20 / 16,
-                                        color: const Color(0xFF374151),
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'will be notified via WhatsApp',
+                                    style: GoogleFonts.inter(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 14,
+                                      color: const Color(0xFF6B7280),
                                     ),
                                   ),
                                 ],
@@ -642,11 +576,25 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
     );
   }
 
-  // Helper method to extract first names
-  List<String> _getFirstNames(List<String> fullNames) {
-    return fullNames.map((name) {
+  // Helper method to format contact names smartly
+  String _formatContactNames(List<String> fullNames) {
+    if (fullNames.isEmpty) return '';
+    if (fullNames.length == 1) {
+      final parts = fullNames.first.split(' ');
+      return parts.isNotEmpty ? parts.first : fullNames.first;
+    }
+    
+    final firstNames = fullNames.map((name) {
       final parts = name.split(' ');
       return parts.isNotEmpty ? parts.first : name;
     }).toList();
+    
+    if (firstNames.length == 2) {
+      return '${firstNames[0]} & ${firstNames[1]}';
+    } else if (firstNames.length == 3) {
+      return '${firstNames[0]}, ${firstNames[1]} & ${firstNames[2]}';
+    } else {
+      return '${firstNames[0]}, ${firstNames[1]} & ${firstNames.length - 2} others';
+    }
   }
 }
