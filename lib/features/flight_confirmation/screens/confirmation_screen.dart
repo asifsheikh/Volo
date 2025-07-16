@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:confetti/confetti.dart';
 import 'dart:math';
@@ -32,11 +34,15 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
     _leftConfettiController = ConfettiController(duration: const Duration(seconds: 3));
     _rightConfettiController = ConfettiController(duration: const Duration(seconds: 3));
     
-    // Start confetti animation after a short delay
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _playConfetti();
+    // Trigger bottom confetti after the frame is rendered
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _playConfetti(includeCenter: false);
+      });
     });
   }
+
+
 
   @override
   void dispose() {
@@ -46,17 +52,30 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
     super.dispose();
   }
 
-  void _playConfetti() {
-    _confettiController?.stop();
-    _leftConfettiController?.stop();
-    _rightConfettiController?.stop();
+  void _playConfetti({bool includeCenter = false}) {
+    // Ensure controllers are initialized
+    if (_confettiController == null || _leftConfettiController == null || _rightConfettiController == null) {
+      return;
+    }
     
-    // Small delay to ensure proper reset
-    Future.delayed(const Duration(milliseconds: 100), () {
-      _confettiController?.play();
-      _leftConfettiController?.play();
-      _rightConfettiController?.play();
+    // Stop all controllers first
+    _confettiController!.stop();
+    _leftConfettiController!.stop();
+    _rightConfettiController!.stop();
+    
+    // Play bottom left and right confetti
+    Future.delayed(const Duration(milliseconds: 50), () {
+      _leftConfettiController!.play();
     });
+    
+    Future.delayed(const Duration(milliseconds: 100), () {
+      _rightConfettiController!.play();
+    });
+    
+    // Play center confetti only if requested (for test button)
+    if (includeCenter) {
+      _confettiController!.play();
+    }
   }
 
   // Helper method to generate initials from contact name
@@ -74,9 +93,14 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
     
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
-      body: Stack(
-        children: [
-          CustomScrollView(
+      body: GestureDetector(
+        onTap: () {
+          // This simulates user interaction which can help trigger animations
+          print('👆 User interaction detected');
+        },
+        child: Stack(
+          children: [
+            CustomScrollView(
             slivers: [
               // Sliver App Bar for the banner with fade effect
               SliverAppBar(
@@ -432,37 +456,41 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                       ),
                       const SizedBox(height: 16),
                       
-                      // Test confetti button (for debugging)
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          onPressed: _playConfetti,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.celebration, color: Colors.white, size: 20),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Test Confetti 🎉',
-                                style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                ),
+                      // Test confetti button (debug builds only)
+                      if (kDebugMode) ...[
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              _playConfetti(includeCenter: true);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                            ],
+                              elevation: 0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.celebration, color: Colors.white, size: 20),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Test Confetti 🎉',
+                                  style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 18),
+                        const SizedBox(height: 18),
+                      ],
                       
                       // Disclaimer
                       Text(
@@ -482,38 +510,46 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
             ],
           ),
           
-          // Confetti Animation (overlay on top)
-          if (_confettiController != null)
-            Align(
-              alignment: Alignment.topCenter,
-              child: ConfettiWidget(
-                confettiController: _confettiController!,
-                blastDirection: pi / 2, // Straight down
-                maxBlastForce: 5,
-                minBlastForce: 2,
-                emissionFrequency: 0.05,
-                numberOfParticles: 50,
-                gravity: 0.1,
-                colors: const [
-                  Colors.green,
-                  Colors.blue,
-                  Colors.pink,
-                  Colors.orange,
-                  Colors.purple,
-                  Colors.red,
-                  Colors.yellow,
-                ],
+          // Center confetti animation
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SizedBox(
+              height: 300,
+              child: Center(
+                child: ConfettiWidget(
+                  confettiController: _confettiController ?? ConfettiController(duration: const Duration(seconds: 3)),
+                  blastDirection: pi / 2,
+                  maxBlastForce: 5,
+                  minBlastForce: 2,
+                  emissionFrequency: 0.05,
+                  numberOfParticles: 50,
+                  gravity: 0.1,
+                  colors: const [
+                    Colors.green,
+                    Colors.blue,
+                    Colors.pink,
+                    Colors.orange,
+                    Colors.purple,
+                    Colors.red,
+                    Colors.yellow,
+                  ],
+                ),
               ),
             ),
+          ),
           
-          // Additional confetti from bottom corners
-          if (_leftConfettiController != null)
-            Positioned(
-              bottom: 0,
-              left: 0,
+          // Bottom left confetti animation
+          Positioned(
+            bottom: 0,
+            left: 0,
+            child: SizedBox(
+              width: 100,
+              height: 100,
               child: ConfettiWidget(
-                confettiController: _leftConfettiController!,
-                blastDirection: -pi / 4, // Diagonal up-right
+                confettiController: _leftConfettiController ?? ConfettiController(duration: const Duration(seconds: 3)),
+                blastDirection: -pi / 4,
                 maxBlastForce: 3,
                 minBlastForce: 1,
                 emissionFrequency: 0.03,
@@ -530,31 +566,40 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                 ],
               ),
             ),
+          ),
           
-          if (_rightConfettiController != null)
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: ConfettiWidget(
-                confettiController: _rightConfettiController!,
-                blastDirection: -3 * pi / 4, // Diagonal up-left
-                maxBlastForce: 3,
-                minBlastForce: 1,
-                emissionFrequency: 0.03,
-                numberOfParticles: 20,
-                gravity: 0.05,
-                colors: const [
-                  Colors.green,
-                  Colors.blue,
-                  Colors.pink,
-                  Colors.orange,
-                  Colors.purple,
-                  Colors.red,
-                  Colors.yellow,
-                ],
+          // Bottom right confetti animation
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: SizedBox(
+              width: 100,
+              height: 100,
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: ConfettiWidget(
+                  confettiController: _rightConfettiController ?? ConfettiController(duration: const Duration(seconds: 3)),
+                  blastDirection: -3 * pi / 4,
+                  maxBlastForce: 3,
+                  minBlastForce: 1,
+                  emissionFrequency: 0.03,
+                  numberOfParticles: 20,
+                  gravity: 0.05,
+                  colors: const [
+                    Colors.green,
+                    Colors.blue,
+                    Colors.pink,
+                    Colors.orange,
+                    Colors.purple,
+                    Colors.red,
+                    Colors.yellow,
+                  ],
+                ),
               ),
             ),
+          ),
         ],
+        ),
       ),
     );
   }
