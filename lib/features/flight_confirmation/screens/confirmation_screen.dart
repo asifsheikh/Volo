@@ -309,7 +309,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                       
                       // Subtitle
                       Text(
-                        "We'll automatically notify your selected contacts about flight updates, delays, and status changes.",
+                        "We'll handle the updates to your closed family members from now on.",
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.w400,
                           fontSize: 16,
