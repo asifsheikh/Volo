@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'dart:developer' as developer;
 import '../add_flight_screen.dart';
 
 class AddFlightController extends ChangeNotifier {
@@ -38,7 +39,7 @@ class AddFlightController extends ChangeNotifier {
       allAirports = jsonList.map((json) => Airport.fromJson(json)).toList();
       isLoadingAirports = false;
       notifyListeners();
-      debugPrint('Loaded  [32m [1m [4m [7m${allAirports.length} [0m airports');
+      debugPrint('Loaded ${allAirports.length} airports');
       if (allAirports.isNotEmpty) {
         debugPrint('Sample airport: ${allAirports.first.displayName}');
       }
@@ -95,6 +96,117 @@ class AddFlightController extends ChangeNotifier {
       return 100;
     }
     return 0;
+  }
+
+  // Find airport object by city name and IATA code (only exact matches)
+  Airport? findAirportByCityAndIata(String city, String iata) {
+    final normalizedCity = city.toLowerCase().trim();
+    final normalizedIata = iata.toUpperCase().trim();
+    
+    developer.log('AddFlightController: Looking for airport - City: "$city", IATA: "$iata"', name: 'VoloUpload');
+    
+    // Only try exact matches - no auto-selection for city names
+    for (final airport in allAirports) {
+      final airportCity = airport.city.toLowerCase().trim();
+      final airportIata = airport.iata.toUpperCase().trim();
+      
+      // Check if city and IATA code match exactly
+      if (airportCity == normalizedCity && airportIata == normalizedIata) {
+        developer.log('AddFlightController: Found exact match: ${airport.displayName}', name: 'VoloUpload');
+        return airport;
+      }
+    }
+    
+    developer.log('AddFlightController: Could not find exact airport match for $city ($iata)', name: 'VoloUpload');
+    return null;
+  }
+
+  // Populate form fields from extracted ticket data
+  void populateFormFromTicket(Map<String, dynamic> ticketData) {
+    try {
+      // Extract flight number
+      final String? flightNumber = ticketData['flightNumber'] as String?;
+      if (flightNumber != null && flightNumber.isNotEmpty) {
+        flightNumberController.text = flightNumber;
+      }
+
+      // Extract and set departure date
+      final String? departureDateStr = ticketData['departureDate'] as String?;
+      if (departureDateStr != null) {
+        final DateTime? parsedDate = DateTime.tryParse(departureDateStr);
+        if (parsedDate != null) {
+          setSelectedDate(parsedDate);
+        }
+      }
+
+      // Extract departure information
+      final String? departureCity = ticketData['departureCity'] as String?;
+      final String? departureAirport = ticketData['departureAirport'] as String?;
+      if (departureCity != null && departureAirport != null) {
+        // Check if departureAirport is a valid IATA code (3 uppercase letters)
+        final bool isDepartureValidIata = RegExp(r'^[A-Z]{3}$').hasMatch(departureAirport.toUpperCase().trim());
+        
+        if (isDepartureValidIata) {
+          // If it's a valid IATA code, try to find the airport
+          final Airport? departureAirportObj = findAirportByCityAndIata(departureCity, departureAirport);
+          if (departureAirportObj != null) {
+            // Use the airport object to populate (same as dropdown selection)
+            onDepartureAirportSelected(departureAirportObj);
+            developer.log('AddFlightController: Found departure airport: ${departureAirportObj.displayName}', name: 'VoloUpload');
+          } else {
+            // Valid IATA but not found in database, pre-populate with city name
+            departureCityController.text = departureCity;
+            selectedDepartureCity = departureCity;
+            selectedDepartureAirport = null; // Clear airport object since we only have city name
+            notifyListeners();
+            developer.log('AddFlightController: Pre-populated departure with city: $departureCity (IATA not found)', name: 'VoloUpload');
+          }
+        } else {
+          // Not a valid IATA code, pre-populate with city name only
+          departureCityController.text = departureCity;
+          selectedDepartureCity = departureCity;
+          selectedDepartureAirport = null; // Clear airport object since we only have city name
+          notifyListeners();
+          developer.log('AddFlightController: Pre-populated departure with city: $departureCity (not valid IATA)', name: 'VoloUpload');
+        }
+      }
+
+      // Extract arrival information
+      final String? arrivalCity = ticketData['arrivalCity'] as String?;
+      final String? arrivalAirport = ticketData['arrivalAirport'] as String?;
+      if (arrivalCity != null && arrivalAirport != null) {
+        // Check if arrivalAirport is a valid IATA code (3 uppercase letters)
+        final bool isArrivalValidIata = RegExp(r'^[A-Z]{3}$').hasMatch(arrivalAirport.toUpperCase().trim());
+        
+        if (isArrivalValidIata) {
+          // If it's a valid IATA code, try to find the airport
+          final Airport? arrivalAirportObj = findAirportByCityAndIata(arrivalCity, arrivalAirport);
+          if (arrivalAirportObj != null) {
+            // Use the airport object to populate (same as dropdown selection)
+            onArrivalAirportSelected(arrivalAirportObj);
+            developer.log('AddFlightController: Found arrival airport: ${arrivalAirportObj.displayName}', name: 'VoloUpload');
+          } else {
+            // Valid IATA but not found in database, pre-populate with city name
+            arrivalCityController.text = arrivalCity;
+            selectedArrivalCity = arrivalCity;
+            selectedArrivalAirport = null; // Clear airport object since we only have city name
+            notifyListeners();
+            developer.log('AddFlightController: Pre-populated arrival with city: $arrivalCity (IATA not found)', name: 'VoloUpload');
+          }
+        } else {
+          // Not a valid IATA code, pre-populate with city name only
+          arrivalCityController.text = arrivalCity;
+          selectedArrivalCity = arrivalCity;
+          selectedArrivalAirport = null; // Clear airport object since we only have city name
+          notifyListeners();
+          developer.log('AddFlightController: Pre-populated arrival with city: $arrivalCity (not valid IATA)', name: 'VoloUpload');
+        }
+      }
+
+      developer.log('AddFlightController: Form populated with ticket data: $ticketData', name: 'VoloUpload');
+    } catch (e) {
+      developer.log('AddFlightController: Error populating form from ticket data: $e', name: 'VoloUpload');
+    }
   }
 
   // Airport selection methods
