@@ -116,7 +116,6 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
           _selectedContacts.add(ContactModel(
             name: contactName,
             phoneNumber: phoneNumber,
-            platform: 'WhatsApp', // For now, assume WhatsApp
           ));
         });
         
@@ -331,28 +330,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                                               ),
                                             ),
                                           ],
-                                          if (contact.platform != null) ...[
-                                            const SizedBox(height: 4),
-                                            Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.message,
-                                                  size: 16,
-                                                  color: Colors.green[600],
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  contact.platform!,
-                                                  style: TextStyle(
-                                                    fontFamily: 'Inter',
-                                                    fontWeight: FontWeight.w400,
-                                                    fontSize: 12,
-                                                    color: Colors.green[600],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+
                                         ],
                                       ),
                                     ),
