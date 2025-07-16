@@ -169,7 +169,9 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: NetworkImage('https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=400&fit=crop'),
+                              image: NetworkImage(args.departureThumbnail.isNotEmpty 
+                                  ? args.departureThumbnail 
+                                  : 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=400&fit=crop'),
                               fit: BoxFit.cover,
                               onError: (exception, stackTrace) {
                                 // Fallback to gradient
@@ -203,7 +205,9 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: NetworkImage('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=400&fit=crop'),
+                              image: NetworkImage(args.arrivalThumbnail.isNotEmpty 
+                                  ? args.arrivalThumbnail 
+                                  : 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=400&fit=crop'),
                               fit: BoxFit.cover,
                               onError: (exception, stackTrace) {
                                 // Fallback to gradient
@@ -496,6 +500,8 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                                     toCity: args.arrivalCity,
                                     contactNames: _selectedContacts.map((c) => c.name).toList(),
                                     contactAvatars: _selectedContacts.map((c) => c.avatar ?? '').toList(),
+                                    departureThumbnail: args.departureThumbnail,
+                                    arrivalThumbnail: args.arrivalThumbnail,
                                   ),
                                 ),
                               ),
