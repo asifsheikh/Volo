@@ -11,15 +11,19 @@ import 'package:google_fonts/google_fonts.dart';
 class AddContactsScreenArgs {
   final dynamic selectedFlight; // Replace with your Flight model
   final String departureCity;
+  final String departureImage;
   final String departureThumbnail;
   final String arrivalCity;
+  final String arrivalImage;
   final String arrivalThumbnail;
   
   AddContactsScreenArgs({
     required this.selectedFlight,
     required this.departureCity,
+    required this.departureImage,
     required this.departureThumbnail,
     required this.arrivalCity,
+    required this.arrivalImage,
     required this.arrivalThumbnail,
   });
 }
@@ -169,9 +173,11 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: NetworkImage(args.departureThumbnail.isNotEmpty 
-                                  ? args.departureThumbnail 
-                                  : 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=400&fit=crop'),
+                              image: NetworkImage(args.departureImage.isNotEmpty 
+                                  ? args.departureImage 
+                                  : args.departureThumbnail.isNotEmpty
+                                      ? args.departureThumbnail
+                                      : 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=400&fit=crop'),
                               fit: BoxFit.cover,
                               onError: (exception, stackTrace) {
                                 // Fallback to gradient
@@ -205,9 +211,11 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: NetworkImage(args.arrivalThumbnail.isNotEmpty 
-                                  ? args.arrivalThumbnail 
-                                  : 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=400&fit=crop'),
+                              image: NetworkImage(args.arrivalImage.isNotEmpty 
+                                  ? args.arrivalImage 
+                                  : args.arrivalThumbnail.isNotEmpty
+                                      ? args.arrivalThumbnail
+                                      : 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=400&fit=crop'),
                               fit: BoxFit.cover,
                               onError: (exception, stackTrace) {
                                 // Fallback to gradient
@@ -500,7 +508,9 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                                     toCity: args.arrivalCity,
                                     contactNames: _selectedContacts.map((c) => c.name).toList(),
                                     contactAvatars: _selectedContacts.map((c) => c.avatar ?? '').toList(),
+                                    departureImage: args.departureImage,
                                     departureThumbnail: args.departureThumbnail,
+                                    arrivalImage: args.arrivalImage,
                                     arrivalThumbnail: args.arrivalThumbnail,
                                   ),
                                 ),

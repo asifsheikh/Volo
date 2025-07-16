@@ -121,9 +121,11 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                             child: Container(
                               decoration: BoxDecoration(
                                 image: DecorationImage(
-                                  image: NetworkImage(widget.args.departureThumbnail.isNotEmpty 
-                                      ? widget.args.departureThumbnail 
-                                      : 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=400&fit=crop'),
+                                  image: NetworkImage(widget.args.departureImage.isNotEmpty 
+                                      ? widget.args.departureImage 
+                                      : widget.args.departureThumbnail.isNotEmpty
+                                          ? widget.args.departureThumbnail
+                                          : 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=400&fit=crop'),
                                   fit: BoxFit.cover,
                                   onError: (exception, stackTrace) {
                                     // Fallback to gradient
@@ -157,9 +159,11 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                             child: Container(
                               decoration: BoxDecoration(
                                 image: DecorationImage(
-                                  image: NetworkImage(widget.args.arrivalThumbnail.isNotEmpty 
-                                      ? widget.args.arrivalThumbnail 
-                                      : 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=400&fit=crop'),
+                                  image: NetworkImage(widget.args.arrivalImage.isNotEmpty 
+                                      ? widget.args.arrivalImage 
+                                      : widget.args.arrivalThumbnail.isNotEmpty
+                                          ? widget.args.arrivalThumbnail
+                                          : 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=400&fit=crop'),
                                   fit: BoxFit.cover,
                                   onError: (exception, stackTrace) {
                                     // Fallback to gradient

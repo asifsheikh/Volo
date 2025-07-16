@@ -335,14 +335,20 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    // Find departure and arrival thumbnails from response.airports
-                    String depThumb = '', arrThumb = '';
+                    // Find departure and arrival images and thumbnails from response.airports
+                    String depImage = '', depThumb = '', arrImage = '', arrThumb = '';
                     for (final airportInfo in response.airports) {
                       for (final dep in airportInfo.departure) {
-                        if (dep.airport.id == depIata) depThumb = dep.thumbnail ?? '';
+                        if (dep.airport.id == depIata) {
+                          depImage = dep.image ?? '';
+                          depThumb = dep.thumbnail ?? '';
+                        }
                       }
                       for (final arr in airportInfo.arrival) {
-                        if (arr.airport.id == arrIata) arrThumb = arr.thumbnail ?? '';
+                        if (arr.airport.id == arrIata) {
+                          arrImage = arr.image ?? '';
+                          arrThumb = arr.thumbnail ?? '';
+                        }
                       }
                     }
                     Navigator.of(context).push(
@@ -351,8 +357,10 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> {
                           args: AddContactsScreenArgs(
                             selectedFlight: option,
                             departureCity: depCity,
+                            departureImage: depImage,
                             departureThumbnail: depThumb,
                             arrivalCity: arrCity,
+                            arrivalImage: arrImage,
                             arrivalThumbnail: arrThumb,
                           ),
                         ),
