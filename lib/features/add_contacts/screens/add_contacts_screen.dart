@@ -144,390 +144,395 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
   Widget build(BuildContext context) {
     final args = widget.args;
     final screenHeight = MediaQuery.of(context).size.height;
-    final bannerHeight = screenHeight * 0.4; // 40% of screen height (slightly less than 50%)
+    final bannerHeight = screenHeight * 0.4; // 40% of screen height
     
     return Scaffold(
       backgroundColor: const Color(0xFFE5E7EB),
-      body: Column(
-        children: [
-          // Dramatic Banner (Top 40% of screen)
-          Container(
-            height: bannerHeight,
-            child: Stack(
-              children: [
-                // Background Images
-                Row(
-                  children: [
-                    // Departing City (Left 50%)
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage('https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=400&fit=crop'),
-                            fit: BoxFit.cover,
-                            onError: (exception, stackTrace) {
-                              // Fallback to gradient
-                            },
-                          ),
-                        ),
+      body: CustomScrollView(
+        slivers: [
+          // Sliver App Bar for the banner with fade effect
+          SliverAppBar(
+            expandedHeight: bannerHeight,
+            floating: false,
+            pinned: false,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            automaticallyImplyLeading: false,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                children: [
+                  // Background Images
+                  Row(
+                    children: [
+                      // Departing City (Left 50%)
+                      Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                Colors.black.withOpacity(0.4),
-                                Colors.transparent,
-                              ],
+                            image: DecorationImage(
+                              image: NetworkImage('https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=400&fit=crop'),
+                              fit: BoxFit.cover,
+                              onError: (exception, stackTrace) {
+                                // Fallback to gradient
+                              },
                             ),
                           ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.flight_takeoff,
-                              color: Colors.white,
-                              size: 48,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Colors.black.withOpacity(0.4),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.flight_takeoff,
+                                color: Colors.white,
+                                size: 48,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    
-                    // Arriving City (Right 50%)
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=400&fit=crop'),
-                            fit: BoxFit.cover,
-                            onError: (exception, stackTrace) {
-                              // Fallback to gradient
-                            },
-                          ),
-                        ),
+                      
+                      // Arriving City (Right 50%)
+                      Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.centerRight,
-                              end: Alignment.centerLeft,
-                              colors: [
-                                Colors.black.withOpacity(0.4),
-                                Colors.transparent,
-                              ],
+                            image: DecorationImage(
+                              image: NetworkImage('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=400&fit=crop'),
+                              fit: BoxFit.cover,
+                              onError: (exception, stackTrace) {
+                                // Fallback to gradient
+                              },
                             ),
                           ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.flight_land,
-                              color: Colors.white,
-                              size: 48,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.centerRight,
+                                end: Alignment.centerLeft,
+                                colors: [
+                                  Colors.black.withOpacity(0.4),
+                                  Colors.transparent,
+                                ],
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                
-                // Back button and title row (top left)
-                Positioned(
-                  top: MediaQuery.of(context).padding.top + 16,
-                  left: 16,
-                  right: 16,
-                  child: Row(
-                    children: [
-                      // Circular back button
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      // Left-aligned title
-                      Text(
-                        'Add Contacts',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 20,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                // City names at bottom of banner
-                Positioned(
-                  bottom: 40,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    children: [
-                      Text(
-                        '${args.departureCity.toUpperCase()} → ${args.arrivalCity.toUpperCase()}',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          color: Colors.white,
-                          letterSpacing: 1.5,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        width: 120,
-                        height: 2,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.transparent,
-                              Colors.white.withOpacity(0.8),
-                              Colors.transparent,
-                            ],
-                            stops: const [0.0, 0.5, 1.0],
+                            child: const Center(
+                              child: Icon(
+                                Icons.flight_land,
+                                color: Colors.white,
+                                size: 48,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
+                  
+                  // Back button and title row (top left)
+                  Positioned(
+                    top: MediaQuery.of(context).padding.top + 16,
+                    left: 16,
+                    right: 16,
+                    child: Row(
+                      children: [
+                        // Circular back button
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Left-aligned title
+                        Text(
+                          'Add Contacts',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 20,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // City names at bottom of banner
+                  Positioned(
+                    bottom: 40,
+                    left: 0,
+                    right: 0,
+                    child: Column(
+                      children: [
+                        Text(
+                          '${args.departureCity.toUpperCase()} → ${args.arrivalCity.toUpperCase()}',
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18,
+                            color: Colors.white,
+                            letterSpacing: 1.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          width: 120,
+                          height: 2,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.transparent,
+                                Colors.white.withOpacity(0.8),
+                                Colors.transparent,
+                              ],
+                              stops: const [0.0, 0.5, 1.0],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           
           // Content below banner
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8),
-                    
-                    // Title
-                    const Text(
-                      'Who should we notify?',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w700,
-                        fontSize: 20,
-                        color: Color(0xFF111827),
-                      ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  
+                  // Title
+                  const Text(
+                    'Who should we notify?',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 20,
+                      color: Color(0xFF111827),
                     ),
-                    const SizedBox(height: 6),
-                    
-                    // Subtitle
-                    const Text(
-                      'Add your loved ones\' WhatsApp contacts',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 15,
-                        color: Color(0xFF6B7280),
-                        height: 1.4,
-                      ),
+                  ),
+                  const SizedBox(height: 6),
+                  
+                  // Subtitle
+                  const Text(
+                    'Add your loved ones\' WhatsApp contacts',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 15,
+                      color: Color(0xFF6B7280),
+                      height: 1.4,
                     ),
-                    const SizedBox(height: 28),
+                  ),
+                  const SizedBox(height: 28),
                     
-                    // Add Contact Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton.icon(
-                        onPressed: _pickContact,
-                        icon: const Icon(Icons.add, color: Color(0xFF374151), size: 24),
-                        label: const Text(
-                          'Add Contact',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            color: Color(0xFF374151),
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 0,
-                          shadowColor: Colors.transparent,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-                    
-                    // Selected Contacts List
-                    if (_selectedContacts.isNotEmpty) ...[
-                      const Text(
-                        'Selected Contacts',
+                  // Add Contact Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton.icon(
+                      onPressed: _pickContact,
+                      icon: const Icon(Icons.add, color: Color(0xFF374151), size: 24),
+                      label: const Text(
+                        'Add Contact',
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          color: Color(0xFF111827),
+                          fontSize: 16,
+                          color: Color(0xFF374151),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                        shadowColor: Colors.transparent,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                    
+                  // Selected Contacts List
+                  if (_selectedContacts.isNotEmpty) ...[
+                    const Text(
+                      'Selected Contacts',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        color: Color(0xFF111827),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    ..._selectedContacts.asMap().entries.map((entry) {
+                      final int index = entry.key;
+                      final ContactModel contact = entry.value;
                       
-                      ..._selectedContacts.asMap().entries.map((entry) {
-                        final int index = entry.key;
-                        final ContactModel contact = entry.value;
-                        
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFE5E7EB)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 2,
-                                offset: const Offset(0, 1),
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFE5E7EB)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 2,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            // Avatar
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF008080).withOpacity(0.1),
+                                shape: BoxShape.circle,
                               ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              // Avatar
-                              Container(
-                                width: 48,
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF008080).withOpacity(0.1),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',
-                                    style: const TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 18,
-                                      color: Color(0xFF008080),
-                                    ),
+                              child: Center(
+                                child: Text(
+                                  contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 18,
+                                    color: Color(0xFF008080),
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 16),
-                              
-                              // Contact Info
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
+                            ),
+                            const SizedBox(width: 16),
+                            
+                            // Contact Info
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    contact.name,
+                                    style: const TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                      color: Color(0xFF111827),
+                                    ),
+                                  ),
+                                  if (contact.phoneNumber != null) ...[
+                                    const SizedBox(height: 4),
                                     Text(
-                                      contact.name,
+                                      contact.phoneNumber!,
                                       style: const TextStyle(
                                         fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
-                                        color: Color(0xFF111827),
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 14,
+                                        color: Color(0xFF6B7280),
                                       ),
                                     ),
-                                    if (contact.phoneNumber != null) ...[
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        contact.phoneNumber!,
-                                        style: const TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 14,
-                                          color: Color(0xFF6B7280),
-                                        ),
-                                      ),
-                                    ],
-
                                   ],
+                                ],
+                              ),
+                            ),
+                            
+                            // Remove Button
+                            IconButton(
+                              onPressed: () => _removeContact(index),
+                              icon: const Icon(
+                                Icons.remove_circle_outline,
+                                color: Color(0xFFDC2626),
+                                size: 24,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                    
+                  const SizedBox(height: 32),
+                    
+                  // Bottom Button - Only show when contacts are selected
+                  if (_selectedContacts.isNotEmpty) ...[
+                    const SizedBox(height: 20),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+                      child: SizedBox(
+                        width: 350,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // Navigate to confirmation screen
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => ConfirmationScreen(
+                                  args: ConfirmationArgs(
+                                    fromCity: args.departureCity,
+                                    toCity: args.arrivalCity,
+                                    contactNames: _selectedContacts.map((c) => c.name).toList(),
+                                    contactAvatars: _selectedContacts.map((c) => c.avatar ?? '').toList(),
+                                  ),
                                 ),
                               ),
-                              
-                              // Remove Button
-                              IconButton(
-                                onPressed: () => _removeContact(index),
-                                icon: const Icon(
-                                  Icons.remove_circle_outline,
-                                  color: Color(0xFFDC2626),
-                                  size: 24,
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1F2937),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 10,
+                            shadowColor: Colors.black.withOpacity(0.1),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.check, color: Colors.white, size: 20),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Continue (${_selectedContacts.length})',
+                                style: const TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: Colors.white,
                                 ),
                               ),
                             ],
                           ),
-                        );
-                      }).toList(),
-                    ],
-                    
-                    const SizedBox(height: 32),
+                        ),
+                      ),
+                    ),
                   ],
-                ),
+                ],
               ),
             ),
           ),
-          
-          // Bottom Button - Only show when contacts are selected
-          if (_selectedContacts.isNotEmpty)
-            Container(
-              width: double.infinity,
-              color: const Color(0xFFE5E7EB),
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-              child: SizedBox(
-                width: 350,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Navigate to confirmation screen
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => ConfirmationScreen(
-                          args: ConfirmationArgs(
-                            fromCity: args.departureCity,
-                            toCity: args.arrivalCity,
-                            contactNames: _selectedContacts.map((c) => c.name).toList(),
-                            contactAvatars: _selectedContacts.map((c) => c.avatar ?? '').toList(),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1F2937),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 10,
-                    shadowColor: Colors.black.withOpacity(0.1),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.check, color: Colors.white, size: 20),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Continue (${_selectedContacts.length})',
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );

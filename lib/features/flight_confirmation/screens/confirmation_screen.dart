@@ -156,17 +156,20 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                       ],
                     ),
                     
-                    // Back button (top left)
+                    // Back button (top left) - matching add contacts screen
                     Positioned(
                       top: MediaQuery.of(context).padding.top + 16,
                       left: 16,
                       child: Container(
+                        width: 36,
+                        height: 36,
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(20),
+                          shape: BoxShape.circle,
                         ),
                         child: IconButton(
-                          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 20),
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
