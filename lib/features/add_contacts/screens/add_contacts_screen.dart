@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import '../../../screens/home/city_connection_header.dart';
 import '../../../features/flight_confirmation/screens/confirmation_screen.dart';
 import '../../../features/flight_confirmation/models/confirmation_args.dart';
 import '../widgets/contact_picker_dialog.dart';
@@ -42,6 +41,8 @@ class AddContactsScreen extends StatefulWidget {
 
 class _AddContactsScreenState extends State<AddContactsScreen> {
   final List<ContactModel> _selectedContacts = [];
+  bool _enableNotifications = false; // Track notification preference
+  bool _showFlightUpdates = false; // Track expandable card state
 
   Future<void> _pickContact() async {
     try {
@@ -154,434 +155,534 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     final bannerHeight = screenHeight * 0.4; // 40% of screen height
     
+    // Check if at least one action is taken
+    final bool hasActionTaken = _enableNotifications || _selectedContacts.isNotEmpty;
+    
     return Scaffold(
       backgroundColor: const Color(0xFFE5E7EB),
-      body: CustomScrollView(
-        slivers: [
-          // Sliver App Bar for the banner with fade effect
-          SliverAppBar(
-            expandedHeight: bannerHeight,
-            floating: false,
-            pinned: false,
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            automaticallyImplyLeading: false,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                children: [
-                  // Background Images
-                  Row(
-                    children: [
-                      // Departing City (Left 50%)
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: NetworkImage(args.departureImage.isNotEmpty 
-                                  ? args.departureImage 
-                                  : args.departureThumbnail.isNotEmpty
-                                      ? args.departureThumbnail
-                                      : 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=400&fit=crop'),
-                              fit: BoxFit.cover,
-                              onError: (exception, stackTrace) {
-                                // Fallback to gradient
-                              },
-                            ),
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Colors.black.withOpacity(0.4),
-                                  Colors.transparent,
-                                ],
-                              ),
-                            ),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.flight_takeoff,
-                                    color: Colors.white,
-                                    size: 48,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    args.departureAirportCode.toUpperCase(),
-                                    style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 32,
-                                      color: Colors.white,
-                                      letterSpacing: 1.5,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      
-                      // Arriving City (Right 50%)
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: NetworkImage(args.arrivalImage.isNotEmpty 
-                                  ? args.arrivalImage 
-                                  : args.arrivalThumbnail.isNotEmpty
-                                      ? args.arrivalThumbnail
-                                      : 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=400&fit=crop'),
-                              fit: BoxFit.cover,
-                              onError: (exception, stackTrace) {
-                                // Fallback to gradient
-                              },
-                            ),
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.centerRight,
-                                end: Alignment.centerLeft,
-                                colors: [
-                                  Colors.black.withOpacity(0.4),
-                                  Colors.transparent,
-                                ],
-                              ),
-                            ),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.flight_land,
-                                    color: Colors.white,
-                                    size: 48,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    args.arrivalAirportCode.toUpperCase(),
-                                    style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 32,
-                                      color: Colors.white,
-                                      letterSpacing: 1.5,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  
-                  // Back button and title row (top left)
-                  Positioned(
-                    top: MediaQuery.of(context).padding.top + 16,
-                    left: 16,
-                    right: 16,
-                    child: Row(
+      body: Column(
+        children: [
+          // Scrollable content
+          Expanded(
+            child: CustomScrollView(
+              slivers: [
+                // Sliver App Bar for the banner with fade effect
+                SliverAppBar(
+                  expandedHeight: bannerHeight,
+                  floating: false,
+                  pinned: false,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  automaticallyImplyLeading: false,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Stack(
                       children: [
-                        // Circular back button
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-                            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        // Left-aligned title
-                        Text(
-                          'Add Contacts',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 20,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  // City names at bottom of banner
-                  Positioned(
-                    bottom: 40,
-                    left: 0,
-                    right: 0,
-                    child: Column(
-                      children: [
-                        Text(
-                          '${args.departureCity.toUpperCase()} → ${args.arrivalCity.toUpperCase()}',
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18,
-                            color: Colors.white,
-                            letterSpacing: 1.5,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 12),
-                        Container(
-                          width: 120,
-                          height: 2,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.transparent,
-                                Colors.white.withOpacity(0.8),
-                                Colors.transparent,
-                              ],
-                              stops: const [0.0, 0.5, 1.0],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          
-          // Content below banner
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 8),
-                  
-                  // Title
-                  const Text(
-                    'Who should we notify?',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w700,
-                      fontSize: 20,
-                      color: Color(0xFF111827),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  
-                  // Subtitle
-                  const Text(
-                    'Add your loved ones\' WhatsApp contacts',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 15,
-                      color: Color(0xFF6B7280),
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                    
-                  // Add Contact Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton.icon(
-                      onPressed: _pickContact,
-                      icon: const Icon(Icons.add, color: Color(0xFF374151), size: 24),
-                      label: const Text(
-                        'Add Contact',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                          color: Color(0xFF374151),
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 0,
-                        shadowColor: Colors.transparent,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                    
-                  // Selected Contacts List
-                  if (_selectedContacts.isNotEmpty) ...[
-                    const Text(
-                      'Selected Contacts',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
-                        color: Color(0xFF111827),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    ..._selectedContacts.asMap().entries.map((entry) {
-                      final int index = entry.key;
-                      final ContactModel contact = entry.value;
-                      
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFE5E7EB)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 2,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                        child: Row(
+                        // Background Images
+                        Row(
                           children: [
-                            // Avatar
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF008080).withOpacity(0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Center(
-                                child: Text(
-                                  contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',
-                                  style: const TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 18,
-                                    color: Color(0xFF008080),
+                            // Departing City (Left 50%)
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: NetworkImage(args.departureImage.isNotEmpty 
+                                        ? args.departureImage 
+                                        : args.departureThumbnail.isNotEmpty
+                                            ? args.departureThumbnail
+                                            : 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=400&fit=crop'),
+                                    fit: BoxFit.cover,
+                                    onError: (exception, stackTrace) {
+                                      // Fallback to gradient
+                                    },
+                                  ),
+                                ),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                      colors: [
+                                        Colors.black.withOpacity(0.4),
+                                        Colors.transparent,
+                                      ],
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.flight_takeoff,
+                                          color: Colors.white,
+                                          size: 48,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          args.departureAirportCode.toUpperCase(),
+                                          style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 32,
+                                            color: Colors.white,
+                                            letterSpacing: 1.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 16),
                             
-                            // Contact Info
+                            // Arriving City (Right 50%)
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    contact.name,
-                                    style: const TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                      color: Color(0xFF111827),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: NetworkImage(args.arrivalImage.isNotEmpty 
+                                        ? args.arrivalImage 
+                                        : args.arrivalThumbnail.isNotEmpty
+                                            ? args.arrivalThumbnail
+                                            : 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=400&fit=crop'),
+                                    fit: BoxFit.cover,
+                                    onError: (exception, stackTrace) {
+                                      // Fallback to gradient
+                                    },
+                                  ),
+                                ),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.centerRight,
+                                      end: Alignment.centerLeft,
+                                      colors: [
+                                        Colors.black.withOpacity(0.4),
+                                        Colors.transparent,
+                                      ],
                                     ),
                                   ),
-                                  if (contact.phoneNumber != null) ...[
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      contact.phoneNumber!,
-                                      style: const TextStyle(
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 14,
-                                        color: Color(0xFF6B7280),
-                                      ),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.flight_land,
+                                          color: Colors.white,
+                                          size: 48,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          args.arrivalAirportCode.toUpperCase(),
+                                          style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 32,
+                                            color: Colors.white,
+                                            letterSpacing: 1.5,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                            
-                            // Remove Button
-                            IconButton(
-                              onPressed: () => _removeContact(index),
-                              icon: const Icon(
-                                Icons.remove_circle_outline,
-                                color: Color(0xFFDC2626),
-                                size: 24,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
                         ),
-                      );
-                    }).toList(),
-                  ],
-                    
-                  const SizedBox(height: 32),
-                    
-                  // Bottom Button - Only show when contacts are selected
-                  if (_selectedContacts.isNotEmpty) ...[
-                    const SizedBox(height: 20),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
-                      child: SizedBox(
-                        width: 350,
-                        height: 56,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Navigate to confirmation screen
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => ConfirmationScreen(
-                                  args: ConfirmationArgs(
-                                    fromCity: args.departureCity,
-                                    toCity: args.arrivalCity,
-                                    contactNames: _selectedContacts.map((c) => c.name).toList(),
-                                    contactAvatars: _selectedContacts.map((c) => c.avatar ?? '').toList(),
-                                    departureAirportCode: args.departureAirportCode,
-                                    departureImage: args.departureImage,
-                                    departureThumbnail: args.departureThumbnail,
-                                    arrivalAirportCode: args.arrivalAirportCode,
-                                    arrivalImage: args.arrivalImage,
-                                    arrivalThumbnail: args.arrivalThumbnail,
-                                  ),
+                        
+                        // Back button and title row (top left)
+                        Positioned(
+                          top: MediaQuery.of(context).padding.top + 16,
+                          left: 16,
+                          right: 16,
+                          child: Row(
+                            children: [
+                              // Circular back button
+                              Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.9),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
+                                  onPressed: () => Navigator.of(context).pop(),
                                 ),
                               ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1F2937),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 10,
-                            shadowColor: Colors.black.withOpacity(0.1),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.check, color: Colors.white, size: 20),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 16),
+                              // Left-aligned title
                               Text(
-                                'Continue (${_selectedContacts.length})',
-                                style: const TextStyle(
+                                'Add Contacts',
+                                style: TextStyle(
                                   fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 20,
                                   color: Colors.white,
                                 ),
                               ),
                             ],
                           ),
                         ),
+                        
+                        // City names at bottom of banner
+                        Positioned(
+                          bottom: 40,
+                          left: 0,
+                          right: 0,
+                          child: Column(
+                            children: [
+                              Text(
+                                '${args.departureCity.toUpperCase()} → ${args.arrivalCity.toUpperCase()}',
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  letterSpacing: 1.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 12),
+                              Container(
+                                width: 120,
+                                height: 2,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.transparent,
+                                      Colors.white.withOpacity(0.8),
+                                      Colors.transparent,
+                                    ],
+                                    stops: const [0.0, 0.5, 1.0],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                
+                // Content below banner
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 8),
+                        
+                        // Your Own Updates Section
+                        const Text(
+                          'Your Own Updates',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18,
+                            color: Color(0xFF111827),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        
+                        // Checkbox for own updates
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: _enableNotifications,
+                              onChanged: (value) {
+                                setState(() {
+                                  _enableNotifications = value ?? false;
+                                });
+                              },
+                              activeColor: const Color(0xFF008080),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Send me updates about this flight',
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                      color: Color(0xFF111827),
+                                    ),
+                                  ),
+                                  SizedBox(height: 2),
+                                  Text(
+                                    "I'll receive all flight updates and notifications for this journey.",
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 13,
+                                      color: Color(0xFF6B7280),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 32),
+                        
+                        // Share With Close Ones Section
+                        const Text(
+                          'Share With Close Ones',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18,
+                            color: Color(0xFF111827),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        
+                        const Text(
+                          'Notify my close ones (via WhatsApp)',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        
+                        // Compact Add Contact Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: OutlinedButton.icon(
+                            onPressed: _pickContact,
+                            icon: const Icon(Icons.add, color: Color(0xFF008080), size: 20),
+                            label: const Text(
+                              'Add Contact',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Color(0xFF008080),
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFF008080), width: 1.5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              backgroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                        
+                        // Selected Contacts
+                        if (_selectedContacts.isNotEmpty) ...[
+                          const SizedBox(height: 20),
+                          
+                          ..._selectedContacts.asMap().entries.map((entry) {
+                            final int index = entry.key;
+                            final ContactModel contact = entry.value;
+                            
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: const Color(0xFFE5E7EB)),
+                              ),
+                              child: Row(
+                                children: [
+                                  // Avatar with emoji
+                                  Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF008080).withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',
+                                        style: const TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                          color: Color(0xFF008080),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  
+                                  // Contact Info
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          contact.name,
+                                          style: const TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            color: Color(0xFF111827),
+                                          ),
+                                        ),
+                                        if (contact.phoneNumber != null) ...[
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            contact.phoneNumber!,
+                                            style: const TextStyle(
+                                              fontFamily: 'Inter',
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 12,
+                                              color: Color(0xFF6B7280),
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                  
+                                  // Remove Button
+                                  IconButton(
+                                    onPressed: () => _removeContact(index),
+                                    icon: const Icon(
+                                      Icons.remove_circle_outline,
+                                      color: Color(0xFFDC2626),
+                                      size: 20,
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ],
+                        
+                        const SizedBox(height: 32),
+                        
+                        // Simple Disclaimer
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              color: const Color(0xFF6B7280),
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'What flight updates do we send?',
+                                style: const TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                  color: Color(0xFF374151),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        
+                        // Description
+                        Text(
+                          'You and your selected contacts will be notified if there\'s a schedule change, gate change, delay, or cancellation.',
+                          style: const TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 13,
+                            color: Color(0xFF6B7280),
+                            height: 1.4,
+                          ),
+                        ),
+                        
+                        // Bottom padding to account for the pinned button
+                        const SizedBox(height: 100),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Pinned Continue Button at bottom
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE5E7EB),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: hasActionTaken ? () {
+                  // Navigate to confirmation screen
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => ConfirmationScreen(
+                        args: ConfirmationArgs(
+                          fromCity: args.departureCity,
+                          toCity: args.arrivalCity,
+                          contactNames: _selectedContacts.map((c) => c.name).toList(),
+                          contactAvatars: _selectedContacts.map((c) => c.avatar ?? '').toList(),
+                          departureAirportCode: args.departureAirportCode,
+                          departureImage: args.departureImage,
+                          departureThumbnail: args.departureThumbnail,
+                          arrivalAirportCode: args.arrivalAirportCode,
+                          arrivalImage: args.arrivalImage,
+                          arrivalThumbnail: args.arrivalThumbnail,
+                          enableNotifications: _enableNotifications,
+                        ),
+                      ),
+                    ),
+                  );
+                } : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: hasActionTaken ? const Color(0xFF1F2937) : const Color(0xFF9CA3AF),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: hasActionTaken ? 10 : 0,
+                  shadowColor: hasActionTaken ? Colors.black.withOpacity(0.1) : Colors.transparent,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.check, 
+                      color: hasActionTaken ? Colors.white : const Color(0xFF6B7280), 
+                      size: 20
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Continue',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: hasActionTaken ? Colors.white : const Color(0xFF6B7280),
                       ),
                     ),
                   ],
-                ],
+                ),
               ),
             ),
           ),

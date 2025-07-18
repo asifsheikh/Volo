@@ -10,6 +10,7 @@ class ConfirmationArgs {
   final String arrivalAirportCode;
   final String arrivalImage;
   final String arrivalThumbnail;
+  final bool enableNotifications;
   
   const ConfirmationArgs({
     required this.fromCity,
@@ -23,5 +24,6 @@ class ConfirmationArgs {
     required this.arrivalAirportCode,
     required this.arrivalImage,
     required this.arrivalThumbnail,
+    this.enableNotifications = false,
   });
 } 
