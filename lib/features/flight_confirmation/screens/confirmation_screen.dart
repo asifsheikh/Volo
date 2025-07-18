@@ -420,7 +420,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                              'Got it, thanks!',
+                                              "Let's go!",
                                               style: GoogleFonts.inter(
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 18,
@@ -630,7 +630,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Got it, thanks!',
+                                "Let's go!",
                                 style: GoogleFonts.inter(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 18,

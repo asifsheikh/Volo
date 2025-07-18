@@ -21,8 +21,29 @@ class FlightSelectScreen extends StatefulWidget {
   State<FlightSelectScreen> createState() => _FlightSelectScreenState();
 }
 
-class _FlightSelectScreenState extends State<FlightSelectScreen> {
+class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProviderStateMixin {
   int? _expandedIndex;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+    _animationController.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   // Helper to get city name by IATA code from airports array
   String _cityNameForIata(String iata, FlightSearchResponse response) {
@@ -65,11 +86,7 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> {
           future: widget.searchFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1F2937)),
-                ),
-              );
+              return _buildSkeletonLoading();
             } else if (snapshot.hasError) {
               return _buildError(snapshot.error.toString());
             } else if (!snapshot.hasData || (snapshot.data!.bestFlights.isEmpty && snapshot.data!.otherFlights.isEmpty)) {
@@ -87,6 +104,154 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> {
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildSkeletonLoading() {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      itemCount: 6, // Show 6 skeleton cards
+      itemBuilder: (context, index) {
+        return _buildSkeletonCard();
+      },
+    );
+  }
+
+  Widget _buildSkeletonCard() {
+    return AnimatedBuilder(
+      animation: _fadeAnimation,
+      builder: (context, child) {
+        return Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Airline logo skeleton
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300]!.withOpacity(_fadeAnimation.value * 0.6 + 0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  const SizedBox(width: 18),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Time skeleton
+                        Row(
+                          children: [
+                            Container(
+                              width: 80,
+                              height: 18,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300]!.withOpacity(_fadeAnimation.value * 0.6 + 0.2),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            const Spacer(),
+                            Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300]!.withOpacity(_fadeAnimation.value * 0.6 + 0.2),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        // Route skeleton
+                        Container(
+                          width: 120,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300]!.withOpacity(_fadeAnimation.value * 0.6 + 0.2),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        // Airport codes skeleton
+                        Container(
+                          width: 80,
+                          height: 15,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300]!.withOpacity(_fadeAnimation.value * 0.6 + 0.2),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // Duration and stops skeleton
+                        Row(
+                          children: [
+                            Container(
+                              width: 60,
+                              height: 15,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300]!.withOpacity(_fadeAnimation.value * 0.6 + 0.2),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Container(
+                              width: 80,
+                              height: 15,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300]!.withOpacity(_fadeAnimation.value * 0.6 + 0.2),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              // Price skeleton
+              Row(
+                children: [
+                  Container(
+                    width: 100,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300]!.withOpacity(_fadeAnimation.value * 0.6 + 0.2),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  const Spacer(),
+                  Container(
+                    width: 120,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300]!.withOpacity(_fadeAnimation.value * 0.6 + 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

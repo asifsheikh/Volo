@@ -68,7 +68,7 @@ class AddFlightScreen extends StatefulWidget {
   State<AddFlightScreen> createState() => _AddFlightScreenState();
 }
 
-class _AddFlightScreenState extends State<AddFlightScreen> {
+class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   DateTime? _selectedDate;
   String? _selectedDepartureCity;
@@ -79,9 +79,32 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   List<Airport> _allAirports = [];
   bool _isLoadingAirports = false;
 
+  // Animation controllers for micro-interactions
+  late AnimationController _uploadButtonController;
+  late AnimationController _scanButtonController;
+  late Animation<double> _uploadButtonScale;
+  late Animation<double> _scanButtonScale;
+
   @override
   void initState() {
     super.initState();
+    // Initialize animation controllers
+    _uploadButtonController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scanButtonController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    
+    _uploadButtonScale = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _uploadButtonController, curve: Curves.easeInOut),
+    );
+    _scanButtonScale = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _scanButtonController, curve: Curves.easeInOut),
+    );
+    
     // Reset confetti flag for new journey
     resetConfettiForNewJourney();
     
@@ -94,6 +117,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
 
   @override
   void dispose() {
+    _uploadButtonController.dispose();
+    _scanButtonController.dispose();
     super.dispose();
   }
 
@@ -259,98 +284,120 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: SizedBox(
-                              height: 58,
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  await UploadTicketService.uploadTicket(
-                                    context,
-                                    onSuccess: _populateFormFromTicket,
-                                  );
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  shadowColor: Colors.black.withOpacity(0.05),
-                                  elevation: 1,
-                                  padding: EdgeInsets.zero,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.upload, color: Color(0xFF4B5563), size: 16),
-                                    const SizedBox(width: 6),
-                                    const Text(
-                                      'Upload Ticket',
-                                      style: TextStyle(
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 14,
-                                        height: 1.2,
-                                        color: Color(0xFF374151),
+                            child: AnimatedBuilder(
+                              animation: _uploadButtonScale,
+                              builder: (context, child) {
+                                return Transform.scale(
+                                  scale: _uploadButtonScale.value,
+                                  child: SizedBox(
+                                    height: 58,
+                                    child: OutlinedButton(
+                                      onPressed: () async {
+                                        _uploadButtonController.forward().then((_) {
+                                          _uploadButtonController.reverse();
+                                        });
+                                        await UploadTicketService.uploadTicket(
+                                          context,
+                                          onSuccess: _populateFormFromTicket,
+                                        );
+                                      },
+                                      style: OutlinedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        shadowColor: Colors.black.withOpacity(0.05),
+                                        elevation: 1,
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.upload, color: Color(0xFF4B5563), size: 16),
+                                          const SizedBox(width: 6),
+                                          const Text(
+                                            'Upload Ticket',
+                                            style: TextStyle(
+                                              fontFamily: 'Inter',
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 14,
+                                              height: 1.2,
+                                              color: Color(0xFF374151),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: SizedBox(
-                              height: 58,
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  try {
-                                    final result = await UploadTicketService.scanPass(
-                                      context,
-                                      onSuccess: _populateFormFromTicket,
-                                    );
-                                    print('Scan Pass result: $result');
-                                  } catch (e) {
-                                    print('Scan Pass error: $e');
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Failed to scan ticket: $e'),
-                                        backgroundColor: Colors.red,
-                                        duration: const Duration(seconds: 3),
+                            child: AnimatedBuilder(
+                              animation: _scanButtonScale,
+                              builder: (context, child) {
+                                return Transform.scale(
+                                  scale: _scanButtonScale.value,
+                                  child: SizedBox(
+                                    height: 58,
+                                    child: OutlinedButton(
+                                      onPressed: () async {
+                                        _scanButtonController.forward().then((_) {
+                                          _scanButtonController.reverse();
+                                        });
+                                        try {
+                                          final result = await UploadTicketService.scanPass(
+                                            context,
+                                            onSuccess: _populateFormFromTicket,
+                                          );
+                                          print('Scan Pass result: $result');
+                                        } catch (e) {
+                                          print('Scan Pass error: $e');
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Failed to scan ticket: $e'),
+                                              backgroundColor: Colors.red,
+                                              duration: const Duration(seconds: 3),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      style: OutlinedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        shadowColor: Colors.black.withOpacity(0.05),
+                                        elevation: 1,
+                                        padding: EdgeInsets.zero,
                                       ),
-                                    );
-                                  }
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  shadowColor: Colors.black.withOpacity(0.05),
-                                  elevation: 1,
-                                  padding: EdgeInsets.zero,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.camera_alt, color: Color(0xFF4B5563), size: 16),
-                                    const SizedBox(width: 6),
-                                    const Text(
-                                      'Scan Pass',
-                                      style: TextStyle(
-                                        fontFamily: 'Inter',
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 14,
-                                        height: 1.2,
-                                        color: Color(0xFF374151),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.camera_alt, color: Color(0xFF4B5563), size: 16),
+                                          const SizedBox(width: 6),
+                                          const Text(
+                                            'Scan Pass',
+                                            style: TextStyle(
+                                              fontFamily: 'Inter',
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 14,
+                                              height: 1.2,
+                                              color: Color(0xFF374151),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ],
