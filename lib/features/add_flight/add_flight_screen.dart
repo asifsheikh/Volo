@@ -10,6 +10,7 @@ import 'upload_ticket_service.dart';
 import '../../screens/home/flight_results_screen.dart';
 import '../../screens/home/flight_select_screen.dart';
 import 'controller/add_flight_controller.dart';
+import '../../features/flight_confirmation/screens/confirmation_screen.dart' show resetConfettiForNewJourney;
 
 class Airport {
   final String city;
@@ -81,6 +82,9 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   @override
   void initState() {
     super.initState();
+    // Reset confetti flag for new journey
+    resetConfettiForNewJourney();
+    
     // Use controller to load airports
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final controller = context.read<AddFlightController>();

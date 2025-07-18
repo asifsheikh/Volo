@@ -6,6 +6,14 @@ import 'package:confetti/confetti.dart';
 import 'dart:math';
 import '../models/confirmation_args.dart';
 
+// Global flag to track if confetti has been shown for the current journey
+bool _hasShownConfettiForJourney = false;
+
+// Global function to reset confetti flag when starting a new journey
+void resetConfettiForNewJourney() {
+  _hasShownConfettiForJourney = false;
+}
+
 class ConfirmationScreen extends StatefulWidget {
   final ConfirmationArgs args;
 
@@ -22,7 +30,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
   ConfettiController? _confettiController;
   ConfettiController? _leftConfettiController;
   ConfettiController? _rightConfettiController;
-
+  
   @override
   void initState() {
     super.initState();
@@ -34,12 +42,17 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
     _leftConfettiController = ConfettiController(duration: const Duration(seconds: 3));
     _rightConfettiController = ConfettiController(duration: const Duration(seconds: 3));
     
-    // Trigger bottom confetti after the frame is rendered
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 100), () {
-        _playConfetti(includeCenter: false);
+    // Only trigger confetti if it hasn't been shown for this journey
+    if (!_hasShownConfettiForJourney) {
+      _hasShownConfettiForJourney = true;
+      
+      // Trigger bottom confetti after the frame is rendered
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          _playConfetti(includeCenter: false);
+        });
       });
-    });
+    }
   }
 
   @override
