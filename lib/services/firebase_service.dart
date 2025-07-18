@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'dart:developer' as developer;
 
 class FirebaseService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -59,16 +61,28 @@ class FirebaseService {
         throw Exception('No authenticated user found');
       }
 
+      // Get FCM token if available
+      String? fcmToken;
+      try {
+        fcmToken = await _messaging.getToken();
+      } catch (e) {
+        // FCM token not available yet, will be updated later
+        developer.log('FirebaseService: FCM token not available during profile creation: $e', name: 'VoloAuth');
+      }
+
       final userData = {
         'firstName': firstName,
         'lastName': lastName,
         'phoneNumber': phoneNumber,
+        'fcmToken': fcmToken, // Include FCM token in initial profile
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
         'isOnboarded': true,
       };
 
       await _firestore.collection('users').doc(user.uid).set(userData);
+      
+      developer.log('FirebaseService: User profile created with FCM token: ${fcmToken != null ? 'Yes' : 'No'}', name: 'VoloAuth');
     } catch (e) {
       rethrow;
     }
@@ -185,4 +199,81 @@ class FirebaseService {
 
   // Listen to user changes
   static Stream<User?> get userChanges => _auth.userChanges();
+
+  // FCM Token Management
+  static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+
+  /// Save FCM token to user profile
+  static Future<void> saveFCMToken(String token) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('No authenticated user found');
+      }
+
+      await _firestore.collection('users').doc(user.uid).update({
+        'fcmToken': token,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      
+      developer.log('FirebaseService: FCM token saved to user profile', name: 'VoloAuth');
+    } catch (e) {
+      developer.log('FirebaseService: Failed to save FCM token: $e', name: 'VoloAuth');
+      rethrow;
+    }
+  }
+
+  /// Ensure FCM token is up to date in user profile
+  static Future<void> ensureFCMTokenUpdated() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return;
+
+      final currentToken = await _messaging.getToken();
+      if (currentToken == null) return;
+
+      final storedToken = await getFCMToken();
+      
+      // Only update if token has changed or doesn't exist
+      if (storedToken != currentToken) {
+        await saveFCMToken(currentToken);
+        developer.log('FirebaseService: FCM token updated in user profile', name: 'VoloAuth');
+      }
+    } catch (e) {
+      developer.log('FirebaseService: Failed to ensure FCM token updated: $e', name: 'VoloAuth');
+    }
+  }
+
+  /// Get FCM token for current user
+  static Future<String?> getFCMToken() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return null;
+
+      final doc = await _firestore.collection('users').doc(user.uid).get();
+      if (doc.exists) {
+        return doc.data()?['fcmToken'];
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Delete FCM token from user profile
+  static Future<void> deleteFCMToken() async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('No authenticated user found');
+      }
+
+      await _firestore.collection('users').doc(user.uid).update({
+        'fcmToken': FieldValue.delete(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
 } 

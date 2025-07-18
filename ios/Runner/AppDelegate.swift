@@ -2,7 +2,9 @@ import Flutter
 import UIKit
 import Firebase
 import FirebaseAuth
-import FirebaseAppCheck // <--- Keep this import!
+import FirebaseAppCheck
+import FirebaseMessaging
+import UserNotifications
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -33,6 +35,12 @@ import FirebaseAppCheck // <--- Keep this import!
     
     // Register Flutter plugins
     GeneratedPluginRegistrant.register(with: self)
+    
+    // Set up Firebase Messaging delegate
+    Messaging.messaging().delegate = self
+    
+    // Request notification permissions (Flutter will handle this, but we can also do it here)
+    UNUserNotificationCenter.current().delegate = self
     
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
@@ -66,15 +74,74 @@ import FirebaseAppCheck // <--- Keep this import!
     super.application(application, didReceiveRemoteNotification: notification, fetchCompletionHandler: completionHandler)
   }
   
-  // Handle APNs device token for Firebase Auth
+  // Handle APNs device token for Firebase Auth and Messaging
   override func application(
     _ application: UIApplication,
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
   ) {
-    // Pass device token to auth
+    // Pass device token to Firebase Auth
     Auth.auth().setAPNSToken(deviceToken, type: .unknown)
+    
+    // Pass device token to Firebase Messaging
+    Messaging.messaging().apnsToken = deviceToken
+    
+    // Log the token for debugging
+    let tokenString = deviceToken.map { String(format: "%02x", $0) }.joined()
+    print("✅ APNs device token: \(tokenString)")
     
     // Further handling of the device token if needed by the app
     super.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
+  }
+  
+  // Handle push notification registration failure
+  override func application(
+    _ application: UIApplication,
+    didFailToRegisterForRemoteNotificationsWithError error: Error
+  ) {
+    print("❌ Failed to register for remote notifications: \(error.localizedDescription)")
+    super.application(application, didFailToRegisterForRemoteNotificationsWithError: error)
+  }
+}
+
+// MARK: - Firebase Messaging Delegate
+extension AppDelegate: MessagingDelegate {
+  func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+    print("✅ Firebase registration token: \(fcmToken ?? "nil")")
+    
+    // Store the token for later use
+    let dataDict: [String: String] = ["token": fcmToken ?? ""]
+    NotificationCenter.default.post(
+      name: Notification.Name("FCMToken"),
+      object: nil,
+      userInfo: dataDict
+    )
+  }
+}
+
+// MARK: - UNUserNotificationCenter Delegate
+extension AppDelegate {
+  // Handle notifications when app is in foreground
+  override func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    willPresent notification: UNNotification,
+    withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+  ) {
+    let userInfo = notification.request.content.userInfo
+    print("📱 Foreground notification received: \(userInfo)")
+    
+    // Show the notification even when app is in foreground
+    completionHandler([[.alert, .sound, .badge]])
+  }
+  
+  // Handle notification tap
+  override func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    didReceive response: UNNotificationResponse,
+    withCompletionHandler completionHandler: @escaping () -> Void
+  ) {
+    let userInfo = response.notification.request.content.userInfo
+    print("👆 Notification tapped: \(userInfo)")
+    
+    completionHandler()
   }
 }

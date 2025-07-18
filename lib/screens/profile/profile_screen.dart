@@ -7,6 +7,7 @@ import '../../services/firebase_service.dart';
 import '../../services/profile_picture_service.dart';
 import '../../services/remote_config_service.dart';
 import '../../features/ai_demo/ai_demo_screen.dart';
+import 'push_notification_test_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String username;
@@ -729,6 +730,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             onTap: () {
                               // Show remote config status in a dialog
                               _showRemoteConfigStatus();
+                            },
+                          ),
+                          const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                          ListTile(
+                            leading: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: Color(0x33008080),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Center(
+                                child: Icon(
+                                  Icons.notifications,
+                                  color: Color(0xFF008080),
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                            title: Row(
+                              children: [
+                                const Text(
+                                  'Push Notifications',
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 18,
+                                    color: Color(0xFF333333),
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFF6B35),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text(
+                                    'DEBUG',
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 8,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (context) => const PushNotificationTestScreen()),
+                              );
                             },
                           ),
                         ],
