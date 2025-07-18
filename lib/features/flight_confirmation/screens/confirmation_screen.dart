@@ -261,7 +261,6 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                       // Content below banner
                       SliverToBoxAdapter(
                         child: Container(
-                          height: MediaQuery.of(context).size.height - bannerHeight - 120, // Account for banner and bottom button
                           padding: const EdgeInsets.all(24.0),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
