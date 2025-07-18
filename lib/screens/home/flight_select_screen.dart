@@ -264,7 +264,7 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.error_outline, size: 56, color: Color(0xFF9CA3AF)),
+              Icon(Icons.search_off, size: 56, color: Color(0xFF9CA3AF)),
               const SizedBox(height: 16),
               Text(
                 'No flights found',
@@ -279,7 +279,7 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: Text(
-                  'Try adjusting your search criteria or check your dates.',
+                  'Try adjusting your search criteria, check your dates, or try a different route.',
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w400,
@@ -287,6 +287,25 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
                     color: Color(0xFF6B7280),
                   ),
                   textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1F2937),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Try Again',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ],

@@ -215,9 +215,15 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
     // Use the selected airport objects directly
     if (controller.selectedDepartureAirport == null || controller.selectedArrivalAirport == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select both departure and arrival airports'),
-          backgroundColor: Color(0xFFDC2626),
+        SnackBar(
+          content: const Text('Please select both departure and arrival airports to continue'),
+          backgroundColor: const Color(0xFFDC2626),
+          duration: const Duration(seconds: 4),
+          action: SnackBarAction(
+            label: 'Got it',
+            textColor: Colors.white,
+            onPressed: () {},
+          ),
         ),
       );
       return;
@@ -359,9 +365,19 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
                                           print('Scan Pass error: $e');
                                           ScaffoldMessenger.of(context).showSnackBar(
                                             SnackBar(
-                                              content: Text('Failed to scan ticket: $e'),
-                                              backgroundColor: Colors.red,
-                                              duration: const Duration(seconds: 3),
+                                              content: Text('Unable to scan ticket. Please try uploading it instead.'),
+                                              backgroundColor: Colors.orange,
+                                              duration: const Duration(seconds: 4),
+                                              action: SnackBarAction(
+                                                label: 'Upload',
+                                                textColor: Colors.white,
+                                                onPressed: () async {
+                                                  await UploadTicketService.uploadTicket(
+                                                    context,
+                                                    onSuccess: _populateFormFromTicket,
+                                                  );
+                                                },
+                                              ),
                                             ),
                                           );
                                         }

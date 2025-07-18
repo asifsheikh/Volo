@@ -86,7 +86,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                       const SizedBox(height: 16),
                       const Text(
-                        'Travel peacefully.\nWe\'ll keep them updated.',
+                        'Your journey, their peace of mind.',
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w400,
@@ -115,7 +115,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 24.0),
                       child: Text(
-                        'You fly.\nThey stay informed.',
+                        'Fly worry-free.\nKeep loved ones updated.',
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w700,
@@ -161,7 +161,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 24.0),
                           child: Text(
-                            'You travel. We handle the updates.',
+                            'Your journey, our responsibility.',
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w700,
@@ -176,7 +176,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 24.0),
                           child: Text(
-                            'Let your close ones stay informed, without having to lift a finger.',
+                            'We take care of the updates, so you can focus on what matters most.',
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w400,
@@ -214,7 +214,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: const [
                                   Text(
-                                    'Get Started',
+                                    'Start Your Journey',
                                     style: TextStyle(
                                       fontFamily: 'Inter',
                                       fontWeight: FontWeight.w400,

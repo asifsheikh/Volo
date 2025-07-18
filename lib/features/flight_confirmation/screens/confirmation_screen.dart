@@ -288,24 +288,15 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   // Title
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Text(
-                                        "🎉",
-                                        style: TextStyle(fontSize: 28),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        "You're all set!",
-                                        style: GoogleFonts.inter(
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 28,
-                                          height: 32 / 28,
-                                          color: const Color(0xFF1F2937),
-                                        ),
-                                      ),
-                                    ],
+                                  Text(
+                                    "You're all set!",
+                                    style: GoogleFonts.inter(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 28,
+                                      height: 32 / 28,
+                                      color: const Color(0xFF1F2937),
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
                                   const SizedBox(height: 16),
                                   
@@ -428,7 +419,10 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                               ),
                                             ),
                                             const SizedBox(width: 8),
-                                            const Icon(Icons.check, color: Colors.white, size: 20),
+                                            const Text(
+                                              "✈️",
+                                              style: TextStyle(fontSize: 20),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -638,7 +632,10 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              const Icon(Icons.check, color: Colors.white, size: 20),
+                              const Text(
+                                "✈️",
+                                style: TextStyle(fontSize: 20),
+                              ),
                             ],
                           ),
                         ),
