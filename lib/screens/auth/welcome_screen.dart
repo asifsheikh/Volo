@@ -59,11 +59,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         'Volo',
                         style: TextStyle(
                           fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 48,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 40,
                           letterSpacing: 1.2,
                           color: Color(0xFF1F2937),
-                          height: 1.0,
+                          height: 1.1,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -90,9 +90,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         style: TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                          height: 26 / 16,
-                          color: Color(0xFF4B5563),
+                          fontSize: 18,
+                          height: 1.4,
+                          color: Color(0xFF6B7280),
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -112,20 +112,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 32),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24.0),
-                      child: Text(
-                        'Fly worry-free.\nKeep loved ones updated.',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 40,
-                          height: 1.1,
-                          color: Color(0xFF232B36),
+                                            const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Text(
+                            'Fly worry-free.\nKeep loved ones updated.',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                              fontSize: 40,
+                              height: 1.1,
+                              color: Color(0xFF1F2937),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
                     const SizedBox(height: 24),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 24.0),
@@ -165,9 +165,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w700,
-                              fontSize: 36,
+                              fontSize: 40,
                               height: 1.1,
-                              color: Color(0xFF232B36),
+                              color: Color(0xFF1F2937),
                             ),
                             textAlign: TextAlign.center,
                           ),
