@@ -213,14 +213,7 @@ class _OtpScreenState extends State<OtpScreen> {
       // Sign in with Firebase using the credential
       await _auth.signInWithCredential(credential);
       
-      // Show success message to user
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Phone number verified successfully!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
+      // Success - no snack bar needed
       
       // Handle post-authentication routing
       await _handlePostAuthentication();
@@ -600,14 +593,7 @@ class _OtpScreenState extends State<OtpScreen> {
           // Start countdown timer
           _startResendCountdown();
           
-          // Show success message
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('OTP resent successfully!'),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 2),
-            ),
-          );
+          // Success - no snack bar needed
         },
         // Timeout callback
         codeAutoRetrievalTimeout: (String verificationId) {

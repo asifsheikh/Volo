@@ -249,14 +249,7 @@ class ProfilePictureService {
       // Close loading dialog
       Navigator.of(context).pop();
 
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profile picture updated successfully!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
+      // Success - no snack bar needed
 
       return true;
     } catch (e) {

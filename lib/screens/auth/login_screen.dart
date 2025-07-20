@@ -233,14 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
             _isLoading = false;
           });
 
-          // Show success message to user
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('OTP sent to ${fullPhoneNumber}'),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 2),
-            ),
-          );
+          // Success - no snack bar needed
 
           // Navigate to OTP verification screen
           Navigator.of(context).push(

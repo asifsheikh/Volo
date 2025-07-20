@@ -47,14 +47,7 @@ class UploadTicketService {
             ticketType: ticketType,
             originalFlightCount: ticketData['originalFlightCount'], // Pass original count for deduplication info
             onFlightSelected: (selectedFlight) {
-              // Show success message
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Successfully extracted flight information from ${_uploadedFileName}'),
-                  backgroundColor: Colors.green,
-                  duration: const Duration(seconds: 3),
-                ),
-              );
+              // Success - no snack bar needed
               
               developer.log('UploadTicketService: Flight selected from multi-flight ticket: $selectedFlight', name: 'VoloUpload');
               
@@ -70,14 +63,7 @@ class UploadTicketService {
       final Map<String, dynamic>? firstFlight = _extractionService.getFirstFlight(ticketData);
       
       if (firstFlight != null) {
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Successfully extracted flight information from ${_uploadedFileName}'),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 3),
-          ),
-        );
+        // Success - no snack bar needed
         
         developer.log('UploadTicketService: Flight info extracted successfully: $firstFlight', name: 'VoloUpload');
         
@@ -88,13 +74,7 @@ class UploadTicketService {
         // Fallback: use the first flight from the flights array
         final List<Map<String, dynamic>> flights = _extractionService.getAllFlights(ticketData);
         if (flights.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Successfully extracted flight information from ${_uploadedFileName}'),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 3),
-            ),
-          );
+          // Success - no snack bar needed
           
           developer.log('UploadTicketService: Flight info extracted successfully (fallback): ${flights.first}', name: 'VoloUpload');
           
