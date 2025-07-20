@@ -376,7 +376,28 @@ class AppTheme {
     ),
     
     // Input decoration theme
-    inputDecorationTheme: inputDecoration,
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: cardBackground,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: borderPrimary),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: borderPrimary),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: borderFocus, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: destructive),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      hintStyle: bodyMedium.copyWith(color: textTertiary),
+    ),
     
     // Elevated button theme
     elevatedButtonTheme: ElevatedButtonThemeData(
