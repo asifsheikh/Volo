@@ -159,7 +159,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
     final bool hasActionTaken = _enableNotifications || _selectedContacts.isNotEmpty;
     
     return Scaffold(
-      backgroundColor: const Color(0xFFE5E7EB),
+      backgroundColor: const Color(0xFFF7F8FA),
       body: Column(
         children: [
           // Scrollable content

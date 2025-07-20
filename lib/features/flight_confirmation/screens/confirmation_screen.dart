@@ -95,7 +95,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
     final bannerHeight = screenHeight * 0.5; // 50% of screen height
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: const Color(0xFFF7F8FA),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final availableHeight = constraints.maxHeight;

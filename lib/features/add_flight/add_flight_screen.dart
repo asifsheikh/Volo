@@ -253,10 +253,10 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE5E7EB),
+      backgroundColor: const Color(0xFFF7F8FA),
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFE5E7EB),
+        backgroundColor: const Color(0xFFF7F8FA),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF111827)),

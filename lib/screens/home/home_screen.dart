@@ -40,21 +40,20 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE5E7EB),
+      backgroundColor: const Color(0xFFF7F8FA),
       body: SafeArea(
         child: Column(
           children: [
+            // Header section with greeting and profile
             Padding(
               padding: EdgeInsets.only(
                 left: 24.0, 
                 right: 24.0,
-                top: MediaQuery.of(context).padding.top > 0 ? 24.0 : 32.0,
-                bottom: 24.0,
+                top: MediaQuery.of(context).padding.top > 0 ? 16.0 : 24.0,
+                bottom: 32.0,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -90,99 +89,159 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 48),
+            
+            // Main content area
             Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                    child: Text(
-                      'No flights being tracked yet',
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Main title
+                    Text(
+                      'Travel confidently—Volo updates your loved ones automatically',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w700,
-                        fontSize: 24,
+                        fontSize: 28,
+                        height: 1.2,
                         color: Color(0xFF1F2937),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                    child: Text(
-                      'Add your first flight to start keeping your loved ones updated',
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Subtitle
+                    Text(
+                      'Add your flight details and Volo will keep your family and friends updated in real time, so you can focus on your journey.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
                         fontSize: 16,
+                        height: 1.5,
                         color: Color(0xFF6B7280),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 48),
-                  SizedBox(
-                    width: 320,
-                    height: 60,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ChangeNotifierProvider(
-                              create: (context) => AddFlightController(),
-                              child: const AddFlightScreen(),
+                    
+                    const SizedBox(height: 48),
+                    
+                    // Primary CTA Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ChangeNotifierProvider(
+                                create: (context) => AddFlightController(),
+                                child: const AddFlightScreen(),
+                              ),
                             ),
+                          );
+                        },
+                        icon: const Icon(
+                          Icons.flight_takeoff, 
+                          color: Colors.white, 
+                          size: 24,
+                        ),
+                        label: const Text(
+                          'Add Your Flight',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF059393),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 0,
+                          shadowColor: Colors.transparent,
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Secondary link
+                    GestureDetector(
+                      onTap: () {
+                        // TODO: Navigate to "How does Volo work?" screen
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('How does Volo work? - Coming soon!'),
+                            duration: Duration(seconds: 2),
                           ),
                         );
                       },
-                      icon: const Icon(Icons.flight_takeoff, color: Colors.white, size: 28),
-                      label: const Text(
-                        'Add Your First Flight',
+                      child: Text(
+                        'How does Volo work?',
                         style: TextStyle(
                           fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
-                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                          color: Color(0xFF059393),
+                          decoration: TextDecoration.underline,
                         ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1F2937),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 8,
-                        shadowColor: Colors.black.withOpacity(0.1),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: (index) {},
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: 0,
+          onTap: (index) {
+            // TODO: Implement navigation logic
+          },
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.flight_outlined),
+              activeIcon: Icon(Icons.flight),
+              label: 'Flights',
+            ),
+          ],
+          selectedItemColor: Color(0xFF059393),
+          unselectedItemColor: Color(0xFF9CA3AF),
+          selectedLabelStyle: TextStyle(
+            fontFamily: 'Inter', 
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.flight),
-            label: 'Flights',
+          unselectedLabelStyle: TextStyle(
+            fontFamily: 'Inter', 
+            fontWeight: FontWeight.w500,
+            fontSize: 12,
           ),
-        ],
-        selectedItemColor: Color(0xFF059393),
-        unselectedItemColor: Color(0xFF9CA3AF),
-        selectedLabelStyle: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w500),
-        unselectedLabelStyle: TextStyle(fontFamily: 'Inter', fontWeight: FontWeight.w400),
-        backgroundColor: Colors.white,
-        elevation: 12,
-        type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+        ),
       ),
     );
   }
