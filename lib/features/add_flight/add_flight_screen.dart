@@ -557,7 +557,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1F2937),
+                        backgroundColor: const Color(0xFF059393),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

@@ -401,7 +401,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                           Navigator.of(context).popUntil((route) => route.isFirst);
                                         },
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xFF1F2937),
+                                          backgroundColor: const Color(0xFF059393),
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(14),
                                           ),
@@ -614,7 +614,7 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                             Navigator.of(context).popUntil((route) => route.isFirst);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1F2937),
+                            backgroundColor: const Color(0xFF059393),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),

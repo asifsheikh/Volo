@@ -293,7 +293,7 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1F2937),
+                  backgroundColor: const Color(0xFF059393),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -564,7 +564,7 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1F2937),
+                    backgroundColor: const Color(0xFF059393),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

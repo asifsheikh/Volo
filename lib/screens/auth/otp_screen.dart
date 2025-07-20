@@ -414,8 +414,8 @@ class _OtpScreenState extends State<OtpScreen> {
                           height: 60,
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _onVerify,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF1F2937),
+                                                  style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF059393),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),

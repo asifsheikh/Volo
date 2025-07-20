@@ -656,7 +656,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                   );
                 } : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: hasActionTaken ? const Color(0xFF1F2937) : const Color(0xFF9CA3AF),
+                                      backgroundColor: hasActionTaken ? const Color(0xFF059393) : const Color(0xFF9CA3AF),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
