@@ -361,32 +361,35 @@ class _OtpScreenState extends State<OtpScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 24.0),
                         child: Column(
                           children: [
-                            PinCodeTextField(
-                              appContext: context,
-                              length: 6,
-                              onChanged: (value) {
-                                setState(() {
-                                  _otp = value;
-                                  if (_otp.length == 6) _errorText = null;
-                                });
-                              },
-                              pinTheme: PinTheme(
-                                shape: PinCodeFieldShape.box,
-                                borderRadius: BorderRadius.circular(12),
-                                fieldHeight: 48,
-                                fieldWidth: 48,
-                                activeColor: _errorText != null ? Colors.red : const Color(0xFF9CA3AF),
-                                selectedColor: const Color(0xFF1F2937),
-                                inactiveColor: const Color(0xFF9CA3AF),
-                                activeFillColor: Colors.white,
-                                selectedFillColor: Colors.white,
-                                inactiveFillColor: Colors.white,
-                                borderWidth: 2,
+                            Center(
+                              child: PinCodeTextField(
+                                appContext: context,
+                                length: 6,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _otp = value;
+                                    if (_otp.length == 6) _errorText = null;
+                                  });
+                                },
+                                pinTheme: PinTheme(
+                                  shape: PinCodeFieldShape.box,
+                                  borderRadius: BorderRadius.circular(12),
+                                  fieldHeight: 56,
+                                  fieldWidth: 52,
+                                  activeColor: _errorText != null ? Colors.red : const Color(0xFF9CA3AF),
+                                  selectedColor: const Color(0xFF1F2937),
+                                  inactiveColor: const Color(0xFF9CA3AF),
+                                  activeFillColor: Colors.white,
+                                  selectedFillColor: Colors.white,
+                                  inactiveFillColor: Colors.white,
+                                  borderWidth: 2,
+                                ),
+                                keyboardType: TextInputType.number,
+                                animationType: AnimationType.fade,
+                                enableActiveFill: true,
+                                cursorColor: const Color(0xFF1F2937),
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               ),
-                              keyboardType: TextInputType.number,
-                              animationType: AnimationType.fade,
-                              enableActiveFill: true,
-                              cursorColor: const Color(0xFF1F2937),
                             ),
                             if (_errorText != null) ...[
                               const SizedBox(height: 8),
