@@ -133,35 +133,24 @@ class FlightApiService {
 }
 
 class FlightSearchResponse {
-  final SearchMetadata searchMetadata;
-  final SearchParameters searchParameters;
   final List<FlightOption> bestFlights;
   final List<FlightOption> otherFlights;
-  final PriceInsights? priceInsights;
   final List<AirportInfo> airports;
 
   FlightSearchResponse({
-    required this.searchMetadata,
-    required this.searchParameters,
     required this.bestFlights,
     required this.otherFlights,
-    this.priceInsights,
     required this.airports,
   });
 
   factory FlightSearchResponse.fromJson(Map<String, dynamic> json) {
     return FlightSearchResponse(
-      searchMetadata: SearchMetadata.fromJson(json['search_metadata'] ?? {}),
-      searchParameters: SearchParameters.fromJson(json['search_parameters'] ?? {}),
       bestFlights: (json['best_flights'] as List<dynamic>?)
           ?.map((flight) => FlightOption.fromJson(flight))
           .toList() ?? [],
       otherFlights: (json['other_flights'] as List<dynamic>?)
           ?.map((flight) => FlightOption.fromJson(flight))
           .toList() ?? [],
-      priceInsights: json['price_insights'] != null 
-          ? PriceInsights.fromJson(json['price_insights']) 
-          : null,
       airports: (json['airports'] as List<dynamic>?)
           ?.map((airport) => AirportInfo.fromJson(airport))
           .toList() ?? [],
@@ -192,51 +181,7 @@ class FlightSearchResponse {
   }
 }
 
-class SearchMetadata {
-  final String id;
-  final String status;
-  final String createdAt;
 
-  SearchMetadata({
-    required this.id,
-    required this.status,
-    required this.createdAt,
-  });
-
-  factory SearchMetadata.fromJson(Map<String, dynamic> json) {
-    return SearchMetadata(
-      id: json['id'] ?? '',
-      status: json['status'] ?? '',
-      createdAt: json['created_at'] ?? '',
-    );
-  }
-}
-
-class SearchParameters {
-  final String engine;
-  final String departureId;
-  final String arrivalId;
-  final String outboundDate;
-  final String type;
-
-  SearchParameters({
-    required this.engine,
-    required this.departureId,
-    required this.arrivalId,
-    required this.outboundDate,
-    required this.type,
-  });
-
-  factory SearchParameters.fromJson(Map<String, dynamic> json) {
-    return SearchParameters(
-      engine: json['engine'] ?? '',
-      departureId: json['departure_id'] ?? '',
-      arrivalId: json['arrival_id'] ?? '',
-      outboundDate: json['outbound_date'] ?? '',
-      type: json['type'] ?? '',
-    );
-  }
-}
 
 class FlightOption {
   final List<Flight> flights;
@@ -387,32 +332,7 @@ class CarbonEmissions {
   }
 }
 
-class PriceInsights {
-  final int lowestPrice;
-  final String priceLevel;
-  final List<int> typicalPriceRange;
-  final List<List<int>> priceHistory;
 
-  PriceInsights({
-    required this.lowestPrice,
-    required this.priceLevel,
-    required this.typicalPriceRange,
-    required this.priceHistory,
-  });
-
-  factory PriceInsights.fromJson(Map<String, dynamic> json) {
-    return PriceInsights(
-      lowestPrice: json['lowest_price'] ?? 0,
-      priceLevel: json['price_level'] ?? '',
-      typicalPriceRange: (json['typical_price_range'] as List<dynamic>?)
-          ?.map((price) => price as int)
-          .toList() ?? [],
-      priceHistory: (json['price_history'] as List<dynamic>?)
-          ?.map((item) => (item as List<dynamic>).map((p) => p as int).toList())
-          .toList() ?? [],
-    );
-  }
-}
 
 class AirportInfo {
   final List<AirportDetail> departure;

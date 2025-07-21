@@ -130,45 +130,44 @@ class FlightResultsScreen extends StatelessWidget {
             ),
             
             // Results count and price info
-            if (searchResponse.priceInsights != null)
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 1),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '${allFlights.length} flights found',
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                        color: Color(0xFF374151),
-                      ),
-                    ),
-                    Text(
-                      'From \$${searchResponse.priceInsights!.lowestPrice}',
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: Color(0xFF059669),
-                      ),
-                    ),
-                  ],
-                ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
               ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${allFlights.length} flights found',
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      color: Color(0xFF374151),
+                    ),
+                  ),
+                  Text(
+                    'From \$${_getLowestPrice(allFlights)}',
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: Color(0xFF059669),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             
             const SizedBox(height: 8),
             
@@ -510,5 +509,10 @@ class FlightResultsScreen extends StatelessWidget {
     } else {
       return '${mins}m';
     }
+  }
+
+  int _getLowestPrice(List<FlightOption> flights) {
+    if (flights.isEmpty) return 0;
+    return flights.map((flight) => flight.price).reduce((a, b) => a < b ? a : b);
   }
 } 
