@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/flight_api_service.dart';
+import '../../services/network_service.dart';
+import '../../widgets/network_error_widget.dart';
 import '../../features/add_contacts/screens/add_contacts_screen.dart';
 
 class FlightSelectScreen extends StatefulWidget {
@@ -88,9 +90,9 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
             if (snapshot.connectionState == ConnectionState.waiting) {
               return _buildSkeletonLoading();
             } else if (snapshot.hasError) {
-              return _buildError(snapshot.error.toString());
+              return _buildNetworkError(snapshot.error);
             } else if (!snapshot.hasData || (snapshot.data!.bestFlights.isEmpty && snapshot.data!.otherFlights.isEmpty)) {
-              return _buildError('No flights found');
+              return _buildNoResultsError();
             }
             final response = snapshot.data!;
             final flights = [...response.bestFlights, ...response.otherFlights];
@@ -255,63 +257,39 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
     );
   }
 
-  Widget _buildError(String message) {
-    return SingleChildScrollView(
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.search_off, size: 56, color: Color(0xFF9CA3AF)),
-              const SizedBox(height: 16),
-              Text(
-                'No flights found',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 20,
-                  color: Color(0xFF374151),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Text(
-                  'Try adjusting your search criteria, check your dates, or try a different route.',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 15,
-                    color: Color(0xFF6B7280),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF059393),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  'Try Again',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+  Widget _buildNetworkError(dynamic error) {
+    NetworkError networkError;
+    
+    if (error is NetworkError) {
+      networkError = error;
+    } else {
+      // Convert generic error to NetworkError
+      networkError = NetworkError(
+        type: NetworkErrorType.unknown,
+        message: error.toString(),
+      );
+    }
+
+    return NetworkErrorWidget(
+      error: networkError,
+      onRetry: () {
+        // Retry the search by rebuilding the widget
+        setState(() {});
+      },
+    );
+  }
+
+  Widget _buildNoResultsError() {
+    return NetworkErrorWidget(
+      error: NetworkError(
+        type: NetworkErrorType.notFound,
+        message: 'No flights found for the specified route and date. Try adjusting your search criteria.',
       ),
+      customTitle: 'No Flights Found',
+      onRetry: () {
+        // Retry the search by rebuilding the widget
+        setState(() {});
+      },
     );
   }
 

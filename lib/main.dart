@@ -10,6 +10,8 @@ import 'firebase_options.dart';
 import 'core/auth_wrapper.dart';
 import 'services/firebase_service.dart';
 import 'services/remote_config_service.dart';
+import 'services/network_service.dart';
+import 'widgets/network_status_indicator.dart';
 import 'theme/app_theme.dart';
 
 // Background message handler for Firebase Cloud Messaging
@@ -28,7 +30,9 @@ class MyApp extends StatelessWidget {
       title: 'Volo',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme, // Use centralized theme
-      home: const AuthWrapper(),
+      home: NetworkStatusIndicator(
+        child: const AuthWrapper(),
+      ),
     );
   }
 }
@@ -72,6 +76,9 @@ void main() async {
     
     // Initialize Remote Config Service
     await RemoteConfigService().initialize();
+    
+    // Initialize Network Service
+    await NetworkService().initialize();
     
     // Set up Firebase Cloud Messaging background handler
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);

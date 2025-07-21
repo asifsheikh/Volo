@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:developer' as developer;
+import 'network_service.dart';
 
 class FlightApiService {
   static const String _baseUrl = 'https://searchflights-3ltmkayg6q-uc.a.run.app';
@@ -29,51 +30,74 @@ class FlightApiService {
       final uri = Uri.parse(_baseUrl).replace(queryParameters: queryParameters);
       developer.log('🟢 API URL: $uri', name: 'VoloFlightAPI');
 
-      final response = await http.get(uri);
+      // Use NetworkService for better error handling
+      final networkService = NetworkService();
+      final response = await networkService.makeRequest(
+        () => http.get(uri),
+        timeout: const Duration(seconds: 30),
+      );
+      
       developer.log('🟢 API Response Status: ${response.statusCode}', name: 'VoloFlightAPI');
       
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        developer.log('🟢 API Response received successfully', name: 'VoloFlightAPI');
-        
-        if (data['success'] != true) {
-          developer.log('❌ API Error: ${data['error'] ?? 'Unknown error'}', name: 'VoloFlightAPI');
-          throw Exception('API Error: ${data['error'] ?? 'Unknown error'}');
-        }
-        
-        // Extract data from the new response format
-        final responseData = data['data'] as Map<String, dynamic>?;
-        if (responseData == null) {
-          throw Exception('Invalid response format: missing data field');
-        }
-        
-        // Convert the new format to our existing format
-        final flights = responseData['flights'] as List<dynamic>? ?? [];
-        final airports = responseData['airports'] as List<dynamic>? ?? [];
-        
-        developer.log('🟢 API returned ${flights.length} flights and ${airports.length} airports', name: 'VoloFlightAPI');
-        
-        if (flights.isEmpty) {
-          developer.log('⚠️ No flights found in API response', name: 'VoloFlightAPI');
-          throw Exception('No flights found for the specified route and date. Try adjusting your search criteria.');
-        }
-        
-        // Convert to our existing format
-        final convertedData = {
-          'best_flights': flights, // All flights are now in one array
-          'other_flights': [], // Empty since we're not separating them
-          'airports': airports,
-        };
-        
-        final searchResponse = FlightSearchResponse.fromJson(convertedData);
-        developer.log('✅ [PRODUCTION] Found ${searchResponse.bestFlights.length} flights', name: 'VoloFlightAPI');
-        return searchResponse;
-      } else {
-        throw Exception('HTTP Error: ${response.statusCode}');
+      // Check for HTTP errors
+      final httpError = networkService.handleHttpResponse(response);
+      if (httpError != null) {
+        throw httpError;
       }
+      
+      final data = json.decode(response.body);
+      developer.log('🟢 API Response received successfully', name: 'VoloFlightAPI');
+      
+      if (data['success'] != true) {
+        developer.log('❌ API Error: ${data['error'] ?? 'Unknown error'}', name: 'VoloFlightAPI');
+        throw NetworkError(
+          type: NetworkErrorType.serverError,
+          message: 'API Error: ${data['error'] ?? 'Unknown error'}',
+        );
+      }
+      
+      // Extract data from the new response format
+      final responseData = data['data'] as Map<String, dynamic>?;
+      if (responseData == null) {
+        throw NetworkError(
+          type: NetworkErrorType.serverError,
+          message: 'Invalid response format: missing data field',
+        );
+      }
+      
+      // Convert the new format to our existing format
+      final flights = responseData['flights'] as List<dynamic>? ?? [];
+      final airports = responseData['airports'] as List<dynamic>? ?? [];
+      
+      developer.log('🟢 API returned ${flights.length} flights and ${airports.length} airports', name: 'VoloFlightAPI');
+      
+      if (flights.isEmpty) {
+        developer.log('⚠️ No flights found in API response', name: 'VoloFlightAPI');
+        throw NetworkError(
+          type: NetworkErrorType.notFound,
+          message: 'No flights found for the specified route and date. Try adjusting your search criteria.',
+        );
+      }
+      
+      // Convert to our existing format
+      final convertedData = {
+        'best_flights': flights, // All flights are now in one array
+        'other_flights': [], // Empty since we're not separating them
+        'airports': airports,
+      };
+      
+      final searchResponse = FlightSearchResponse.fromJson(convertedData);
+      developer.log('✅ [PRODUCTION] Found ${searchResponse.bestFlights.length} flights', name: 'VoloFlightAPI');
+      return searchResponse;
+    } on NetworkError {
+      rethrow;
     } catch (e) {
       developer.log('❌ [PRODUCTION] Flight search error: $e', name: 'VoloFlightAPI');
-      rethrow;
+      throw NetworkError(
+        type: NetworkErrorType.unknown,
+        message: 'An unexpected error occurred while searching flights.',
+        originalException: e is Exception ? e : Exception(e.toString()),
+      );
     }
   }
 }

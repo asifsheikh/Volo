@@ -4,6 +4,7 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'otp_screen.dart';
+import '../../services/network_service.dart';
 import 'dart:developer' as developer;
 
 /// Login Screen for Volo App
@@ -66,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Network and connectivity errors
       case 'network-request-failed':
-        return 'Network error. Please check your internet connection';
+        return 'No internet connection. Please check your network settings and try again.';
 
     // Firebase configuration errors
       case 'operation-not-allowed':
@@ -147,9 +148,9 @@ class _LoginScreenState extends State<LoginScreen> {
         if (e.message?.contains('rate limit') == true || e.message?.contains('too many requests') == true) {
           return 'Too many requests. Please wait a few minutes and try again.';
         }
-        if (e.message?.contains('network') == true || e.message?.contains('connection') == true) {
-          return 'Network error. Please check your internet connection and try again.';
-        }
+              if (e.message?.contains('network') == true || e.message?.contains('connection') == true) {
+        return 'No internet connection. Please check your network settings and try again.';
+      }
 
       // Generic error message for unknown errors
         return 'Failed to send OTP. Please try again.';
