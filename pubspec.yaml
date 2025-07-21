@@ -54,7 +54,6 @@ flutter:
     - assets/volo_app_icon.png
     - assets/animations/file_searching.json
     - assets/airports_global.json
-    - assets/mock_flights_response.json
 
 flutter_icons:
   android: true

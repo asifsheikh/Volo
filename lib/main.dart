@@ -10,7 +10,6 @@ import 'firebase_options.dart';
 import 'core/auth_wrapper.dart';
 import 'services/firebase_service.dart';
 import 'services/remote_config_service.dart';
-import 'services/push_notification_service.dart';
 import 'theme/app_theme.dart';
 
 // Background message handler for Firebase Cloud Messaging

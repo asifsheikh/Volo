@@ -75,29 +75,7 @@ class RemoteConfigService {
   /// Check if remote config is initialized
   bool get isInitialized => _isInitialized;
 
-  /// Get all current config values for debugging
-  Map<String, dynamic> getAllConfigValues() {
-    if (!_isInitialized) {
-      return {
-        'status': 'not_initialized',
-      };
-    }
 
-    try {
-      final allParams = _remoteConfig.getAll();
-      return {
-        'status': 'initialized',
-        'last_fetch_time': _remoteConfig.lastFetchTime?.toIso8601String() ?? 'never',
-        'last_fetch_status': _remoteConfig.lastFetchStatus.toString(),
-        'all_parameters': allParams,
-      };
-    } catch (e) {
-      return {
-        'status': 'error_getting_values',
-        'error': e.toString(),
-      };
-    }
-  }
   
   /// Get clean config values for UI display (read-only)
   Map<String, dynamic> getDisplayConfigValues() {
