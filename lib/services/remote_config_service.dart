@@ -1,5 +1,4 @@
 import 'package:firebase_remote_config/firebase_remote_config.dart';
-import '../config/remote_config_defaults.dart';
 import 'dart:developer' as developer;
 
 class RemoteConfigService {
@@ -27,10 +26,10 @@ class RemoteConfigService {
 
       // Set default values
       await _remoteConfig.setDefaults({
-        'use_mock_flight_data': RemoteConfigDefaults.useMockFlightData,
+        // Add future remote config parameters here
       });
       
-      developer.log('Remote Config defaults set: use_mock_flight_data = ${RemoteConfigDefaults.useMockFlightData}', name: 'VoloRemoteConfig');
+      developer.log('Remote Config defaults set', name: 'VoloRemoteConfig');
 
       // Fetch and activate config
       developer.log('Fetching Remote Config from Firebase...', name: 'VoloRemoteConfig');
@@ -42,21 +41,11 @@ class RemoteConfigService {
       
       _isInitialized = true;
       
-      // Log the actual value retrieved
-      final actualValue = _remoteConfig.getBool('use_mock_flight_data');
       developer.log('Remote Config initialized successfully', name: 'VoloRemoteConfig');
-      developer.log('use_mock_flight_data from Firebase: $actualValue', name: 'VoloRemoteConfig');
       
       // Log all available parameters for debugging
       final allParameters = _remoteConfig.getAll();
       developer.log('All Remote Config parameters: $allParameters', name: 'VoloRemoteConfig');
-      
-      // Test different ways to get the value
-      developer.log('Testing different value retrieval methods:', name: 'VoloRemoteConfig');
-      developer.log('getBool: ${_remoteConfig.getBool('use_mock_flight_data')}', name: 'VoloRemoteConfig');
-      developer.log('getString: ${_remoteConfig.getString('use_mock_flight_data')}', name: 'VoloRemoteConfig');
-      developer.log('getInt: ${_remoteConfig.getInt('use_mock_flight_data')}', name: 'VoloRemoteConfig');
-      developer.log('getDouble: ${_remoteConfig.getDouble('use_mock_flight_data')}', name: 'VoloRemoteConfig');
       
     } catch (e) {
       developer.log('Remote Config initialization failed: $e', name: 'VoloRemoteConfig');
@@ -66,43 +55,7 @@ class RemoteConfigService {
     }
   }
 
-  /// Get the use_mock_flight_data parameter value
-  /// Returns true if mock data should be used, false for real API
-  bool getUseMockFlightData() {
-    try {
-      if (!_isInitialized) {
-        developer.log('Remote Config not initialized, using default value', name: 'VoloRemoteConfig');
-        return RemoteConfigDefaults.useMockFlightData;
-      }
-      
-      // Try multiple ways to get the value
-      final boolValue = _remoteConfig.getBool('use_mock_flight_data');
-      final stringValue = _remoteConfig.getString('use_mock_flight_data');
-      
-      developer.log('Remote Config: use_mock_flight_data = $boolValue', name: 'VoloRemoteConfig');
-      developer.log('Remote Config string value: $stringValue', name: 'VoloRemoteConfig');
-      
-      // Log all parameters for debugging
-      final allParams = _remoteConfig.getAll();
-      developer.log('All Remote Config parameters: $allParams', name: 'VoloRemoteConfig');
-      
-      // Log the actual value type and source
-      developer.log('Value type: ${boolValue.runtimeType}', name: 'VoloRemoteConfig');
-      developer.log('Default value: ${RemoteConfigDefaults.useMockFlightData}', name: 'VoloRemoteConfig');
-      
-      // Check if the parameter exists in the config
-      if (allParams.containsKey('use_mock_flight_data')) {
-        developer.log('Parameter exists in config: ${allParams['use_mock_flight_data']}', name: 'VoloRemoteConfig');
-      } else {
-        developer.log('Parameter NOT found in config!', name: 'VoloRemoteConfig');
-      }
-      
-      return boolValue;
-    } catch (e) {
-      developer.log('Error getting use_mock_flight_data, using default: $e', name: 'VoloRemoteConfig');
-      return RemoteConfigDefaults.useMockFlightData;
-    }
-  }
+
 
   /// Force refresh remote config values
   Future<void> refresh() async {
@@ -110,7 +63,6 @@ class RemoteConfigService {
       developer.log('Forcing Remote Config refresh...', name: 'VoloRemoteConfig');
       final bool activated = await _remoteConfig.fetchAndActivate();
       developer.log('Remote Config refresh result: activated = $activated', name: 'VoloRemoteConfig');
-      developer.log('use_mock_flight_data after refresh: ${getUseMockFlightData()}', name: 'VoloRemoteConfig');
       
       // Log all parameters after refresh
       final allParams = _remoteConfig.getAll();
@@ -127,7 +79,6 @@ class RemoteConfigService {
   Map<String, dynamic> getAllConfigValues() {
     if (!_isInitialized) {
       return {
-        'use_mock_flight_data': RemoteConfigDefaults.useMockFlightData,
         'status': 'not_initialized',
       };
     }
@@ -135,18 +86,13 @@ class RemoteConfigService {
     try {
       final allParams = _remoteConfig.getAll();
       return {
-        'use_mock_flight_data': getUseMockFlightData(),
         'status': 'initialized',
         'last_fetch_time': _remoteConfig.lastFetchTime?.toIso8601String(),
         'last_fetch_status': _remoteConfig.lastFetchStatus.toString(),
         'all_parameters': allParams,
-        'default_value': RemoteConfigDefaults.useMockFlightData,
-        'string_value': _remoteConfig.getString('use_mock_flight_data'),
-        'parameter_exists': allParams.containsKey('use_mock_flight_data'),
       };
     } catch (e) {
       return {
-        'use_mock_flight_data': RemoteConfigDefaults.useMockFlightData,
         'status': 'error_getting_values',
         'error': e.toString(),
       };
@@ -157,20 +103,17 @@ class RemoteConfigService {
   Map<String, dynamic> getDisplayConfigValues() {
     if (!_isInitialized) {
       return {
-        'use_mock_flight_data': RemoteConfigDefaults.useMockFlightData,
         'status': 'not_initialized',
       };
     }
 
     try {
       return {
-        'use_mock_flight_data': getUseMockFlightData(),
         'status': 'initialized',
         'last_fetch_time': _remoteConfig.lastFetchTime?.toIso8601String(),
       };
     } catch (e) {
       return {
-        'use_mock_flight_data': RemoteConfigDefaults.useMockFlightData,
         'status': 'error_getting_values',
       };
     }

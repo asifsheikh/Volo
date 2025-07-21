@@ -1,133 +1,79 @@
 import 'dart:convert';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'remote_config_service.dart';
 import 'dart:developer' as developer;
 
 class FlightApiService {
-  static const String _baseUrl = 'https://serpapi.com/search.json';
-  static const String _apiKey = 'e9f50763e5d701bdb20b8b0619488341b02f382fb648c80c336b92eb004635f2';
-  
-  /// Get whether to use mock API based on remote config
-  static bool get _useMockApi {
-    return RemoteConfigService().getUseMockFlightData();
-  }
-  
-  /// Get current data source for debugging
-  static String getCurrentDataSource() {
-    return _useMockApi ? 'Mock Data' : 'Real API';
-  }
-  
-  /// Get remote config status for debugging
-  static Map<String, dynamic> getRemoteConfigStatus() {
-    return RemoteConfigService().getAllConfigValues();
-  }
+  static const String _baseUrl = 'https://searchflights-3ltmkayg6q-uc.a.run.app';
   
 
 
-  /// Search for flights using either Mock Data or the real API
+  /// Search for flights using the production backend API
   static Future<FlightSearchResponse> searchFlights({
     required String departureIata,
     required String arrivalIata,
     required String date,
     String? flightNumber,
   }) async {
-    // Get the current remote config value
-    final useMockData = _useMockApi;
-    
     developer.log('Searching flights: $departureIata → $arrivalIata on $date', name: 'VoloFlightAPI');
     
-    if (useMockData) {
-      // --- MOCK API RESPONSE ---
-      try {
-        developer.log('🔴 Using MOCK flight data', name: 'VoloFlightAPI');
-        // Load mock data from JSON file
-        final String jsonString = await rootBundle.loadString('assets/mock_flights_response.json');
-        final Map<String, dynamic> data = json.decode(jsonString);
-        // Update search parameters to match the current search
-        data['search_parameters'] = {
-          'engine': 'google_flights',
-          'hl': 'en',
-          'gl': 'us',
-          'type': '2',
-          'departure_id': departureIata,
-          'arrival_id': arrivalIata,
-          'outbound_date': date,
-          'currency': 'USD'
-        };
-        // Update search metadata
-        data['search_metadata'] = {
-          'id': 'mock_${DateTime.now().millisecondsSinceEpoch}',
-          'status': 'Success',
-          'created_at': DateTime.now().toUtc().toString(),
-          'processed_at': DateTime.now().toUtc().toString(),
-          'total_time_taken': 0.1
-        };
-        // (airports array is left as-is from the mock JSON)
-        final searchResponse = FlightSearchResponse.fromJson(data);
-        // Filter by flight number if provided
-        if (flightNumber != null && flightNumber.isNotEmpty) {
-          searchResponse.filterByFlightNumber(flightNumber);
-        }
-        developer.log('✅ [MOCK] Found ${searchResponse.bestFlights.length} flights', name: 'VoloFlightAPI');
-        return searchResponse;
-      } catch (e) {
-        developer.log('❌ [MOCK] Flight search error: $e', name: 'VoloFlightAPI');
-        rethrow;
-      }
-    } else {
-      // --- REAL API RESPONSE ---
-      try {
-        developer.log('🟢 Using REAL flight API', name: 'VoloFlightAPI');
-        
-        final queryParameters = {
-          'engine': 'google_flights',
-          'departure_id': departureIata,
-          'arrival_id': arrivalIata,
-          'outbound_date': date,
-          'type': '2', // One-way trip
-          'api_key': _apiKey,
-        };
-        
-        final uri = Uri.parse(_baseUrl).replace(queryParameters: queryParameters);
+    try {
+      developer.log('🟢 Using PRODUCTION flight API', name: 'VoloFlightAPI');
+      
+      final queryParameters = {
+        'departureIata': departureIata,
+        'arrivalIata': arrivalIata,
+        'date': date,
+        if (flightNumber != null && flightNumber.isNotEmpty) 'flightNumber': flightNumber,
+      };
+      
+      final uri = Uri.parse(_baseUrl).replace(queryParameters: queryParameters);
+      developer.log('🟢 API URL: $uri', name: 'VoloFlightAPI');
 
-        final response = await http.get(uri);
-        developer.log('🟢 API Response Status: ${response.statusCode}', name: 'VoloFlightAPI');
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
-          developer.log('🟢 API Response received successfully', name: 'VoloFlightAPI');
-          
-          if (data['error'] != null) {
-            developer.log('❌ API Error: ${data['error']}', name: 'VoloFlightAPI');
-            throw Exception('API Error: ${data['error']}');
-          }
-          
-          // Check if we have any flights
-          final bestFlights = data['best_flights'] as List<dynamic>? ?? [];
-          final otherFlights = data['other_flights'] as List<dynamic>? ?? [];
-          
-          developer.log('🟢 API returned ${bestFlights.length} best flights and ${otherFlights.length} other flights', name: 'VoloFlightAPI');
-          
-          if (bestFlights.isEmpty && otherFlights.isEmpty) {
-            developer.log('⚠️ No flights found in API response', name: 'VoloFlightAPI');
-            throw Exception('No flights found for the specified route and date. Try adjusting your search criteria.');
-          }
-          
-          final searchResponse = FlightSearchResponse.fromJson(data);
-          // Filter by flight number if provided
-          if (flightNumber != null && flightNumber.isNotEmpty) {
-            searchResponse.filterByFlightNumber(flightNumber);
-          }
-          developer.log('✅ [REAL] Found ${searchResponse.bestFlights.length} flights', name: 'VoloFlightAPI');
-          return searchResponse;
-        } else {
-          throw Exception('HTTP Error: ${response.statusCode}');
+      final response = await http.get(uri);
+      developer.log('🟢 API Response Status: ${response.statusCode}', name: 'VoloFlightAPI');
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        developer.log('🟢 API Response received successfully', name: 'VoloFlightAPI');
+        
+        if (data['success'] != true) {
+          developer.log('❌ API Error: ${data['error'] ?? 'Unknown error'}', name: 'VoloFlightAPI');
+          throw Exception('API Error: ${data['error'] ?? 'Unknown error'}');
         }
-      } catch (e) {
-        developer.log('❌ [REAL] Flight search error: $e', name: 'VoloFlightAPI');
-        // Re-throw the original error so the user sees the actual API error
-        rethrow;
+        
+        // Extract data from the new response format
+        final responseData = data['data'] as Map<String, dynamic>?;
+        if (responseData == null) {
+          throw Exception('Invalid response format: missing data field');
+        }
+        
+        // Convert the new format to our existing format
+        final flights = responseData['flights'] as List<dynamic>? ?? [];
+        final airports = responseData['airports'] as List<dynamic>? ?? [];
+        
+        developer.log('🟢 API returned ${flights.length} flights and ${airports.length} airports', name: 'VoloFlightAPI');
+        
+        if (flights.isEmpty) {
+          developer.log('⚠️ No flights found in API response', name: 'VoloFlightAPI');
+          throw Exception('No flights found for the specified route and date. Try adjusting your search criteria.');
+        }
+        
+        // Convert to our existing format
+        final convertedData = {
+          'best_flights': flights, // All flights are now in one array
+          'other_flights': [], // Empty since we're not separating them
+          'airports': airports,
+        };
+        
+        final searchResponse = FlightSearchResponse.fromJson(convertedData);
+        developer.log('✅ [PRODUCTION] Found ${searchResponse.bestFlights.length} flights', name: 'VoloFlightAPI');
+        return searchResponse;
+      } else {
+        throw Exception('HTTP Error: ${response.statusCode}');
       }
+    } catch (e) {
+      developer.log('❌ [PRODUCTION] Flight search error: $e', name: 'VoloFlightAPI');
+      rethrow;
     }
   }
 }
