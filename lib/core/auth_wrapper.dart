@@ -4,6 +4,7 @@ import 'package:firebase_app_check/firebase_app_check.dart'; // Import App Check
 import 'dart:developer' as developer;
 import 'dart:async';
 import '../services/firebase_service.dart';
+import '../services/network_service.dart';
 import '../screens/auth/welcome_screen.dart';
 import '../screens/home/home_screen.dart';
 
@@ -17,6 +18,7 @@ class AuthWrapper extends StatefulWidget {
 class _AuthWrapperState extends State<AuthWrapper> {
   bool _isLoading = true;
   bool _isOnboarded = false;
+  bool _isOffline = false;
   User? _currentUser;
 
   // Add a StreamSubscription to manage the authStateChanges listener
@@ -40,35 +42,27 @@ class _AuthWrapperState extends State<AuthWrapper> {
   /// Wait for App Check to be ready, then check authentication state
   Future<void> _waitForAppCheckAndAuthState() async {
     try {
-      // Step 1: Wait for an App Check token to be available.
-      // This will ensure App Check has initialized and propagated its state.
-      // We can use the 'getToken' method which will implicitly activate
-      // the App Check attestation if it hasn't already.
-      // Setting `forceRefresh: true` ensures we try to get a new token.
-      developer.log('AuthWrapper: Waiting for App Check token...', name: 'VoloAuth');
-      await FirebaseAppCheck.instance.getToken(true);
-      developer.log('AuthWrapper: App Check token obtained, proceeding to auth state.', name: 'VoloAuth');
-
-      // Step 2: Now that App Check is ready, set up the authStateChanges listener
-      _authStateSubscription = FirebaseAuth.instance.authStateChanges().listen((User? user) async {
-        developer.log('AuthWrapper: Auth state changed: ${user == null ? "Logged out" : "Logged in"}', name: 'VoloAuth');
-        if (user != null) {
-          // User is authenticated, check onboarding status
-          final isOnboarded = await FirebaseService.isUserOnboarded();
-
-          // Double-check: if user profile doesn't exist, they're not onboarded
-          final userProfile = await FirebaseService.getUserProfile();
-          final hasProfile = userProfile != null;
-
+      // Step 1: Check network connectivity first
+      final networkService = NetworkService();
+      final hasInternet = await networkService.hasInternetConnection();
+      
+      if (!hasInternet) {
+        developer.log('AuthWrapper: No internet connection detected, using cached auth state', name: 'VoloAuth');
+        _isOffline = true;
+        
+        // In offline mode, we can still check Firebase Auth state (it's cached)
+        final currentUser = FirebaseAuth.instance.currentUser;
+        if (currentUser != null) {
+          developer.log('AuthWrapper: User is authenticated (offline mode)', name: 'VoloAuth');
           if (mounted) {
             setState(() {
-              _currentUser = user;
-              _isOnboarded = isOnboarded && hasProfile;
+              _currentUser = currentUser;
+              _isOnboarded = true; // Assume onboarded in offline mode if authenticated
               _isLoading = false;
             });
           }
         } else {
-          // User is not authenticated
+          developer.log('AuthWrapper: No authenticated user (offline mode)', name: 'VoloAuth');
           if (mounted) {
             setState(() {
               _currentUser = null;
@@ -77,11 +71,68 @@ class _AuthWrapperState extends State<AuthWrapper> {
             });
           }
         }
+        return;
+      }
+
+      // Step 2: Wait for an App Check token to be available (only when online)
+      developer.log('AuthWrapper: Waiting for App Check token...', name: 'VoloAuth');
+      await FirebaseAppCheck.instance.getToken(true);
+      developer.log('AuthWrapper: App Check token obtained, proceeding to auth state.', name: 'VoloAuth');
+
+      // Step 3: Now that App Check is ready, set up the authStateChanges listener
+      _authStateSubscription = FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+        developer.log('AuthWrapper: Auth state changed: ${user == null ? "Logged out" : "Logged in"}', name: 'VoloAuth');
+        if (user != null) {
+          // User is authenticated, check onboarding status
+          try {
+            final isOnboarded = await FirebaseService.isUserOnboarded();
+
+            // Double-check: if user profile doesn't exist, they're not onboarded
+            final userProfile = await FirebaseService.getUserProfile();
+            final hasProfile = userProfile != null;
+
+            if (mounted) {
+              setState(() {
+                _currentUser = user;
+                _isOnboarded = isOnboarded && hasProfile;
+                _isOffline = false;
+                _isLoading = false;
+              });
+            }
+          } catch (e) {
+            developer.log('AuthWrapper: Error checking onboarding status: $e', name: 'VoloAuth');
+            // If there's an error checking onboarding (e.g., network issue), 
+            // assume user is onboarded if they're authenticated
+            if (mounted) {
+              setState(() {
+                _currentUser = user;
+                _isOnboarded = true; // Assume onboarded if authenticated
+                _isOffline = true;
+                _isLoading = false;
+              });
+            }
+          }
+        } else {
+          // User is not authenticated
+          if (mounted) {
+            setState(() {
+              _currentUser = null;
+              _isOnboarded = false;
+              _isOffline = false;
+              _isLoading = false;
+            });
+          }
+        }
       });
     } catch (e) {
       developer.log('AuthWrapper: Error during App Check or Auth state check: $e', name: 'VoloAuth');
+      // If there's an error, try to use cached auth state
+      final currentUser = FirebaseAuth.instance.currentUser;
       if (mounted) {
         setState(() {
+          _currentUser = currentUser;
+          _isOnboarded = currentUser != null; // Assume onboarded if authenticated
+          _isOffline = true;
           _isLoading = false;
         });
       }
@@ -90,7 +141,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    // ... (rest of your build method, _buildLoadingScreen, _buildHomeScreen remain the same)
     // Show loading screen while checking authentication state
     if (_isLoading) {
       return _buildLoadingScreen();
@@ -105,6 +155,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
     // User is authenticated and onboarded
     developer.log('AuthWrapper: Routing to HomeScreen', name: 'VoloAuth');
+    if (_isOffline) {
+      developer.log('AuthWrapper: User is in offline mode', name: 'VoloAuth');
+    }
     return _buildHomeScreen();
   }
 
@@ -156,7 +209,23 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
   /// Build home screen with user data
   Widget _buildHomeScreen() {
-    // Get user profile data for display name
+    // If offline, use cached user data or default values
+    if (_isOffline) {
+      final user = _currentUser;
+      String displayName = 'User';
+      
+      // Try to get display name from cached user data
+      if (user?.displayName != null && user!.displayName!.isNotEmpty) {
+        displayName = user.displayName!;
+      } else if (user?.phoneNumber != null) {
+        // Use phone number as fallback
+        displayName = 'User (${user!.phoneNumber!.substring(user.phoneNumber!.length - 4)})';
+      }
+
+      return HomeScreen(username: displayName);
+    }
+
+    // Online mode - get user profile data for display name
     return FutureBuilder<Map<String, dynamic>?>(
       future: FirebaseService.getUserProfile(),
       builder: (context, snapshot) {
@@ -165,12 +234,20 @@ class _AuthWrapperState extends State<AuthWrapper> {
           return _buildLoadingScreen();
         }
 
-        // If no data or error, user is not properly onboarded
+        // If no data or error, try to use cached user data
         if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
-          // User profile doesn't exist, they haven't completed onboarding
-          // Sign them out and redirect to welcome screen
-          FirebaseService.signOut();
-          return const WelcomeScreen();
+          developer.log('AuthWrapper: Could not fetch user profile, using cached data', name: 'VoloAuth');
+          
+          final user = _currentUser;
+          String displayName = 'User';
+          
+          if (user?.displayName != null && user!.displayName!.isNotEmpty) {
+            displayName = user.displayName!;
+          } else if (user?.phoneNumber != null) {
+            displayName = 'User (${user!.phoneNumber!.substring(user.phoneNumber!.length - 4)})';
+          }
+
+          return HomeScreen(username: displayName);
         }
 
         // User profile exists, get display name
