@@ -87,7 +87,7 @@ class RemoteConfigService {
       final allParams = _remoteConfig.getAll();
       return {
         'status': 'initialized',
-        'last_fetch_time': _remoteConfig.lastFetchTime?.toIso8601String(),
+        'last_fetch_time': _remoteConfig.lastFetchTime?.toIso8601String() ?? 'never',
         'last_fetch_status': _remoteConfig.lastFetchStatus.toString(),
         'all_parameters': allParams,
       };
@@ -110,7 +110,7 @@ class RemoteConfigService {
     try {
       return {
         'status': 'initialized',
-        'last_fetch_time': _remoteConfig.lastFetchTime?.toIso8601String(),
+        'last_fetch_time': _remoteConfig.lastFetchTime?.toIso8601String() ?? 'never',
       };
     } catch (e) {
       return {
