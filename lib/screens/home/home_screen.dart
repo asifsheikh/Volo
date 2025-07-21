@@ -90,47 +90,47 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             
-            // Main content area
+            // Main content area with improved visual hierarchy
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Main title
+                    // Main title - Secondary level prominence
                     Text(
                       'Travel confidently—Volo updates your loved ones automatically',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w700,
-                        fontSize: 28,
-                        height: 1.2,
+                        fontSize: 24, // Reduced from 28 for better hierarchy
+                        height: 1.3,
                         color: Color(0xFF1F2937),
                       ),
                     ),
                     
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 20), // Increased spacing for breathing room
                     
-                    // Subtitle
+                    // Subtitle - Tertiary level (significantly de-emphasized)
                     Text(
                       'Add your flight details and Volo will keep your family and friends updated in real time, so you can focus on your journey.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16,
-                        height: 1.5,
-                        color: Color(0xFF6B7280),
+                        fontWeight: FontWeight.w400, // Regular weight instead of medium
+                        fontSize: 14, // Reduced from 16 for de-emphasis
+                        height: 1.6, // Increased line height for lighter feel
+                        color: const Color(0xFF9CA3AF).withOpacity(0.8), // Tertiary color with reduced opacity
                       ),
                     ),
                     
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 56), // Increased spacing to emphasize CTA
                     
-                    // Primary CTA Button
+                    // Primary CTA Button - Most prominent element
                     SizedBox(
                       width: double.infinity,
-                      height: 56,
+                      height: 60, // Slightly increased height for prominence
                       child: ElevatedButton.icon(
                         onPressed: () {
                           Navigator.of(context).push(
@@ -152,12 +152,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w600,
-                            fontSize: 16,
+                            fontSize: 18, // Increased to 18pt for accessibility compliance
                             color: Colors.white,
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF059393),
+                          backgroundColor: const Color(0xFF047C7C), // Updated to new primary color
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -167,9 +167,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 32), // Increased spacing
                     
-                    // Secondary link
+                    // Secondary link - Very subtle (optional secondary action)
                     GestureDetector(
                       onTap: () {
                         // TODO: Navigate to "How does Volo work?" screen
@@ -184,9 +184,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         'How does Volo work?',
                         style: TextStyle(
                           fontFamily: 'Inter',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                          color: Color(0xFF059393),
+                          fontWeight: FontWeight.w400, // Reduced from 500 for de-emphasis
+                          fontSize: 12, // Reduced from 14 for subtlety
+                          color: const Color(0xFF6B7280).withOpacity(0.7), // Secondary color with reduced opacity
                           decoration: TextDecoration.underline,
                         ),
                       ),
@@ -226,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
               label: 'Flights',
             ),
           ],
-          selectedItemColor: Color(0xFF059393),
+          selectedItemColor: Color(0xFF047C7C), // Updated to new primary color
           unselectedItemColor: Color(0xFF9CA3AF),
           selectedLabelStyle: TextStyle(
             fontFamily: 'Inter', 
