@@ -5,6 +5,7 @@ import 'dart:developer' as developer;
 import 'dart:core';
 import '../../services/firebase_service.dart';
 import '../../services/profile_picture_service.dart';
+import '../../services/network_service.dart';
 import '../../features/add_flight/add_flight_screen.dart';
 import '../../features/add_flight/controller/add_flight_controller.dart';
 import '../profile/profile_screen.dart';
@@ -19,11 +20,43 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String? _profilePictureUrl;
+  bool _isLoadingProfile = true;
+  bool _isOffline = false;
 
   @override
   void initState() {
     super.initState();
-    _loadProfilePicture();
+    _checkNetworkAndLoadProfile();
+  }
+
+  /// Check network status and load profile picture accordingly
+  Future<void> _checkNetworkAndLoadProfile() async {
+    try {
+      final networkService = NetworkService();
+      final hasInternet = await networkService.hasInternetConnection();
+      
+      if (!hasInternet) {
+        developer.log('HomeScreen: No internet connection, skipping profile picture load', name: 'VoloProfile');
+        if (mounted) {
+          setState(() {
+            _isOffline = true;
+            _isLoadingProfile = false;
+          });
+        }
+        return;
+      }
+
+      // Only load profile picture if we have internet
+      await _loadProfilePicture();
+    } catch (e) {
+      developer.log('HomeScreen: Error checking network or loading profile: $e', name: 'VoloProfile');
+      if (mounted) {
+        setState(() {
+          _isOffline = true;
+          _isLoadingProfile = false;
+        });
+      }
+    }
   }
 
   /// Load user's profile picture from Firestore
@@ -33,10 +66,16 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted) {
         setState(() {
           _profilePictureUrl = url;
+          _isLoadingProfile = false;
         });
       }
     } catch (e) {
       developer.log('HomeScreen: Error loading profile picture: $e', name: 'VoloProfile');
+      if (mounted) {
+        setState(() {
+          _isLoadingProfile = false;
+        });
+      }
     }
   }
 
@@ -58,33 +97,22 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Hey, ${widget.username} 👋',
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 28,
-                      color: Color(0xFF1F2937),
+                  Expanded(
+                    child: Text(
+                      'Hey, ${widget.username} 👋',
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 28,
+                        color: Color(0xFF1F2937),
+                      ),
                     ),
                   ),
                   GestureDetector(
                     onTap: () {
                       _navigateToProfile(context);
                     },
-                    child: CircleAvatar(
-                      radius: 28,
-                      backgroundColor: Colors.white,
-                      backgroundImage: _profilePictureUrl != null
-                          ? NetworkImage(_profilePictureUrl!)
-                          : null,
-                      child: _profilePictureUrl == null
-                          ? Icon(
-                              Icons.person,
-                              size: 28,
-                              color: Color(0xFF9CA3AF),
-                            )
-                          : null,
-                    ),
+                    child: _buildProfileAvatar(),
                   ),
                 ],
               ),
@@ -260,7 +288,49 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     ).then((_) {
       // Refresh profile picture when returning from profile screen
-      _loadProfilePicture();
+      _checkNetworkAndLoadProfile();
     });
+  }
+
+  Widget _buildProfileAvatar() {
+    if (_isLoadingProfile) {
+      return const CircleAvatar(
+        radius: 28,
+        backgroundColor: Colors.white,
+        child: CircularProgressIndicator(
+          color: Color(0xFF9CA3AF),
+        ),
+      );
+    }
+
+    if (_isOffline) {
+      return const CircleAvatar(
+        radius: 28,
+        backgroundColor: Colors.white,
+        child: Icon(
+          Icons.signal_wifi_off,
+          size: 28,
+          color: Color(0xFF9CA3AF),
+        ),
+      );
+    }
+
+    if (_profilePictureUrl != null) {
+      return CircleAvatar(
+        radius: 28,
+        backgroundColor: Colors.white,
+        backgroundImage: NetworkImage(_profilePictureUrl!),
+      );
+    }
+
+    return const CircleAvatar(
+      radius: 28,
+      backgroundColor: Colors.white,
+      child: Icon(
+        Icons.person,
+        size: 28,
+        color: Color(0xFF9CA3AF),
+      ),
+    );
   }
 } 

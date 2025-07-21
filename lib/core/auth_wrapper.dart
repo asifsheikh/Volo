@@ -212,14 +212,21 @@ class _AuthWrapperState extends State<AuthWrapper> {
     // If offline, use cached user data or default values
     if (_isOffline) {
       final user = _currentUser;
-      String displayName = 'User';
+      String displayName = 'Traveler';
       
       // Try to get display name from cached user data
       if (user?.displayName != null && user!.displayName!.isNotEmpty) {
         displayName = user.displayName!;
       } else if (user?.phoneNumber != null) {
-        // Use phone number as fallback
-        displayName = 'User (${user!.phoneNumber!.substring(user.phoneNumber!.length - 4)})';
+        // Use a more user-friendly format for phone number
+        final phone = user!.phoneNumber!;
+        if (phone.length >= 10) {
+          // Show last 4 digits in a friendly format
+          final lastFour = phone.substring(phone.length - 4);
+          displayName = 'Traveler ($lastFour)';
+        } else {
+          displayName = 'Traveler';
+        }
       }
 
       return HomeScreen(username: displayName);
@@ -239,19 +246,27 @@ class _AuthWrapperState extends State<AuthWrapper> {
           developer.log('AuthWrapper: Could not fetch user profile, using cached data', name: 'VoloAuth');
           
           final user = _currentUser;
-          String displayName = 'User';
+          String displayName = 'Traveler';
           
           if (user?.displayName != null && user!.displayName!.isNotEmpty) {
             displayName = user.displayName!;
           } else if (user?.phoneNumber != null) {
-            displayName = 'User (${user!.phoneNumber!.substring(user.phoneNumber!.length - 4)})';
+            // Use a more user-friendly format for phone number
+            final phone = user!.phoneNumber!;
+            if (phone.length >= 10) {
+              // Show last 4 digits in a friendly format
+              final lastFour = phone.substring(phone.length - 4);
+              displayName = 'Traveler ($lastFour)';
+            } else {
+              displayName = 'Traveler';
+            }
           }
 
           return HomeScreen(username: displayName);
         }
 
         // User profile exists, get display name
-        String displayName = 'User';
+        String displayName = 'Traveler';
         final firstName = snapshot.data!['firstName'] as String?;
         if (firstName != null && firstName.isNotEmpty) {
           displayName = firstName;

@@ -51,32 +51,39 @@ class _NetworkStatusIndicatorState extends State<NetworkStatusIndicator> {
   Widget _buildOfflineBanner() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: const BoxDecoration(
-        color: Color(0xFFEF4444),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEF4444),
         boxShadow: [
           BoxShadow(
-            color: Color(0x1A000000),
-            blurRadius: 4,
-            offset: Offset(0, 2),
+            color: const Color(0xFFEF4444).withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.wifi_off,
-            color: Colors.white,
-            size: 16,
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: const Icon(
+              Icons.wifi_off_rounded,
+              color: Colors.white,
+              size: 16,
+            ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
           const Expanded(
             child: Text(
-              'No internet connection',
+              'You\'re offline',
               style: TextStyle(
                 fontFamily: 'Inter',
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
                 fontSize: 14,
                 color: Colors.white,
               ),
@@ -91,14 +98,20 @@ class _NetworkStatusIndicatorState extends State<NetworkStatusIndicator> {
                 });
               }
             },
-            child: const Text(
-              'Retry',
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: Colors.white,
-                decoration: TextDecoration.underline,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Text(
+                'Retry',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
