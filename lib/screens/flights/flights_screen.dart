@@ -200,6 +200,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
                 ),
+                dividerColor: Colors.transparent,
                 tabs: const [
                   Tab(text: 'Upcoming'),
                   Tab(text: 'Past'),
@@ -494,6 +495,19 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
         return 'Cancelled';
       default:
         return 'Scheduled';
+    }
+  }
+
+  String _formatDuration(int minutes) {
+    final hours = minutes ~/ 60;
+    final remainingMinutes = minutes % 60;
+    
+    if (hours == 0) {
+      return '$remainingMinutes min';
+    } else if (remainingMinutes == 0) {
+      return '$hours hr';
+    } else {
+      return '$hours hr $remainingMinutes min';
     }
   }
 }
@@ -831,18 +845,33 @@ class _TripCardState extends State<_TripCard> {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  '${flight.airline} ${flight.flightNumber}',
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: Color(0xFF1F2937),
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${_getAirportName(flight.departureAirport)} to ${_getAirportName(flight.arrivalAirport)}',
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: Color(0xFF1F2937),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${flight.airline} • ${flight.flightNumber}',
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                        color: Color(0xFF6B7280),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Text(
-                '${flight.duration} min',
+                _formatDuration(flight.duration),
                 style: const TextStyle(
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w500,
@@ -939,6 +968,19 @@ class _TripCardState extends State<_TripCard> {
     final departureCity = _getAirportName(widget.firstFlight.departureAirport);
     final arrivalCity = _getAirportName(widget.lastFlight.arrivalAirport);
     return '$departureCity to $arrivalCity';
+  }
+
+  String _formatDuration(int minutes) {
+    final hours = minutes ~/ 60;
+    final remainingMinutes = minutes % 60;
+    
+    if (hours == 0) {
+      return '$remainingMinutes min';
+    } else if (remainingMinutes == 0) {
+      return '$hours hr';
+    } else {
+      return '$hours hr $remainingMinutes min';
+    }
   }
 
   String _getLayoverInfo() {
