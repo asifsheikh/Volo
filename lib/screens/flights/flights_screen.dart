@@ -207,6 +207,8 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
               ),
             ),
 
+            const SizedBox(height: 24),
+
             // Tab Content
             Expanded(
               child: TabBarView(
@@ -543,36 +545,36 @@ class _TripCardState extends State<_TripCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with airline and status
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${widget.firstFlight.airline} ${widget.firstFlight.flightNumber}',
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16,
-                              color: Color(0xFF1F2937),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            widget.firstFlight.airline,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 12,
-                              color: Color(0xFF6B7280),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                                 // Header with route and status
+                 Row(
+                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                   children: [
+                     Expanded(
+                       child: Column(
+                         crossAxisAlignment: CrossAxisAlignment.start,
+                         children: [
+                           Text(
+                             _getRouteTitle(),
+                             style: const TextStyle(
+                               fontFamily: 'Inter',
+                               fontWeight: FontWeight.w700,
+                               fontSize: 16,
+                               color: Color(0xFF1F2937),
+                             ),
+                           ),
+                           const SizedBox(height: 2),
+                           Text(
+                             '${widget.firstFlight.airline} • ${widget.firstFlight.flightNumber}',
+                             style: const TextStyle(
+                               fontFamily: 'Inter',
+                               fontWeight: FontWeight.w400,
+                               fontSize: 12,
+                               color: Color(0xFF6B7280),
+                             ),
+                           ),
+                         ],
+                       ),
+                     ),
                     // Status badge
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -655,19 +657,19 @@ class _TripCardState extends State<_TripCard> {
                                       ),
                                     ),
                                   ),
-                                  Container(
-                                    width: 16,
-                                    height: 16,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[400],
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Icon(
-                                      Icons.flight,
-                                      size: 12,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                                                                     Container(
+                                     width: 16,
+                                     height: 16,
+                                     decoration: BoxDecoration(
+                                       color: const Color(0xFF047C7C),
+                                       borderRadius: BorderRadius.circular(8),
+                                     ),
+                                     child: const Icon(
+                                       Icons.flight,
+                                       size: 12,
+                                       color: Colors.white,
+                                     ),
+                                   ),
                                   Expanded(
                                     child: Container(
                                       decoration: BoxDecoration(
@@ -737,24 +739,23 @@ class _TripCardState extends State<_TripCard> {
                         color: Color(0xFF6B7280),
                       ),
                     ),
-                    if (widget.isMultiLeg)
-                      Text(
-                        _getLayoverInfo(),
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 12,
-                          color: Color(0xFF047C7C),
-                        ),
-                      ),
+                                         Text(
+                       _getLayoverInfo(),
+                       style: const TextStyle(
+                         fontFamily: 'Inter',
+                         fontWeight: FontWeight.w500,
+                         fontSize: 12,
+                         color: Color(0xFF047C7C),
+                       ),
+                     ),
                   ],
                 ),
               ],
             ),
           ),
 
-          // Expandable section for multi-leg flights
-          if (widget.isMultiLeg) ...[
+                     // Expandable section for multi-leg flights
+           if (widget.trip.tripData.flights.length > 1) ...[
             // Divider
             Container(
               height: 1,
@@ -934,8 +935,16 @@ class _TripCardState extends State<_TripCard> {
     );
   }
 
+  String _getRouteTitle() {
+    final departureCity = _getAirportName(widget.firstFlight.departureAirport);
+    final arrivalCity = _getAirportName(widget.lastFlight.arrivalAirport);
+    return '$departureCity to $arrivalCity';
+  }
+
   String _getLayoverInfo() {
-    if (widget.trip.tripData.flights.length == 2) {
+    if (widget.trip.tripData.flights.length == 1) {
+      return 'Direct flight';
+    } else if (widget.trip.tripData.flights.length == 2) {
       final layoverAirport = widget.trip.tripData.flights[0].arrivalAirport;
       return 'Via ${_getAirportName(layoverAirport)}';
     } else if (widget.trip.tripData.flights.length > 2) {
