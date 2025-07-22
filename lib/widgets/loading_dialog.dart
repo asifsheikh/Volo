@@ -11,30 +11,30 @@ class LoadingDialog extends StatelessWidget {
     this.isDismissible = false,
   }) : super(key: key);
 
-  /// Show loading dialog
-  static Future<void> show({
-    required BuildContext context,
-    required String message,
-    bool isDismissible = false,
-  }) async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: isDismissible,
-      builder: (BuildContext context) {
-        return LoadingDialog(
-          message: message,
-          isDismissible: isDismissible,
-        );
-      },
-    );
-  }
+                /// Show loading dialog
+              static Future<void> show({
+                required BuildContext context,
+                required String message,
+                bool isDismissible = false,
+              }) async {
+                return showDialog<void>(
+                  context: context,
+                  barrierDismissible: isDismissible,
+                  builder: (BuildContext context) {
+                    return LoadingDialog(
+                      message: message,
+                      isDismissible: isDismissible,
+                    );
+                  },
+                );
+              }
 
-  /// Hide loading dialog
-  static void hide(BuildContext context) {
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
-    }
-  }
+              /// Hide loading dialog
+              static void hide(BuildContext context) {
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+              }
 
   @override
   Widget build(BuildContext context) {

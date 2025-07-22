@@ -44,12 +44,13 @@ class Trip {
   }
 
   bool isValid() {
-    return id.isNotEmpty && tripData.isValid();
+    // ID can be empty initially (will be set by Firestore)
+    return tripData.isValid();
   }
 
   List<String> getValidationErrors() {
     final errors = <String>[];
-    if (id.isEmpty) errors.add('Trip ID is required');
+    // Don't require ID initially (will be set by Firestore)
     errors.addAll(tripData.getValidationErrors());
     return errors;
   }
@@ -117,15 +118,15 @@ class TripData {
   }
 
   bool isValid() {
-    return id.isNotEmpty &&
-        departureAirport.isNotEmpty &&
+    // ID can be empty initially (will be set by Firestore)
+    return departureAirport.isNotEmpty &&
         arrivalAirport.isNotEmpty &&
         flights.isNotEmpty;
   }
 
   List<String> getValidationErrors() {
     final errors = <String>[];
-    if (id.isEmpty) errors.add('Trip data ID is required');
+    // Don't require ID initially (will be set by Firestore)
     if (departureAirport.isEmpty) errors.add('Departure airport is required');
     if (arrivalAirport.isEmpty) errors.add('Arrival airport is required');
     if (flights.isEmpty) errors.add('At least one flight is required');

@@ -151,60 +151,51 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
     });
   }
 
-  /// Save trip to Firestore and navigate to confirmation screen
-  Future<void> _saveTripAndContinue() async {
-    try {
-      // Get current user ID
-      final userId = TripService.getCurrentUserId();
-      if (userId == null) {
-        _showErrorSnackBar('User not authenticated. Please login again.');
-        return;
-      }
+                  /// Save trip to Firestore and navigate to confirmation screen
+                Future<void> _saveTripAndContinue() async {
+                  try {
+                    // Get current user ID
+                    final userId = TripService.getCurrentUserId();
+                    if (userId == null) {
+                      _showErrorSnackBar('User not authenticated. Please login again.');
+                      return;
+                    }
 
-      // Show loading dialog
-      await LoadingDialog.show(
-        context: context,
-        message: 'Saving your trip...',
-      );
+                    // Show loading dialog
+                    LoadingDialog.show(
+                      context: context,
+                      message: 'Saving your trip...',
+                    );
 
-      // Create trip from flight option and contacts
-      final trip = TripService.createTripFromFlightOption(
-        flightOption: widget.args.selectedFlight,
-        contacts: _selectedContacts,
-        userNotifications: _enableNotifications,
-        departureCity: widget.args.departureCity,
-        arrivalCity: widget.args.arrivalCity,
-      );
+                    // Create trip from flight option and contacts
+                    final trip = TripService.createTripFromFlightOption(
+                      flightOption: widget.args.selectedFlight,
+                      contacts: _selectedContacts,
+                      userNotifications: _enableNotifications,
+                      departureCity: widget.args.departureCity,
+                      arrivalCity: widget.args.arrivalCity,
+                    );
 
-      // Save trip to Firestore
-      await TripService.saveTrip(
-        trip: trip,
-        userId: userId,
-      );
+                    // Save trip to Firestore
+                    await TripService.saveTrip(
+                      trip: trip,
+                      userId: userId,
+                    );
 
-      // Hide loading dialog
-      LoadingDialog.hide(context);
+                    // Hide loading dialog
+                    LoadingDialog.hide(context);
 
-      // Show success message briefly
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Trip saved successfully!'),
-          backgroundColor: Color(0xFF10B981),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      
-      // Navigate to confirmation screen
-      _navigateToConfirmationScreen();
+                    // Navigate to confirmation screen
+                    _navigateToConfirmationScreen();
 
-    } catch (e) {
-      // Hide loading dialog if it's still showing
-      LoadingDialog.hide(context);
-      
-      // Show error message
-      _showErrorSnackBar('Failed to save trip: ${e.toString()}');
-    }
-  }
+                  } catch (e) {
+                    // Hide loading dialog if it's still showing
+                    LoadingDialog.hide(context);
+                    
+                    // Show error message
+                    _showErrorSnackBar('Failed to save trip: ${e.toString()}');
+                  }
+                }
 
   /// Navigate to confirmation screen
   void _navigateToConfirmationScreen() {
