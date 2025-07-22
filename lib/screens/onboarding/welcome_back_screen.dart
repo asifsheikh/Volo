@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../home/home_screen.dart';
+import '../main_navigation_screen.dart';
 
 class WelcomeBackScreen extends StatelessWidget {
   final String userName;
@@ -69,7 +69,7 @@ class WelcomeBackScreen extends StatelessWidget {
                     ),
                     onPressed: () {
                       Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(builder: (_) => HomeScreen(username: userName)),
+                        MaterialPageRoute(builder: (_) => MainNavigationScreen(username: userName)),
                         (route) => false,
                       );
                     },

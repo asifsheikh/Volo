@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../services/firebase_service.dart';
-import '../home/home_screen.dart';
+import '../main_navigation_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final String phoneNumber;
@@ -69,7 +69,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (context) => HomeScreen(
+            builder: (context) => MainNavigationScreen(
               username: _firstNameController.text.trim(),
             ),
           ),

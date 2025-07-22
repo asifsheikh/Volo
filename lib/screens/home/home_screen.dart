@@ -226,51 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          currentIndex: 0,
-          onTap: (index) {
-            // TODO: Implement navigation logic
-          },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.flight_outlined),
-              activeIcon: Icon(Icons.flight),
-              label: 'Flights',
-            ),
-          ],
-          selectedItemColor: Color(0xFF047C7C), // Updated to new primary color
-          unselectedItemColor: Color(0xFF9CA3AF),
-          selectedLabelStyle: TextStyle(
-            fontFamily: 'Inter', 
-            fontWeight: FontWeight.w600,
-            fontSize: 12,
-          ),
-          unselectedLabelStyle: TextStyle(
-            fontFamily: 'Inter', 
-            fontWeight: FontWeight.w500,
-            fontSize: 12,
-          ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          type: BottomNavigationBarType.fixed,
-        ),
-      ),
+
     );
   }
 

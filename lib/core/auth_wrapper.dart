@@ -6,7 +6,7 @@ import 'dart:async';
 import '../services/firebase_service.dart';
 import '../services/network_service.dart';
 import '../screens/auth/welcome_screen.dart';
-import '../screens/home/home_screen.dart';
+import '../screens/main_navigation_screen.dart';
 
 class AuthWrapper extends StatefulWidget {
   const AuthWrapper({Key? key}) : super(key: key);
@@ -229,7 +229,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
         }
       }
 
-      return HomeScreen(username: displayName);
+      return MainNavigationScreen(username: displayName);
     }
 
     // Online mode - get user profile data for display name
@@ -262,7 +262,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
             }
           }
 
-          return HomeScreen(username: displayName);
+          return MainNavigationScreen(username: displayName);
         }
 
         // User profile exists, get display name
@@ -272,7 +272,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
           displayName = firstName;
         }
 
-        return HomeScreen(username: displayName);
+        return MainNavigationScreen(username: displayName);
       },
     );
   }
