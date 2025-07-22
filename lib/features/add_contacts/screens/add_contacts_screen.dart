@@ -4,6 +4,8 @@ import '../../../features/flight_confirmation/screens/confirmation_screen.dart';
 import '../../../features/flight_confirmation/models/confirmation_args.dart';
 import '../widgets/contact_picker_dialog.dart';
 import '../models/contact_model.dart';
+import '../../../services/trip_service.dart';
+import '../../../widgets/loading_dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // Arguments for AddContactsScreen
@@ -147,6 +149,100 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
     setState(() {
       _selectedContacts.removeAt(index);
     });
+  }
+
+  /// Save trip to Firestore and navigate to confirmation screen
+  Future<void> _saveTripAndContinue() async {
+    try {
+      // Get current user ID
+      final userId = TripService.getCurrentUserId();
+      if (userId == null) {
+        _showErrorSnackBar('User not authenticated. Please login again.');
+        return;
+      }
+
+      // Show loading dialog
+      await LoadingDialog.show(
+        context: context,
+        message: 'Saving your trip...',
+      );
+
+      // Create trip from flight option and contacts
+      final trip = TripService.createTripFromFlightOption(
+        flightOption: widget.args.selectedFlight,
+        contacts: _selectedContacts,
+        userNotifications: _enableNotifications,
+        departureCity: widget.args.departureCity,
+        arrivalCity: widget.args.arrivalCity,
+      );
+
+      // Save trip to Firestore
+      await TripService.saveTrip(
+        trip: trip,
+        userId: userId,
+      );
+
+      // Hide loading dialog
+      LoadingDialog.hide(context);
+
+      // Show success message briefly
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Trip saved successfully!'),
+          backgroundColor: Color(0xFF10B981),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      
+      // Navigate to confirmation screen
+      _navigateToConfirmationScreen();
+
+    } catch (e) {
+      // Hide loading dialog if it's still showing
+      LoadingDialog.hide(context);
+      
+      // Show error message
+      _showErrorSnackBar('Failed to save trip: ${e.toString()}');
+    }
+  }
+
+  /// Navigate to confirmation screen
+  void _navigateToConfirmationScreen() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ConfirmationScreen(
+          args: ConfirmationArgs(
+            fromCity: widget.args.departureCity,
+            toCity: widget.args.arrivalCity,
+            contactNames: _selectedContacts.map((c) => c.name).toList(),
+            contactAvatars: _selectedContacts.map((c) => c.avatar ?? '').toList(),
+            departureAirportCode: widget.args.departureAirportCode,
+            departureImage: widget.args.departureImage,
+            departureThumbnail: widget.args.departureThumbnail,
+            arrivalAirportCode: widget.args.arrivalAirportCode,
+            arrivalImage: widget.args.arrivalImage,
+            arrivalThumbnail: widget.args.arrivalThumbnail,
+            enableNotifications: _enableNotifications,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Show error snackbar
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: const Color(0xFFDC2626),
+        duration: const Duration(seconds: 4),
+        action: SnackBarAction(
+          label: 'Dismiss',
+          textColor: Colors.white,
+          onPressed: () {},
+        ),
+      ),
+    );
   }
 
   @override
@@ -633,28 +729,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: hasActionTaken ? () {
-                  // Navigate to confirmation screen
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => ConfirmationScreen(
-                        args: ConfirmationArgs(
-                          fromCity: args.departureCity,
-                          toCity: args.arrivalCity,
-                          contactNames: _selectedContacts.map((c) => c.name).toList(),
-                          contactAvatars: _selectedContacts.map((c) => c.avatar ?? '').toList(),
-                          departureAirportCode: args.departureAirportCode,
-                          departureImage: args.departureImage,
-                          departureThumbnail: args.departureThumbnail,
-                          arrivalAirportCode: args.arrivalAirportCode,
-                          arrivalImage: args.arrivalImage,
-                          arrivalThumbnail: args.arrivalThumbnail,
-                          enableNotifications: _enableNotifications,
-                        ),
-                      ),
-                    ),
-                  );
-                } : null,
+                onPressed: hasActionTaken ? () => _saveTripAndContinue() : null,
                 style: ElevatedButton.styleFrom(
                                       backgroundColor: hasActionTaken ? const Color(0xFF059393) : const Color(0xFF9CA3AF),
                   shape: RoundedRectangleBorder(
