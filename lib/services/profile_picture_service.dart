@@ -14,8 +14,8 @@ class ProfilePictureService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
   /// Show image source selection bottom sheet
-  static Future<ImageSource?> _showImageSourceSheet(BuildContext context) async {
-    return await showModalBottomSheet<ImageSource>(
+  static Future<String?> _showImageSourceSheet(BuildContext context, bool hasExistingPhoto) async {
+    return await showModalBottomSheet<String>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -64,7 +64,7 @@ class ProfilePictureService {
                       fontSize: 16,
                     ),
                   ),
-                  onTap: () => Navigator.of(context).pop(ImageSource.camera),
+                  onTap: () => Navigator.of(context).pop('camera'),
                 ),
                 ListTile(
                   leading: Container(
@@ -83,8 +83,30 @@ class ProfilePictureService {
                       fontSize: 16,
                     ),
                   ),
-                  onTap: () => Navigator.of(context).pop(ImageSource.gallery),
+                  onTap: () => Navigator.of(context).pop('gallery'),
                 ),
+                if (hasExistingPhoto) ...[
+                  ListTile(
+                    leading: Container(
+                      decoration: BoxDecoration(
+                        color: Color(0xFFEF4444).withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: const Icon(Icons.delete, color: Color(0xFFEF4444)),
+                    ),
+                    title: const Text(
+                      'Remove Profile Picture',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                        color: Color(0xFFEF4444),
+                      ),
+                    ),
+                    onTap: () => Navigator.of(context).pop('remove'),
+                  ),
+                ],
                 const SizedBox(height: 8),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
@@ -106,11 +128,24 @@ class ProfilePictureService {
   }
 
   /// Pick image from camera or gallery
-  static Future<File?> pickImage(BuildContext context) async {
+  static Future<File?> pickImage(BuildContext context, bool hasExistingPhoto) async {
     try {
-      final ImageSource? source = await _showImageSourceSheet(context);
+      final String? action = await _showImageSourceSheet(context, hasExistingPhoto);
       
-      if (source == null) {
+      if (action == null) {
+        return null;
+      }
+
+      if (action == 'remove') {
+        return null; // Special case for remove action
+      }
+
+      ImageSource source;
+      if (action == 'camera') {
+        source = ImageSource.camera;
+      } else if (action == 'gallery') {
+        source = ImageSource.gallery;
+      } else {
         return null;
       }
 
@@ -206,12 +241,40 @@ class ProfilePictureService {
     }
   }
 
+  /// Remove user's profile picture from Firestore
+  static Future<bool> removeProfilePicture() async {
+    try {
+      final User? user = _auth.currentUser;
+      if (user == null) {
+        throw Exception('User not authenticated');
+      }
+
+      // Remove profile picture URL from Firestore
+      await _firestore.collection('users').doc(user.uid).update({
+        'profilePictureUrl': FieldValue.delete(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      developer.log('ProfilePictureService: Profile picture removed from Firestore', name: 'VoloProfile');
+      return true;
+    } catch (e) {
+      developer.log('ProfilePictureService: Error removing profile picture from Firestore: $e', name: 'VoloProfile');
+      return false;
+    }
+  }
+
   /// Complete profile picture update process
   static Future<bool> updateProfilePicture(BuildContext context) async {
     try {
-      // Pick image
-      final File? imageFile = await pickImage(context);
-      if (imageFile == null) {
+      // Check if user has existing profile picture
+      final String? existingUrl = await getUserProfilePictureUrl();
+      final bool hasExistingPhoto = existingUrl != null && existingUrl.isNotEmpty;
+
+      // Pick image or handle remove action
+      final File? imageFile = await pickImage(context, hasExistingPhoto);
+      
+      // If user cancelled or no action taken
+      if (imageFile == null && !hasExistingPhoto) {
         return false;
       }
 
@@ -220,36 +283,58 @@ class ProfilePictureService {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return const AlertDialog(
+          return AlertDialog(
             content: Row(
               children: [
-                CircularProgressIndicator(),
-                SizedBox(width: 16),
-                Text('Updating profile picture...'),
+                const CircularProgressIndicator(),
+                const SizedBox(width: 16),
+                Text(hasExistingPhoto && imageFile == null 
+                  ? 'Removing profile picture...' 
+                  : 'Updating profile picture...'),
               ],
             ),
           );
         },
       );
 
-      // Upload to Firebase Storage
-      final String? imageUrl = await uploadProfilePicture(imageFile);
-      if (imageUrl == null) {
-        Navigator.of(context).pop(); // Close loading dialog
-        throw Exception('Failed to upload image');
-      }
+      bool success = false;
 
-      // Update Firestore
-      final bool success = await updateUserProfilePicture(imageUrl);
-      if (!success) {
-        Navigator.of(context).pop(); // Close loading dialog
-        throw Exception('Failed to update profile in database');
+      if (imageFile != null) {
+        // Upload new image to Firebase Storage
+        final String? imageUrl = await uploadProfilePicture(imageFile);
+        if (imageUrl == null) {
+          Navigator.of(context).pop(); // Close loading dialog
+          throw Exception('Failed to upload image');
+        }
+
+        // Update Firestore with new image URL
+        success = await updateUserProfilePicture(imageUrl);
+        if (!success) {
+          Navigator.of(context).pop(); // Close loading dialog
+          throw Exception('Failed to update profile in database');
+        }
+      } else if (hasExistingPhoto) {
+        // Remove profile picture
+        success = await removeProfilePicture();
+        if (!success) {
+          Navigator.of(context).pop(); // Close loading dialog
+          throw Exception('Failed to remove profile picture from database');
+        }
       }
 
       // Close loading dialog
       Navigator.of(context).pop();
 
-      // Success - no snack bar needed
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(imageFile != null 
+            ? 'Profile picture updated successfully!' 
+            : 'Profile picture removed successfully!'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
 
       return true;
     } catch (e) {
