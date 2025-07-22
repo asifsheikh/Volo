@@ -139,30 +139,30 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
                       ],
                     ),
                   ),
-                  // Add Flight Button
-                  GestureDetector(
-                    onTap: _navigateToAddFlight,
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF047C7C),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF047C7C).withOpacity(0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.add,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ),
-                  ),
+                                     // Add Flight Button
+                   GestureDetector(
+                     onTap: _navigateToAddFlight,
+                     child: Container(
+                       width: 40,
+                       height: 40,
+                       decoration: BoxDecoration(
+                         color: const Color(0xFF047C7C),
+                         borderRadius: BorderRadius.circular(20),
+                         boxShadow: [
+                           BoxShadow(
+                             color: const Color(0xFF047C7C).withOpacity(0.2),
+                             blurRadius: 8,
+                             offset: const Offset(0, 2),
+                           ),
+                         ],
+                       ),
+                       child: const Icon(
+                         Icons.add,
+                         color: Colors.white,
+                         size: 20,
+                       ),
+                     ),
+                   ),
                 ],
               ),
             ),
@@ -206,8 +206,6 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
                 ],
               ),
             ),
-
-            const SizedBox(height: 24),
 
             // Tab Content
             Expanded(
@@ -419,229 +417,23 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildTripCard(Trip trip) {
+    Widget _buildTripCard(Trip trip) {
     final firstFlight = trip.tripData.flights.first;
     final lastFlight = trip.tripData.flights.last;
     final departureTime = trip.tripData.departureTime;
+    final isMultiLeg = trip.tripData.flights.length > 1;
     
     // Format date and time
-    final dateFormat = 'MMM dd, yyyy';
-    final timeFormat = 'h:mm a';
     final formattedDate = '${_getMonthName(departureTime.month)} ${departureTime.day}, ${departureTime.year}';
     final formattedTime = '${departureTime.hour > 12 ? departureTime.hour - 12 : departureTime.hour}:${departureTime.minute.toString().padLeft(2, '0')} ${departureTime.hour >= 12 ? 'PM' : 'AM'}';
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with airline and status
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${firstFlight.airline} ${firstFlight.flightNumber}',
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                          color: Color(0xFF1F2937),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${firstFlight.airline} Airlines',
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          color: Color(0xFF6B7280),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Status badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(trip.status),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    _getStatusText(trip.status),
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // Flight route
-            Row(
-              children: [
-                // Departure
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        firstFlight.departureAirport,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18,
-                          color: Color(0xFF1F2937),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _getAirportName(firstFlight.departureAirport),
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          color: Color(0xFF6B7280),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Flight path visual
-                Expanded(
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF047C7C),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      Expanded(
-                        child: Container(
-                          height: 1,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            borderRadius: BorderRadius.circular(1),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[300],
-                                    borderRadius: BorderRadius.circular(1),
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: 16,
-                                height: 16,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[400],
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
-                                  Icons.flight,
-                                  size: 12,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[300],
-                                    borderRadius: BorderRadius.circular(1),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[400],
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Arrival
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        lastFlight.arrivalAirport,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18,
-                          color: Color(0xFF1F2937),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _getAirportName(lastFlight.arrivalAirport),
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          color: Color(0xFF6B7280),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            // Date and time
-            Text(
-              '$formattedDate · $formattedTime',
-              style: const TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                fontSize: 12,
-                color: Color(0xFF6B7280),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return _TripCard(
+      trip: trip,
+      firstFlight: firstFlight,
+      lastFlight: lastFlight,
+      formattedDate: formattedDate,
+      formattedTime: formattedTime,
+      isMultiLeg: isMultiLeg,
     );
   }
 
@@ -685,6 +477,503 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
         return const Color(0xFFEF4444); // Red
       default:
         return const Color(0xFF6B7280); // Gray
+    }
+  }
+
+  String _getStatusText(String status) {
+    switch (status.toLowerCase()) {
+      case 'on time':
+        return 'On Time';
+      case 'delayed':
+        return 'Delayed';
+      case 'scheduled':
+        return 'Scheduled';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return 'Scheduled';
+    }
+  }
+}
+
+class _TripCard extends StatefulWidget {
+  final Trip trip;
+  final TripFlight firstFlight;
+  final TripFlight lastFlight;
+  final String formattedDate;
+  final String formattedTime;
+  final bool isMultiLeg;
+
+  const _TripCard({
+    required this.trip,
+    required this.firstFlight,
+    required this.lastFlight,
+    required this.formattedDate,
+    required this.formattedTime,
+    required this.isMultiLeg,
+  });
+
+  @override
+  State<_TripCard> createState() => _TripCardState();
+}
+
+class _TripCardState extends State<_TripCard> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Main card content
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with airline and status
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${widget.firstFlight.airline} ${widget.firstFlight.flightNumber}',
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              color: Color(0xFF1F2937),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            widget.firstFlight.airline,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Status badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(widget.trip.status),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        _getStatusText(widget.trip.status),
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // Flight route
+                Row(
+                  children: [
+                    // Departure
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.firstFlight.departureAirport,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                              color: Color(0xFF1F2937),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _getAirportName(widget.firstFlight.departureAirport),
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Flight path visual
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF047C7C),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              height: 1,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(1),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: BorderRadius.circular(1),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 16,
+                                    height: 16,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[400],
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(
+                                      Icons.flight,
+                                      size: 12,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: BorderRadius.circular(1),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Arrival
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            widget.lastFlight.arrivalAirport,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                              color: Color(0xFF1F2937),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _getAirportName(widget.lastFlight.arrivalAirport),
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // Multi-leg indicator and date/time
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${widget.formattedDate} · ${widget.formattedTime}',
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                        color: Color(0xFF6B7280),
+                      ),
+                    ),
+                    if (widget.isMultiLeg)
+                      Text(
+                        _getLayoverInfo(),
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          color: Color(0xFF047C7C),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Expandable section for multi-leg flights
+          if (widget.isMultiLeg) ...[
+            // Divider
+            Container(
+              height: 1,
+              color: Colors.grey[200],
+            ),
+            
+            // Expand/Collapse button
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _isExpanded = !_isExpanded;
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _isExpanded ? 'Hide details' : 'Show details',
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Color(0xFF047C7C),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      _isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                      color: const Color(0xFF047C7C),
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Expanded content
+            if (_isExpanded)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                child: Column(
+                  children: widget.trip.tripData.flights.map((flight) {
+                    return _buildFlightDetail(flight);
+                  }).toList(),
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFlightDetail(TripFlight flight) {
+    final departureTime = flight.departureTime;
+    final arrivalTime = flight.arrivalTime;
+    
+    final formattedDepartureTime = '${departureTime.hour > 12 ? departureTime.hour - 12 : departureTime.hour}:${departureTime.minute.toString().padLeft(2, '0')} ${departureTime.hour >= 12 ? 'PM' : 'AM'}';
+    final formattedArrivalTime = '${arrivalTime.hour > 12 ? arrivalTime.hour - 12 : arrivalTime.hour}:${arrivalTime.minute.toString().padLeft(2, '0')} ${arrivalTime.hour >= 12 ? 'PM' : 'AM'}';
+
+    return Container(
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9FAFB),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Column(
+        children: [
+          // Flight header
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '${flight.airline} ${flight.flightNumber}',
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: Color(0xFF1F2937),
+                  ),
+                ),
+              ),
+              Text(
+                '${flight.duration} min',
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
+                  color: Color(0xFF6B7280),
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Flight route details
+          Row(
+            children: [
+              // Departure
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      formattedDepartureTime,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: Color(0xFF1F2937),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      flight.departureAirport,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                        color: Color(0xFF6B7280),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Flight icon
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF047C7C),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.flight,
+                  size: 16,
+                  color: Colors.white,
+                ),
+              ),
+              
+              // Arrival
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      formattedArrivalTime,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: Color(0xFF1F2937),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      flight.arrivalAirport,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                        color: Color(0xFF6B7280),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getLayoverInfo() {
+    if (widget.trip.tripData.flights.length == 2) {
+      final layoverAirport = widget.trip.tripData.flights[0].arrivalAirport;
+      return 'Via ${_getAirportName(layoverAirport)}';
+    } else if (widget.trip.tripData.flights.length > 2) {
+      return '${widget.trip.tripData.flights.length - 1} stops';
+    }
+    return '';
+  }
+
+  String _getAirportName(String airportCode) {
+    const airportNames = {
+      'DEL': 'Delhi',
+      'LHR': 'London',
+      'DXB': 'Dubai',
+      'SFO': 'San Francisco',
+      'JFK': 'New York',
+      'BOM': 'Mumbai',
+      'PNQ': 'Pune',
+      'DEE': 'Dee',
+      'NRT': 'Tokyo',
+      'DPS': 'Bali',
+      'TRR': 'Tiruchirappalli',
+      'KEP': 'Nepalgunj',
+    };
+    return airportNames[airportCode] ?? airportCode;
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'on time':
+        return const Color(0xFF047C7C);
+      case 'delayed':
+        return const Color(0xFFF59E0B);
+      case 'scheduled':
+        return const Color(0xFF6B7280);
+      case 'cancelled':
+        return const Color(0xFFEF4444);
+      default:
+        return const Color(0xFF6B7280);
     }
   }
 
