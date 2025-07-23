@@ -532,9 +532,7 @@ class _TripCardState extends State<_TripCard> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: widget.firstFlight.airlineLogo != null 
-                        ? Colors.transparent 
-                        : _getAirlineColor(widget.firstFlight.airline),
+                    color: _getAirlineColor(widget.firstFlight.airline),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: widget.firstFlight.airlineLogo != null
@@ -545,23 +543,32 @@ class _TripCardState extends State<_TripCard> {
                             width: 40,
                             height: 40,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: _getAirlineColor(widget.firstFlight.airline),
-                                  borderRadius: BorderRadius.circular(8),
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) {
+                                return child;
+                              }
+                              // Show initials while loading
+                              return Center(
+                                child: Text(
+                                  _getAirlineInitials(widget.firstFlight.airline),
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    _getAirlineInitials(widget.firstFlight.airline),
-                                    style: const TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                    ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Center(
+                                child: Text(
+                                  _getAirlineInitials(widget.firstFlight.airline),
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16,
+                                    color: Colors.white,
                                   ),
                                 ),
                               );
@@ -766,8 +773,9 @@ class _TripCardState extends State<_TripCard> {
             // Row 4: Connection info and passenger contacts
             Row(
               children: [
-                // Connection information
+                // Connection information (reserves 60% of space)
                 Expanded(
+                  flex: 6,
                   child: Text(
                     _getConnectionInfo(),
                     style: const TextStyle(
@@ -777,21 +785,28 @@ class _TripCardState extends State<_TripCard> {
                       height: 1.33,
                       color: Color(0xFF6B7280),
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
                 ),
                 
-                // Passenger initials
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ..._getSimplePassengerInitials(),
-                    const SizedBox(width: 4),
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 14,
-                      color: Color(0xFF6B7280),
-                    ),
-                  ],
+                const SizedBox(width: 8),
+                
+                // Passenger initials (reserves 40% of space)
+                Expanded(
+                  flex: 4,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ..._getSimplePassengerInitials(),
+                      const SizedBox(width: 4),
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        size: 14,
+                        color: Color(0xFF6B7280),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -874,19 +889,61 @@ class _TripCardState extends State<_TripCard> {
     
     // If there's only one flight, it's direct
     if (flights.length == 1) {
-      return 'Direct (Non-stop)';
+      return 'Direct flight';
     }
     
     // If there are multiple flights, show the connection points
     if (flights.length == 2) {
       // For 2 flights, show the connection point
       final connectionAirport = flights[0].arrivalAirport;
-      return 'via $connectionAirport';
+      final cityName = _getCityNameFromIATA(connectionAirport);
+      return 'via $cityName';
     } else {
-      // For more than 2 flights, show the number of connections
-      final connectionCount = flights.length - 1;
-      return '$connectionCount connections';
+      // For more than 2 flights, show all connection cities
+      final connectionCities = <String>[];
+      for (int i = 0; i < flights.length - 1; i++) {
+        final airport = flights[i].arrivalAirport;
+        final cityName = _getCityNameFromIATA(airport);
+        connectionCities.add(cityName);
+      }
+      return 'via ${connectionCities.join(', ')}';
     }
+  }
+
+  String _getCityNameFromIATA(String iataCode) {
+    // Map of common IATA codes to city names
+    final cityMap = {
+      'DXB': 'Dubai',
+      'AUH': 'Abu Dhabi',
+      'DOH': 'Doha',
+      'IST': 'Istanbul',
+      'LHR': 'London',
+      'CDG': 'Paris',
+      'FRA': 'Frankfurt',
+      'AMS': 'Amsterdam',
+      'JFK': 'New York',
+      'LAX': 'Los Angeles',
+      'SFO': 'San Francisco',
+      'ORD': 'Chicago',
+      'BOM': 'Mumbai',
+      'DEL': 'Delhi',
+      'BLR': 'Bangalore',
+      'MAA': 'Chennai',
+      'HYD': 'Hyderabad',
+      'CCU': 'Kolkata',
+      'SIN': 'Singapore',
+      'BKK': 'Bangkok',
+      'HKG': 'Hong Kong',
+      'NRT': 'Tokyo',
+      'ICN': 'Seoul',
+      'SYD': 'Sydney',
+      'MEL': 'Melbourne',
+      'YYZ': 'Toronto',
+      'YVR': 'Vancouver',
+      'YUL': 'Montreal',
+    };
+    
+    return cityMap[iataCode] ?? iataCode; // Return city name if found, otherwise return IATA code
   }
 
   List<Widget> _getSimplePassengerInitials() {
