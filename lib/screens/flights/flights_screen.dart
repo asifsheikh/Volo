@@ -767,7 +767,12 @@ class _TripCardState extends State<_TripCard> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          ..._getDummyPassengerInitials(),
+                          SizedBox(
+                            width: 80, // Fixed width to prevent overflow
+                            child: Stack(
+                              children: _getDummyPassengerInitials(),
+                            ),
+                          ),
                           const SizedBox(width: 4),
                           const Icon(
                             Icons.arrow_forward_ios,
@@ -871,8 +876,8 @@ class _TripCardState extends State<_TripCard> {
     
     return List.generate(count, (index) {
       final initial = initials[random.nextInt(initials.length)];
-      return Transform.translate(
-        offset: Offset(-8.0 * index, 0), // Create overlap effect
+      return Positioned(
+        left: (16.0 * index).toDouble(), // 16px spacing between initials (24px - 8px overlap)
         child: Container(
           width: 24,
           height: 24,
