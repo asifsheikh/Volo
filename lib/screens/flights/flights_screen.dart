@@ -124,7 +124,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
                             fontWeight: FontWeight.w700,
                             fontSize: 24,
                             height: 1.33, // 32px line height
-                            color: Color(0xFF333333),
+                            color: Color(0xFF1F2937),
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -147,7 +147,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
                        width: 40,
                        height: 40,
                        decoration: BoxDecoration(
-                         color: const Color(0xFF059393),
+                         color: const Color(0xFF047C7C),
                          borderRadius: BorderRadius.circular(9999),
                          boxShadow: [
                            BoxShadow(
@@ -191,7 +191,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
               child: TabBar(
                 controller: _tabController,
                 indicator: BoxDecoration(
-                  color: const Color(0xFF059393),
+                  color: const Color(0xFF047C7C),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 indicatorSize: TabBarIndicatorSize.tab,
@@ -239,7 +239,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(
-          color: Color(0xFF059393),
+          color: Color(0xFF047C7C),
         ),
       );
     }
@@ -267,7 +267,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
             ElevatedButton(
               onPressed: _loadTrips,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF059393),
+                backgroundColor: const Color(0xFF047C7C),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -314,7 +314,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
               icon: const Icon(Icons.add),
               label: const Text('Add Your First Flight'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF059393),
+                backgroundColor: const Color(0xFF047C7C),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -327,7 +327,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
 
     return RefreshIndicator(
       onRefresh: _loadTrips,
-      color: const Color(0xFF059393),
+      color: const Color(0xFF047C7C),
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         itemCount: _upcomingTrips.length,
@@ -342,7 +342,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(
-          color: Color(0xFF059393),
+          color: Color(0xFF047C7C),
         ),
       );
     }
@@ -370,7 +370,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
             ElevatedButton(
               onPressed: _loadTrips,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF059393),
+                backgroundColor: const Color(0xFF047C7C),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -418,7 +418,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
 
     return RefreshIndicator(
       onRefresh: _loadTrips,
-      color: const Color(0xFF059393),
+      color: const Color(0xFF047C7C),
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         itemCount: _pastTrips.length,
@@ -593,7 +593,7 @@ class _TripCardState extends State<_TripCard> {
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
                           height: 1.5, // 24px line height
-                          color: Color(0xFF333333),
+                          color: Color(0xFF1F2937),
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -647,7 +647,7 @@ class _TripCardState extends State<_TripCard> {
                         fontWeight: FontWeight.w600,
                         fontSize: 24,
                         height: 1.21, // 29px line height
-                        color: Color(0xFF333333),
+                        color: Color(0xFF1F2937),
                       ),
                     ),
                     
@@ -670,7 +670,7 @@ class _TripCardState extends State<_TripCard> {
                         fontWeight: FontWeight.w600,
                         fontSize: 24,
                         height: 1.21, // 29px line height
-                        color: Color(0xFF333333),
+                        color: Color(0xFF1F2937),
                       ),
                     ),
                   ],
@@ -693,7 +693,7 @@ class _TripCardState extends State<_TripCard> {
                               fontWeight: FontWeight.w500,
                               fontSize: 14,
                               height: 1.21, // 17px line height
-                              color: Color(0xFF333333),
+                              color: Color(0xFF1F2937),
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -753,7 +753,7 @@ class _TripCardState extends State<_TripCard> {
                               fontWeight: FontWeight.w500,
                               fontSize: 14,
                               height: 1.21, // 17px line height
-                              color: Color(0xFF333333),
+                              color: Color(0xFF1F2937),
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -816,15 +816,15 @@ class _TripCardState extends State<_TripCard> {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'on time':
-        return const Color(0xFF059393); // Teal from Figma
+        return const Color(0xFF047C7C); // App theme primary
       case 'delayed 25 min':
-        return const Color(0xFFF59E0B); // Orange from Figma
+        return const Color(0xFFD97706); // App theme warning
       case 'scheduled':
-        return const Color(0xFF9CA3AF); // Gray from Figma
+        return const Color(0xFF9CA3AF); // App theme secondary
       case 'cancelled':
-        return const Color(0xFFEF4444); // Red
+        return const Color(0xFFDC2626); // App theme destructive
       default:
-        return const Color(0xFF6B7280); // Gray
+        return const Color(0xFF6B7280); // App theme text secondary
     }
   }
 
