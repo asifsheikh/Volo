@@ -517,25 +517,58 @@ class _TripCardState extends State<_TripCard> {
             // Header with airline logo, flight number, and status
             Row(
               children: [
-                // Airline logo (placeholder for now)
+                // Airline logo
                 Container(
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: _getAirlineColor(widget.firstFlight.airline),
+                    color: widget.firstFlight.airlineLogo != null 
+                        ? Colors.transparent 
+                        : _getAirlineColor(widget.firstFlight.airline),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Center(
-                    child: Text(
-                      _getAirlineInitials(widget.firstFlight.airline),
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+                  child: widget.firstFlight.airlineLogo != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            widget.firstFlight.airlineLogo!,
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: _getAirlineColor(widget.firstFlight.airline),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    _getAirlineInitials(widget.firstFlight.airline),
+                                    style: const TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      : Center(
+                          child: Text(
+                            _getAirlineInitials(widget.firstFlight.airline),
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                 ),
                 const SizedBox(width: 12),
                 // Flight number and airline name
@@ -644,59 +677,28 @@ class _TripCardState extends State<_TripCard> {
                     children: [
                       Row(
                         children: [
+                          // Departure dot
                           Container(
-                            width: 8,
-                            height: 8,
+                            width: 6,
+                            height: 6,
                             decoration: const BoxDecoration(
                               color: Color(0xFF047C7C),
                               shape: BoxShape.circle,
                             ),
                           ),
+                          // Dotted line
                           Expanded(
                             child: Container(
-                              height: 1,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                borderRadius: BorderRadius.circular(1),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(1),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 16,
-                                    height: 16,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF047C7C),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Icon(
-                                      Icons.flight,
-                                      size: 12,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[300],
-                                        borderRadius: BorderRadius.circular(1),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              height: 2,
+                              child: CustomPaint(
+                                painter: DottedLinePainter(),
                               ),
                             ),
                           ),
+                          // Arrival dot
                           Container(
-                            width: 8,
-                            height: 8,
+                            width: 6,
+                            height: 6,
                             decoration: BoxDecoration(
                               color: Colors.grey[400],
                               shape: BoxShape.circle,
@@ -704,7 +706,7 @@ class _TripCardState extends State<_TripCard> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       // Duration chip
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -766,10 +768,10 @@ class _TripCardState extends State<_TripCard> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           ..._getDummyPassengerInitials(),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 4),
                           const Icon(
                             Icons.arrow_forward_ios,
-                            size: 16,
+                            size: 14,
                             color: Color(0xFF6B7280),
                           ),
                         ],
@@ -870,12 +872,16 @@ class _TripCardState extends State<_TripCard> {
     return List.generate(count, (index) {
       final initial = initials[random.nextInt(initials.length)];
       return Container(
-        margin: const EdgeInsets.only(right: 4),
+        margin: EdgeInsets.only(right: index < count - 1 ? -8.0 : 0), // 8px overlap (about 33% of 24px)
         width: 24,
         height: 24,
         decoration: BoxDecoration(
           color: const Color(0xFF047C7C),
           shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white,
+            width: 1.5,
+          ),
         ),
         child: Center(
           child: Text(
@@ -891,4 +897,32 @@ class _TripCardState extends State<_TripCard> {
       );
     });
   }
+} 
+
+// Custom painter for dotted line
+class DottedLinePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFD1D5DB)
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+
+    const dashWidth = 4;
+    const dashSpace = 4;
+    double startX = 0;
+    final endX = size.width;
+
+    while (startX < endX) {
+      canvas.drawLine(
+        Offset(startX, size.height / 2),
+        Offset(startX + dashWidth, size.height / 2),
+        paint,
+      );
+      startX += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 } 
