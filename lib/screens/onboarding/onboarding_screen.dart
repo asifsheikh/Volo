@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../services/firebase_service.dart';
+import '../../theme/app_theme.dart';
 import '../main_navigation_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -109,12 +110,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F8FA),
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF111827)),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -150,28 +151,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                         const SizedBox(height: 32),
                         // Title
-                        const Text(
+                        Text(
                           "Welcome to Volo! ✈️",
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 28,
-                            height: 34 / 28,
-                            color: Color(0xFF1F2937),
-                          ),
+                          style: AppTheme.headlineLarge,
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 12),
                         // Subtitle
-                        const Text(
+                        Text(
                           "Let's set up your profile so we can keep your loved ones updated about your flights.",
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16,
-                            height: 24 / 16,
-                            color: Color(0xFF4B5563),
-                          ),
+                          style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 32),
@@ -278,14 +267,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             onPressed: (_isFirstNameValid && !_isLoading)
                                 ? _completeOnboarding
                                 : null,
-                                                  style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF059393),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              shadowColor: Colors.black.withOpacity(0.1),
-                              elevation: 8,
-                            ),
+                                                  style: AppTheme.primaryButton,
                             child: _isLoading
                                 ? const SizedBox(
                                     width: 24,
@@ -295,15 +277,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : const Text(
+                                : Text(
                                     'Get Started',
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 18,
-                                      height: 22 / 18,
-                                      color: Colors.white,
-                                    ),
+                                    style: AppTheme.titleLarge.copyWith(color: AppTheme.textOnPrimary),
                                   ),
                           ),
                         ),

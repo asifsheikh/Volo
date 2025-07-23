@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../main_navigation_screen.dart';
+import '../../theme/app_theme.dart';
 
 class WelcomeBackScreen extends StatelessWidget {
   final String userName;
@@ -9,7 +10,7 @@ class WelcomeBackScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -41,7 +42,7 @@ class WelcomeBackScreen extends StatelessWidget {
                     fontFamily: 'Inter',
                     fontSize: 28,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF232B36),
+                    color: AppTheme.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -51,7 +52,7 @@ class WelcomeBackScreen extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: 'Inter',
                     fontSize: 16,
-                    color: Color(0xFF6B7280),
+                    color: AppTheme.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -60,7 +61,7 @@ class WelcomeBackScreen extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF059393),
+                      backgroundColor: AppTheme.primary,
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
