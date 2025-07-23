@@ -857,26 +857,28 @@ class _TripCardState extends State<_TripCard> {
     
     return List.generate(count, (index) {
       final initial = initials[random.nextInt(initials.length)];
-      return Container(
-        margin: EdgeInsets.only(right: index < count - 1 ? -6.0 : 0), // 6px overlap
-        width: 20,
-        height: 20,
-        decoration: BoxDecoration(
-          color: const Color(0xFF047C7C),
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Colors.white,
-            width: 1.5,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            initial,
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w600,
-              fontSize: 9,
+      return Transform.translate(
+        offset: Offset(-6.0 * index, 0), // Create overlap effect without negative margin
+        child: Container(
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            color: const Color(0xFF047C7C),
+            shape: BoxShape.circle,
+            border: Border.all(
               color: Colors.white,
+              width: 1.5,
+            ),
+          ),
+          child: Center(
+            child: Text(
+              initial,
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w600,
+                fontSize: 9,
+                color: Colors.white,
+              ),
             ),
           ),
         ),
