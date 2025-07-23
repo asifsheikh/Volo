@@ -532,7 +532,9 @@ class _TripCardState extends State<_TripCard> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: _getAirlineColor(widget.firstFlight.airline),
+                    color: widget.firstFlight.airlineLogo != null 
+                        ? Colors.transparent 
+                        : _getAirlineColor(widget.firstFlight.airline),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: widget.firstFlight.airlineLogo != null
@@ -548,27 +550,39 @@ class _TripCardState extends State<_TripCard> {
                                 return child;
                               }
                               // Show initials while loading
-                              return Center(
-                                child: Text(
-                                  _getAirlineInitials(widget.firstFlight.airline),
-                                  style: const TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 16,
-                                    color: Colors.white,
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: _getAirlineColor(widget.firstFlight.airline),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    _getAirlineInitials(widget.firstFlight.airline),
+                                    style: const TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               );
                             },
                             errorBuilder: (context, error, stackTrace) {
-                              return Center(
-                                child: Text(
-                                  _getAirlineInitials(widget.firstFlight.airline),
-                                  style: const TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 16,
-                                    color: Colors.white,
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: _getAirlineColor(widget.firstFlight.airline),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    _getAirlineInitials(widget.firstFlight.airline),
+                                    style: const TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               );
