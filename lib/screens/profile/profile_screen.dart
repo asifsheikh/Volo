@@ -7,6 +7,7 @@ import '../../services/firebase_service.dart';
 import '../../services/profile_picture_service.dart';
 import '../../services/remote_config_service.dart';
 import '../../features/ai_demo/ai_demo_screen.dart';
+import '../../theme/app_theme.dart';
 import 'push_notification_test_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -410,22 +411,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F8FA),
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF111827)),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
+        title: Text(
           'Profile',
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w700,
-            fontSize: 24,
-            color: Color(0xFF111827),
-          ),
+          style: AppTheme.headlineMedium,
         ),
         centerTitle: false,
       ),
