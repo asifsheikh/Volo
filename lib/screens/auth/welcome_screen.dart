@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
+import '../../theme/app_theme.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
@@ -22,7 +23,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: Stack(
           children: [
@@ -57,12 +58,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       const SizedBox(height: 40),
                       const Text(
                         'Volo',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
+                        style: AppTheme.headlineLarge.copyWith(
                           fontSize: 40,
                           letterSpacing: 1.2,
-                          color: Color(0xFF1F2937),
                           height: 1.1,
                         ),
                         textAlign: TextAlign.center,
@@ -77,7 +75,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             end: Alignment.centerRight,
                             colors: [
                               Color.fromRGBO(0, 0, 0, 0),
-                              Color(0xFF9CA3AF),
+                              AppTheme.textSecondary,
                               Color.fromRGBO(0, 0, 0, 0),
                             ],
                             stops: [0.0, 0.5, 1.0],
@@ -85,15 +83,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      const Text(
+                      Text(
                         'Your journey, their peace of mind.',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18,
-                          height: 1.4,
-                          color: Color(0xFF6B7280),
-                        ),
+                        style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
                         textAlign: TextAlign.center,
                       ),
                     ],

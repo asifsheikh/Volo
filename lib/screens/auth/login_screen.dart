@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'otp_screen.dart';
 import '../../services/network_service.dart';
+import '../../theme/app_theme.dart';
 import 'dart:developer' as developer;
 
 /// Login Screen for Volo App
@@ -283,12 +284,12 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F8FA),
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF111827)),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -322,28 +323,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 32),
                       // Title
-                      const Text(
+                      Text(
                         'Welcome to Volo! ✈️',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 28,
-                          height: 34 / 28,
-                          color: Color(0xFF1F2937),
-                        ),
+                        style: AppTheme.headlineLarge,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 12),
                       // Subtitle
-                      const Text(
+                      Text(
                         'Enter your phone number to get started',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                          height: 24 / 16,
-                          color: Color(0xFF4B5563),
-                        ),
+                        style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 32),
@@ -395,14 +384,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 60,
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _onContinue,
-                                                  style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF059393),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              shadowColor: Colors.black.withOpacity(0.1),
-                              elevation: 8,
-                            ),
+                                                  style: AppTheme.primaryButton,
                             child: _isLoading
                                 ? const SizedBox(
                                     width: 20,
@@ -412,30 +394,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                     ),
                                   )
-                                : const Text(
+                                : Text(
                                     'Send OTP',
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 18,
-                                      height: 22 / 18,
-                                      color: Colors.white,
-                                    ),
+                                    style: AppTheme.titleLarge.copyWith(color: AppTheme.textOnPrimary),
                                   ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 16),
                       // Info Text
-                      const Text(
+                      Text(
                         "We'll send a verification code to your phone number",
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                          height: 20 / 14,
-                          color: Color(0xFF6B7280),
-                        ),
+                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 32),
@@ -449,15 +419,10 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: const EdgeInsets.only(bottom: 16.0, left: 24.0, right: 24.0),
               child: Column(
                 children: [
-                  const Text.rich(
+                  Text.rich(
                     TextSpan(
                       text: 'By continuing, you agree to our ',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 14,
-                        color: Color(0xFF9CA3AF),
-                      ),
+                      style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
                       children: [
                         TextSpan(
                           text: 'Terms',

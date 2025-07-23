@@ -7,6 +7,7 @@ import 'dart:async';
 
 import '../../services/firebase_service.dart';
 import '../../services/network_service.dart';
+import '../../theme/app_theme.dart';
 import '../onboarding/welcome_back_screen.dart';
 
 /// OTP Verification Screen for Volo App
@@ -293,12 +294,12 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F8FA),
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF111827)),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -332,28 +333,16 @@ class _OtpScreenState extends State<OtpScreen> {
                       ),
                       const SizedBox(height: 32),
                       // Title
-                      const Text(
+                      Text(
                         'Enter verification code',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 24,
-                          height: 30 / 24,
-                          color: Color(0xFF1F2937),
-                        ),
+                        style: AppTheme.headlineMedium,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
                       // Subtitle
                       Text(
                         'We sent a 6-digit code to ${widget.phoneNumber}',
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                          height: 24 / 16,
-                          color: Color(0xFF4B5563),
-                        ),
+                        style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 32),
@@ -377,12 +366,12 @@ class _OtpScreenState extends State<OtpScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                   fieldHeight: 56,
                                   fieldWidth: 52,
-                                  activeColor: _errorText != null ? Colors.red : const Color(0xFF9CA3AF),
-                                  selectedColor: const Color(0xFF1F2937),
-                                  inactiveColor: const Color(0xFF9CA3AF),
-                                  activeFillColor: Colors.white,
-                                  selectedFillColor: Colors.white,
-                                  inactiveFillColor: Colors.white,
+                                  activeColor: _errorText != null ? AppTheme.destructive : AppTheme.textSecondary,
+                                  selectedColor: AppTheme.textPrimary,
+                                  inactiveColor: AppTheme.textSecondary,
+                                  activeFillColor: AppTheme.cardBackground,
+                                  selectedFillColor: AppTheme.cardBackground,
+                                  inactiveFillColor: AppTheme.cardBackground,
                                   borderWidth: 2,
                                 ),
                                 keyboardType: TextInputType.number,
@@ -411,14 +400,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           height: 60,
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _onVerify,
-                                                  style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF059393),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              shadowColor: Colors.black.withOpacity(0.1),
-                              elevation: 8,
-                            ),
+                                                  style: AppTheme.primaryButton,
                             child: _isLoading
                                 ? const SizedBox(
                                     width: 20,
@@ -428,15 +410,9 @@ class _OtpScreenState extends State<OtpScreen> {
                                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                     ),
                                   )
-                                : const Text(
+                                : Text(
                                     'Verify & Continue',
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 18,
-                                      height: 22 / 18,
-                                      color: Colors.white,
-                                    ),
+                                    style: AppTheme.titleLarge.copyWith(color: AppTheme.textOnPrimary),
                                   ),
                           ),
                         ),
@@ -446,25 +422,18 @@ class _OtpScreenState extends State<OtpScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
+                          Text(
                             "Didn't receive the code? ",
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14,
-                              color: Color(0xFF6B7280),
-                            ),
+                            style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
                           ),
                           if (_canResend)
                             GestureDetector(
                               onTap: _resendOTP,
-                              child: const Text(
+                              child: Text(
                                 'Resend code',
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
+                                style: AppTheme.bodyMedium.copyWith(
                                   fontWeight: FontWeight.w500,
-                                  fontSize: 14,
-                                  color: Color(0xFF1F2937),
+                                  color: AppTheme.textPrimary,
                                   decoration: TextDecoration.underline,
                                 ),
                               ),
@@ -472,12 +441,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           else
                             Text(
                               'Resend in $_resendCountdown seconds',
-                              style: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                                color: Color(0xFF9CA3AF),
-                              ),
+                              style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
                             ),
                         ],
                       ),
@@ -485,13 +449,11 @@ class _OtpScreenState extends State<OtpScreen> {
                       // Change number
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
-                        child: const Text(
+                        child: Text(
                           'Use different number',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
+                          style: AppTheme.bodyMedium.copyWith(
                             fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                            color: Color(0xFF1F2937),
+                            color: AppTheme.textPrimary,
                             decoration: TextDecoration.underline,
                           ),
                           textAlign: TextAlign.center,
@@ -506,15 +468,10 @@ class _OtpScreenState extends State<OtpScreen> {
             // Terms/Privacy at bottom
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0, left: 24.0, right: 24.0),
-              child: const Text.rich(
+              child: Text.rich(
                 TextSpan(
                   text: 'By continuing, you agree to our ',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 14,
-                    color: Color(0xFF9CA3AF),
-                  ),
+                  style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
                   children: [
                     TextSpan(
                       text: 'Terms',
