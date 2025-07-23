@@ -578,24 +578,12 @@ class _TripCardState extends State<_TripCard> {
                     children: [
                       Text(
                         widget.firstFlight.flightNumber,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                          height: 1.5, // 24px line height
-                          color: Color(0xFF1F2937),
-                        ),
+                        style: AppTheme.titleMedium,
                       ),
                       const SizedBox(height: 2),
                       Text(
                         widget.firstFlight.airline,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          height: 1.33, // 16px line height
-                          color: Color(0xFF6B7280),
-                        ),
+                        style: AppTheme.bodySmall,
                       ),
                     ],
                   ),
@@ -609,13 +597,7 @@ class _TripCardState extends State<_TripCard> {
                   ),
                   child: Text(
                     _getRandomStatus(),
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
-                      height: 1.25, // 15px line height
-                      color: Colors.white,
-                    ),
+                    style: AppTheme.labelMedium.copyWith(color: AppTheme.textOnPrimary),
                   ),
                 ),
               ],
@@ -629,13 +611,7 @@ class _TripCardState extends State<_TripCard> {
                 // Departure IATA code
                 Text(
                   widget.firstFlight.departureAirport,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 24,
-                    height: 1.21,
-                    color: Color(0xFF1F2937),
-                  ),
+                  style: AppTheme.headlineMedium,
                 ),
                 
                 // Dotted line connecting departure to arrival (full width)
@@ -652,13 +628,7 @@ class _TripCardState extends State<_TripCard> {
                 // Arrival IATA code
                 Text(
                   widget.lastFlight.arrivalAirport,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 24,
-                    height: 1.21,
-                    color: Color(0xFF1F2937),
-                  ),
+                  style: AppTheme.headlineMedium,
                 ),
               ],
             ),
@@ -671,13 +641,7 @@ class _TripCardState extends State<_TripCard> {
                 // Departure time
                 Text(
                   widget.departureTime,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                    height: 1.21,
-                    color: Color(0xFF1F2937),
-                  ),
+                  style: AppTheme.bodyMedium.copyWith(fontWeight: FontWeight.w500),
                 ),
                 
                 // Duration badge in center
@@ -686,18 +650,12 @@ class _TripCardState extends State<_TripCard> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F1F1),
+                        color: AppTheme.background,
                         borderRadius: BorderRadius.circular(9999),
                       ),
                       child: Text(
                         _formatDuration(widget.trip.tripData.totalDuration),
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          height: 1.25,
-                          color: Color(0xFF6B7280),
-                        ),
+                        style: AppTheme.bodySmall,
                       ),
                     ),
                   ),
@@ -706,13 +664,7 @@ class _TripCardState extends State<_TripCard> {
                 // Arrival time
                 Text(
                   widget.arrivalTime,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                    height: 1.21,
-                    color: Color(0xFF1F2937),
-                  ),
+                  style: AppTheme.bodyMedium.copyWith(fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -725,13 +677,7 @@ class _TripCardState extends State<_TripCard> {
                 // Departure date
                 Text(
                   widget.departureDate,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                    height: 1.25,
-                    color: Color(0xFF6B7280),
-                  ),
+                  style: AppTheme.bodySmall,
                 ),
                 
                 // Empty space in middle
@@ -740,13 +686,7 @@ class _TripCardState extends State<_TripCard> {
                 // Arrival date
                 Text(
                   widget.arrivalDate,
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                    height: 1.25,
-                    color: Color(0xFF6B7280),
-                  ),
+                  style: AppTheme.bodySmall,
                 ),
               ],
             ),
@@ -761,13 +701,7 @@ class _TripCardState extends State<_TripCard> {
                   flex: 6,
                   child: Text(
                     _getConnectionInfo(),
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 12,
-                      height: 1.33,
-                      color: Color(0xFF6B7280),
-                    ),
+                    style: AppTheme.bodySmall,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                   ),
@@ -783,10 +717,10 @@ class _TripCardState extends State<_TripCard> {
                     children: [
                       ..._getSimplePassengerInitials(),
                       const SizedBox(width: 4),
-                      const Icon(
+                      Icon(
                         Icons.arrow_forward_ios,
                         size: 14,
-                        color: Color(0xFF6B7280),
+                        color: AppTheme.textSecondary,
                       ),
                     ],
                   ),
@@ -942,7 +876,7 @@ class _TripCardState extends State<_TripCard> {
           width: 24,
           height: 24,
           decoration: BoxDecoration(
-            color: const Color(0xFF6B7280),
+            color: AppTheme.textSecondary,
             shape: BoxShape.circle,
             border: Border.all(
               color: Colors.white,
@@ -952,13 +886,7 @@ class _TripCardState extends State<_TripCard> {
           child: Center(
             child: Text(
               initial,
-              style: const TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                fontSize: 12,
-                height: 1.25, // 15px line height
-                color: Colors.white,
-              ),
+              style: AppTheme.labelMedium.copyWith(color: AppTheme.textOnPrimary),
             ),
           ),
         ),
