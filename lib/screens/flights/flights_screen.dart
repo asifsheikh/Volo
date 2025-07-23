@@ -716,7 +716,12 @@ class _TripCardState extends State<_TripCard> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      ..._getContactInitials(widget.trip),
+                      Flexible(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: _getContactInitials(widget.trip),
+                        ),
+                      ),
                       const SizedBox(width: 4),
                       Icon(
                         Icons.arrow_forward_ios,
@@ -871,10 +876,10 @@ class _TripCardState extends State<_TripCard> {
     if (contacts.isEmpty) {
       return [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
           decoration: BoxDecoration(
             color: AppTheme.textSecondary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: AppTheme.textSecondary.withOpacity(0.3),
               width: 1,
@@ -885,15 +890,15 @@ class _TripCardState extends State<_TripCard> {
             children: [
               Icon(
                 Icons.info_outline,
-                size: 12,
+                size: 10,
                 color: AppTheme.textSecondary,
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: 3),
               Text(
-                'No contacts added',
+                'No contacts',
                 style: AppTheme.bodySmall.copyWith(
                   color: AppTheme.textSecondary,
-                  fontSize: 10,
+                  fontSize: 9,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -903,24 +908,24 @@ class _TripCardState extends State<_TripCard> {
       ];
     }
     
-    // Limit to first 4 contacts to avoid overflow
-    final displayContacts = contacts.take(4).toList();
+    // Limit to first 3 contacts to avoid overflow
+    final displayContacts = contacts.take(3).toList();
     
     return List.generate(displayContacts.length, (index) {
       final contact = displayContacts[index];
       final initials = _getInitialsFromName(contact.name);
       
       return Transform.translate(
-        offset: Offset(-6.0 * index, 0), // Create overlap effect
+        offset: Offset(-5.0 * index, 0), // Create overlap effect
         child: Container(
-          width: 24,
-          height: 24,
+          width: 22,
+          height: 22,
           decoration: BoxDecoration(
             color: AppTheme.primary,
             shape: BoxShape.circle,
             border: Border.all(
               color: Colors.white,
-              width: 2,
+              width: 1.5,
             ),
           ),
           child: Center(
@@ -928,7 +933,7 @@ class _TripCardState extends State<_TripCard> {
               initials,
               style: AppTheme.labelMedium.copyWith(
                 color: AppTheme.textOnPrimary,
-                fontSize: 10,
+                fontSize: 9,
                 fontWeight: FontWeight.w600,
               ),
             ),
