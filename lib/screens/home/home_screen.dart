@@ -9,6 +9,7 @@ import '../../services/network_service.dart';
 import '../../features/add_flight/add_flight_screen.dart';
 import '../../features/add_flight/controller/add_flight_controller.dart';
 import '../profile/profile_screen.dart';
+import '../../theme/app_theme.dart';
 
 class HomeScreen extends StatefulWidget {
   final String username;
@@ -82,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -100,12 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                     child: Text(
                       'Hey, ${widget.username} 👋',
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 28,
-                        color: Color(0xFF1F2937),
-                      ),
+                      style: AppTheme.headlineLarge.copyWith(fontWeight: FontWeight.w400),
                     ),
                   ),
                   GestureDetector(
@@ -129,13 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       'Travel confidently—Volo updates your loved ones automatically',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w700,
-                        fontSize: 24, // Reduced from 28 for better hierarchy
-                        height: 1.3,
-                        color: Color(0xFF1F2937),
-                      ),
+                      style: AppTheme.headlineMedium,
                     ),
                     
                     const SizedBox(height: 20), // Increased spacing for breathing room
@@ -144,13 +134,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       'Add your flight details and Volo will keep your family and friends updated in real time, so you can focus on your journey.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400, // Regular weight instead of medium
-                        fontSize: 14, // Reduced from 16 for de-emphasis
-                        height: 1.6, // Increased line height for lighter feel
-                        color: const Color(0xFF9CA3AF).withOpacity(0.8), // Tertiary color with reduced opacity
-                      ),
+                                              style: AppTheme.bodyMedium.copyWith(
+                          color: AppTheme.textSecondary.withOpacity(0.8),
+                        ),
                     ),
                     
                     const SizedBox(height: 56), // Increased spacing to emphasize CTA
@@ -184,14 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Colors.white,
                           ),
                         ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF047C7C), // Updated to new primary color
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 0,
-                          shadowColor: Colors.transparent,
-                        ),
+                        style: AppTheme.primaryButton,
                       ),
                     ),
                     
@@ -210,11 +189,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       child: Text(
                         'How does Volo work?',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400, // Reduced from 500 for de-emphasis
-                          fontSize: 12, // Reduced from 14 for subtlety
-                          color: const Color(0xFF6B7280).withOpacity(0.7), // Secondary color with reduced opacity
+                        style: AppTheme.bodySmall.copyWith(
+                          color: AppTheme.textSecondary.withOpacity(0.7),
                           decoration: TextDecoration.underline,
                         ),
                       ),
@@ -250,23 +226,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildProfileAvatar() {
     if (_isLoadingProfile) {
-      return const CircleAvatar(
+      return CircleAvatar(
         radius: 28,
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.cardBackground,
         child: CircularProgressIndicator(
-          color: Color(0xFF9CA3AF),
+          color: AppTheme.textSecondary,
         ),
       );
     }
 
     if (_isOffline) {
-      return const CircleAvatar(
+      return CircleAvatar(
         radius: 28,
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.cardBackground,
         child: Icon(
           Icons.signal_wifi_off,
           size: 28,
-          color: Color(0xFF9CA3AF),
+          color: AppTheme.textSecondary,
         ),
       );
     }
@@ -274,18 +250,18 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_profilePictureUrl != null) {
       return CircleAvatar(
         radius: 28,
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.cardBackground,
         backgroundImage: NetworkImage(_profilePictureUrl!),
       );
     }
 
-    return const CircleAvatar(
+    return CircleAvatar(
       radius: 28,
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.cardBackground,
       child: Icon(
         Icons.person,
         size: 28,
-        color: Color(0xFF9CA3AF),
+        color: AppTheme.textSecondary,
       ),
     );
   }

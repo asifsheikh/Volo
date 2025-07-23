@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home/home_screen.dart';
 import 'flights/flights_screen.dart';
+import '../theme/app_theme.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   final String username;
@@ -61,10 +62,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.cardBackground,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: AppTheme.shadowPrimary,
               blurRadius: 10,
               offset: const Offset(0, -2),
             ),
@@ -85,18 +86,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               label: 'Flights',
             ),
           ],
-          selectedItemColor: const Color(0xFF047C7C),
-          unselectedItemColor: const Color(0xFF9CA3AF),
-          selectedLabelStyle: const TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w600,
-            fontSize: 12,
-          ),
-          unselectedLabelStyle: const TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w500,
-            fontSize: 12,
-          ),
+          selectedItemColor: AppTheme.primary,
+          unselectedItemColor: AppTheme.textSecondary,
+          selectedLabelStyle: AppTheme.labelMedium.copyWith(fontWeight: FontWeight.w600),
+          unselectedLabelStyle: AppTheme.labelMedium,
           backgroundColor: Colors.transparent,
           elevation: 0,
           type: BottomNavigationBarType.fixed,
