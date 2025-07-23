@@ -676,7 +676,30 @@ class _TripCardState extends State<_TripCard> {
                   ],
                 ),
                 
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
+                
+                // Duration chip positioned closer to dotted line
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F1F1),
+                      borderRadius: BorderRadius.circular(9999),
+                    ),
+                    child: Text(
+                      _formatDuration(widget.trip.tripData.totalDuration),
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                        height: 1.25, // 15px line height
+                        color: Color(0xFF6B7280),
+                      ),
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 8),
                 
                 // Times, dates, and details
                 Row(
@@ -722,24 +745,8 @@ class _TripCardState extends State<_TripCard> {
                       ),
                     ),
 
-                    // Duration chip in center
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF1F1F1),
-                        borderRadius: BorderRadius.circular(9999),
-                      ),
-                      child: Text(
-                        _formatDuration(widget.trip.tripData.totalDuration),
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          height: 1.25, // 15px line height
-                          color: Color(0xFF6B7280),
-                        ),
-                      ),
-                    ),
+                    // Spacer for center alignment
+                    const SizedBox(width: 60), // Match duration chip width
 
                     // Arrival details
                     Expanded(
