@@ -621,168 +621,149 @@ class _TripCardState extends State<_TripCard> {
             const SizedBox(height: 20),
 
             // Flight route with times and dates
-            Row(
+            Column(
               children: [
-                // Departure section
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.firstFlight.departureAirport,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 20,
-                          color: Color(0xFF1F2937),
+                // Flight path with IATA codes and dotted line
+                Row(
+                  children: [
+                    // Departure IATA code
+                    Text(
+                      widget.firstFlight.departureAirport,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                        color: Color(0xFF1F2937),
+                      ),
+                    ),
+                    
+                    // Dotted line connecting departure to arrival
+                    Expanded(
+                      child: Container(
+                        height: 2,
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        child: CustomPaint(
+                          painter: DottedLinePainter(),
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        widget.departureTime,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Color(0xFF1F2937),
-                        ),
+                    ),
+                    
+                    // Arrival IATA code
+                    Text(
+                      widget.lastFlight.arrivalAirport,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                        color: Color(0xFF1F2937),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        widget.departureDate,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          color: Color(0xFF6B7280),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _getDummyGateInfo(),
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          color: Color(0xFF6B7280),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-
-                // Flight path visual
-                Expanded(
-                  child: Column(
-                    children: [
-                      Row(
+                
+                const SizedBox(height: 16),
+                
+                // Times, dates, and details
+                Row(
+                  children: [
+                    // Departure details
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Departure dot
-                          Container(
-                            width: 6,
-                            height: 6,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF047C7C),
-                              shape: BoxShape.circle,
+                          Text(
+                            widget.departureTime,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Color(0xFF1F2937),
                             ),
                           ),
-                          // Dotted line
-                          Expanded(
-                            child: Container(
-                              height: 2,
-                              child: CustomPaint(
-                                painter: DottedLinePainter(),
+                          const SizedBox(height: 2),
+                          Text(
+                            widget.departureDate,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _getDummyGateInfo(),
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Duration chip in center
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF3F4F6),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        _formatDuration(widget.trip.tripData.totalDuration),
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
+                    ),
+
+                    // Arrival details
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            widget.arrivalTime,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Color(0xFF1F2937),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            widget.arrivalDate,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Passenger initials
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              ..._getSimplePassengerInitials(),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.arrow_forward_ios,
+                                size: 14,
+                                color: Color(0xFF6B7280),
                               ),
-                            ),
-                          ),
-                          // Arrival dot
-                          Container(
-                            width: 6,
-                            height: 6,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[400],
-                              shape: BoxShape.circle,
-                            ),
+                            ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      // Duration chip
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF3F4F6),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          _formatDuration(widget.trip.tripData.totalDuration),
-                          style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12,
-                            color: Color(0xFF6B7280),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Arrival section
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        widget.lastFlight.arrivalAirport,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 20,
-                          color: Color(0xFF1F2937),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        widget.arrivalTime,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Color(0xFF1F2937),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        widget.arrivalDate,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          color: Color(0xFF6B7280),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Passenger initials
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          SizedBox(
-                            width: 80, // Fixed width to prevent overflow
-                            child: Stack(
-                              children: _getDummyPassengerInitials(),
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          const Icon(
-                            Icons.arrow_forward_ios,
-                            size: 14,
-                            color: Color(0xFF6B7280),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -869,35 +850,33 @@ class _TripCardState extends State<_TripCard> {
     return '$terminal - Gate $gate';
   }
 
-  List<Widget> _getDummyPassengerInitials() {
+  List<Widget> _getSimplePassengerInitials() {
     final random = Random();
     final initials = ['AS', 'MK', 'RJ', 'SP', 'AB'];
     final count = random.nextInt(3) + 2; // 2-4 passengers
     
     return List.generate(count, (index) {
       final initial = initials[random.nextInt(initials.length)];
-      return Positioned(
-        left: (16.0 * index).toDouble(), // 16px spacing between initials (24px - 8px overlap)
-        child: Container(
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(
-            color: const Color(0xFF047C7C),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.white,
-              width: 1.5,
-            ),
+      return Container(
+        margin: EdgeInsets.only(right: index < count - 1 ? -6.0 : 0), // 6px overlap
+        width: 20,
+        height: 20,
+        decoration: BoxDecoration(
+          color: const Color(0xFF047C7C),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white,
+            width: 1.5,
           ),
-          child: Center(
-            child: Text(
-              initial,
-              style: const TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w600,
-                fontSize: 10,
-                color: Colors.white,
-              ),
+        ),
+        child: Center(
+          child: Text(
+            initial,
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w600,
+              fontSize: 9,
+              color: Colors.white,
             ),
           ),
         ),
