@@ -1,3 +1,4 @@
+
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -715,7 +716,7 @@ class _TripCardState extends State<_TripCard> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      ..._getSimplePassengerInitials(),
+                      ..._getContactInitials(widget.trip),
                       const SizedBox(width: 4),
                       Icon(
                         Icons.arrow_forward_ios,
@@ -863,20 +864,47 @@ class _TripCardState extends State<_TripCard> {
     return cityMap[iataCode] ?? iataCode; // Return city name if found, otherwise return IATA code
   }
 
-  List<Widget> _getSimplePassengerInitials() {
-    final random = Random();
-    final initials = ['AS', 'MK', 'RJ', 'SP', 'AB'];
-    final count = random.nextInt(3) + 2; // 2-4 passengers
+  List<Widget> _getContactInitials(Trip trip) {
+    final contacts = trip.contacts;
     
-    return List.generate(count, (index) {
-      final initial = initials[random.nextInt(initials.length)];
+    // If no contacts, show a message
+    if (contacts.isEmpty) {
+      return [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: AppTheme.textSecondary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: AppTheme.textSecondary.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          child: Text(
+            'No contacts informed',
+            style: AppTheme.bodySmall.copyWith(
+              color: AppTheme.textSecondary,
+              fontSize: 10,
+            ),
+          ),
+        ),
+      ];
+    }
+    
+    // Limit to first 4 contacts to avoid overflow
+    final displayContacts = contacts.take(4).toList();
+    
+    return List.generate(displayContacts.length, (index) {
+      final contact = displayContacts[index];
+      final initials = _getInitialsFromName(contact.name);
+      
       return Transform.translate(
-        offset: Offset(-6.0 * index, 0), // Create overlap effect without negative margin
+        offset: Offset(-6.0 * index, 0), // Create overlap effect
         child: Container(
           width: 24,
           height: 24,
           decoration: BoxDecoration(
-            color: AppTheme.textSecondary,
+            color: AppTheme.primary,
             shape: BoxShape.circle,
             border: Border.all(
               color: Colors.white,
@@ -885,13 +913,32 @@ class _TripCardState extends State<_TripCard> {
           ),
           child: Center(
             child: Text(
-              initial,
-              style: AppTheme.labelMedium.copyWith(color: AppTheme.textOnPrimary),
+              initials,
+              style: AppTheme.labelMedium.copyWith(
+                color: AppTheme.textOnPrimary,
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),
       );
     });
+  }
+  
+  String _getInitialsFromName(String name) {
+    if (name.isEmpty) return '?';
+    
+    final nameParts = name.trim().split(' ');
+    if (nameParts.length >= 2) {
+      // First letter of first name + first letter of last name
+      return '${nameParts[0][0]}${nameParts[1][0]}'.toUpperCase();
+    } else if (nameParts.length == 1) {
+      // Just first letter of the name
+      return nameParts[0][0].toUpperCase();
+    }
+    
+    return '?';
   }
 } 
 
