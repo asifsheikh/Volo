@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_theme.dart';
 
 class CityConnectionHeader extends StatelessWidget {
   final String fromCity;
@@ -41,10 +42,10 @@ class CityConnectionHeader extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF008080),
-                    const Color(0xFF006666),
-                  ],
+                          colors: [
+          AppTheme.primary,
+          AppTheme.primary.withOpacity(0.8),
+        ],
                 ),
               ),
               child: Stack(
@@ -125,10 +126,10 @@ class CityConnectionHeader extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
-                  colors: [
-                    const Color(0xFF1F2937),
-                    const Color(0xFF374151),
-                  ],
+                          colors: [
+          AppTheme.textPrimary,
+          AppTheme.textSecondary,
+        ],
                 ),
               ),
               child: Stack(

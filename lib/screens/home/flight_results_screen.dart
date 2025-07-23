@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../services/flight_api_service.dart';
+import '../../theme/app_theme.dart';
 
 class FlightResultsScreen extends StatelessWidget {
   final FlightSearchResponse searchResponse;
@@ -21,23 +22,18 @@ class FlightResultsScreen extends StatelessWidget {
     final allFlights = [...searchResponse.bestFlights, ...searchResponse.otherFlights];
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F8FA),
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF111827)),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
           splashRadius: 24,
         ),
-        title: const Text(
+        title: Text(
           'Flight Results',
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w700,
-            fontSize: 24,
-            color: Color(0xFF111827),
-          ),
+          style: AppTheme.headlineMedium,
         ),
         centerTitle: false,
       ),
@@ -49,7 +45,7 @@ class FlightResultsScreen extends StatelessWidget {
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.cardBackground,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -67,22 +63,12 @@ class FlightResultsScreen extends StatelessWidget {
                       children: [
                         Text(
                           departureCity,
-                          style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            color: Color(0xFF111827),
-                          ),
+                          style: AppTheme.bodyLarge.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Departure',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            color: Color(0xFF6B7280),
-                          ),
+                          style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
                         ),
                       ],
                     ),
@@ -90,7 +76,7 @@ class FlightResultsScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1F2937),
+                      color: AppTheme.textPrimary,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Icon(
@@ -105,22 +91,12 @@ class FlightResultsScreen extends StatelessWidget {
                       children: [
                         Text(
                           arrivalCity,
-                          style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            color: Color(0xFF111827),
-                          ),
+                          style: AppTheme.bodyLarge.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Arrival',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            color: Color(0xFF6B7280),
-                          ),
+                          style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
                         ),
                       ],
                     ),
@@ -134,7 +110,7 @@ class FlightResultsScreen extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.cardBackground,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(

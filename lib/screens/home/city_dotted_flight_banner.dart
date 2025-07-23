@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_theme.dart';
 
 class CityDottedFlightBanner extends StatelessWidget {
   final String fromCity;
@@ -39,7 +40,7 @@ class CityDottedFlightBanner extends StatelessWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1F2937),
+                      color: AppTheme.textPrimary,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -91,7 +92,7 @@ class _CityThumbnailBox extends StatelessWidget {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF374151),
+            color: AppTheme.textSecondary,
           ),
         ),
       ],
@@ -106,7 +107,7 @@ class _DottedLinePainter extends CustomPainter {
     const double dashSpace = 4;
     double startX = 0;
     final paint = Paint()
-      ..color = const Color(0xFFE5E7EB)
+              ..color = AppTheme.borderPrimary
       ..strokeWidth = 2;
     while (startX < size.width) {
       canvas.drawLine(

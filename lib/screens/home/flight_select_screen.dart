@@ -4,6 +4,7 @@ import '../../services/flight_api_service.dart';
 import '../../services/network_service.dart';
 import '../../widgets/network_error_widget.dart';
 import '../../features/add_contacts/screens/add_contacts_screen.dart';
+import '../../theme/app_theme.dart';
 
 class FlightSelectScreen extends StatefulWidget {
   final Future<FlightSearchResponse> searchFuture;
@@ -63,23 +64,18 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F8FA),
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF111827)),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
           splashRadius: 24,
         ),
-        title: const Text(
+        title: Text(
           'Choose Your Flight',
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w700,
-            fontSize: 22,
-            color: Color(0xFF111827),
-          ),
+          style: AppTheme.headlineMedium.copyWith(fontSize: 22),
         ),
         centerTitle: false,
       ),

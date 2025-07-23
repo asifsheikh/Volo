@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/push_notification_service.dart';
 import '../../services/firebase_service.dart';
+import '../../theme/app_theme.dart';
 import 'dart:developer' as developer;
 
 class PushNotificationTestScreen extends StatefulWidget {
@@ -87,19 +88,15 @@ class _PushNotificationTestScreenState extends State<PushNotificationTestScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: Text(
           'Push Notification Test',
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-            color: const Color(0xFF1F2937),
-          ),
+          style: AppTheme.titleLarge,
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.cardBackground,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF6B7280)),
+        iconTheme: IconThemeData(color: AppTheme.textSecondary),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
