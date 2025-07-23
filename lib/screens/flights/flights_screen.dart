@@ -880,12 +880,24 @@ class _TripCardState extends State<_TripCard> {
               width: 1,
             ),
           ),
-          child: Text(
-            'No contacts informed',
-            style: AppTheme.bodySmall.copyWith(
-              color: AppTheme.textSecondary,
-              fontSize: 10,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.info_outline,
+                size: 12,
+                color: AppTheme.textSecondary,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                'No contacts added',
+                style: AppTheme.bodySmall.copyWith(
+                  color: AppTheme.textSecondary,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
       ];
