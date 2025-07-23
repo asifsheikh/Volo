@@ -56,7 +56,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                       ),
                       const SizedBox(height: 40),
-                      const Text(
+                      Text(
                         'Volo',
                         style: AppTheme.headlineLarge.copyWith(
                           fontSize: 40,
@@ -69,7 +69,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       Container(
                         width: 64,
                         height: 2,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.centerLeft,
                             end: Alignment.centerRight,
@@ -78,7 +78,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               AppTheme.textSecondary,
                               Color.fromRGBO(0, 0, 0, 0),
                             ],
-                            stops: [0.0, 0.5, 1.0],
+                            stops: const [0.0, 0.5, 1.0],
                           ),
                         ),
                       ),
@@ -104,32 +104,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 32),
-                                            const Padding(
+                                            Padding(
                           padding: EdgeInsets.symmetric(horizontal: 24.0),
                           child: Text(
                             'Fly worry-free.\nKeep loved ones updated.',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w700,
+                            style: AppTheme.headlineLarge.copyWith(
                               fontSize: 40,
                               height: 1.1,
-                              color: Color(0xFF1F2937),
                             ),
                             textAlign: TextAlign.center,
                           ),
                         ),
                     const SizedBox(height: 24),
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.symmetric(horizontal: 24.0),
                       child: Text(
                         'Volo shares real-time flight updates with your circle — so you can focus on the journey.',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18,
-                          height: 1.4,
-                          color: Color(0xFF6B7280),
-                        ),
+                        style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
                         textAlign: TextAlign.center,
                       ),
                     ),
