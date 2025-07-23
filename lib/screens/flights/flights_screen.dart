@@ -5,6 +5,7 @@ import '../../models/trip/trip_model.dart';
 import '../../services/trip_service.dart';
 import '../../features/add_flight/add_flight_screen.dart';
 import '../../features/add_flight/controller/add_flight_controller.dart';
+import '../../theme/app_theme.dart';
 
 class FlightsScreen extends StatefulWidget {
   final String username;
@@ -103,7 +104,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+              backgroundColor: AppTheme.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -117,25 +118,14 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Flights',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 24,
-                            height: 1.33, // 32px line height
-                            color: Color(0xFF1F2937),
-                          ),
+                          style: AppTheme.headlineMedium,
                         ),
                         const SizedBox(height: 4),
                         Text(
                           'Manage your upcoming trips',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 14,
-                            color: const Color(0xFF6B7280),
-                          ),
+                          style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
                         ),
                       ],
                     ),
@@ -147,7 +137,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
                        width: 40,
                        height: 40,
                        decoration: BoxDecoration(
-                         color: const Color(0xFF047C7C),
+                         color: AppTheme.primary,
                          borderRadius: BorderRadius.circular(9999),
                          boxShadow: [
                            BoxShadow(
@@ -164,7 +154,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
                        ),
                        child: const Icon(
                          Icons.add,
-                         color: Colors.white,
+                         color: AppTheme.textOnPrimary,
                          size: 20,
                          weight: 900,
                        ),
@@ -179,7 +169,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
               margin: const EdgeInsets.symmetric(horizontal: 20),
               height: 52,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.cardBackground,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -192,24 +182,14 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
               child: TabBar(
                 controller: _tabController,
                 indicator: BoxDecoration(
-                  color: const Color(0xFF047C7C),
+                  color: AppTheme.primary,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 indicatorSize: TabBarIndicatorSize.tab,
-                labelColor: Colors.white,
-                unselectedLabelColor: const Color(0xFF6B7280),
-                labelStyle: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  height: 1.21, // 17px line height
-                ),
-                unselectedLabelStyle: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  height: 1.21, // 17px line height
-                ),
+                labelColor: AppTheme.textOnPrimary,
+                unselectedLabelColor: AppTheme.textSecondary,
+                labelStyle: AppTheme.labelLarge,
+                unselectedLabelStyle: AppTheme.labelLarge,
                 dividerColor: Colors.transparent,
                 tabs: const [
                   Tab(text: 'Upcoming'),
@@ -238,9 +218,9 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
 
   Widget _buildUpcomingTab() {
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(
-          color: Color(0xFF047C7C),
+          color: AppTheme.primary,
         ),
       );
     }
@@ -291,22 +271,15 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
               color: Colors.grey[400],
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'You don\'t have any upcoming flights',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF374151),
-              ),
+              style: AppTheme.titleLarge,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Everything you are all caught up!',
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF6B7280),
-              ),
+              style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -314,12 +287,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
               onPressed: _navigateToAddFlight,
               icon: const Icon(Icons.add),
               label: const Text('Add Your First Flight'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF047C7C),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
+              style: AppTheme.primaryButton,
             ),
           ],
         ),
@@ -341,9 +309,9 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
 
   Widget _buildPastTab() {
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(
-          color: Color(0xFF047C7C),
+          color: AppTheme.primary,
         ),
       );
     }
@@ -509,8 +477,8 @@ class _TripCardState extends State<_TripCard> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFF3F4F6), width: 1),
+        color: AppTheme.cardBackground,
+        border: Border.all(color: AppTheme.borderPrimary, width: 1),
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
@@ -853,15 +821,15 @@ class _TripCardState extends State<_TripCard> {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'on time':
-        return const Color(0xFF047C7C); // App theme primary
+        return AppTheme.primary;
       case 'delayed 25 min':
-        return const Color(0xFFD97706); // App theme warning
+        return AppTheme.warning;
       case 'scheduled':
-        return const Color(0xFF9CA3AF); // App theme secondary
+        return AppTheme.secondary;
       case 'cancelled':
-        return const Color(0xFFDC2626); // App theme destructive
+        return AppTheme.destructive;
       default:
-        return const Color(0xFF6B7280); // App theme text secondary
+        return AppTheme.textSecondary;
     }
   }
 
@@ -878,7 +846,7 @@ class _TripCardState extends State<_TripCard> {
       case 'lufthansa':
         return const Color(0xFF1F2937); // Dark gray
       default:
-        return const Color(0xFF047C7C); // Teal
+        return AppTheme.primary; // Use theme primary color
     }
   }
 
@@ -1004,7 +972,7 @@ class DottedLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF9CA3AF) // Darker color
+      ..color = AppTheme.secondary // Use theme secondary color
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
 
