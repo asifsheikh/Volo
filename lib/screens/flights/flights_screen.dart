@@ -763,13 +763,13 @@ class _TripCardState extends State<_TripCard> {
             
             const SizedBox(height: 12),
             
-            // Row 4: Gate info and passenger contacts
+            // Row 4: Connection info and passenger contacts
             Row(
               children: [
-                // Gate information
+                // Connection information
                 Expanded(
                   child: Text(
-                    _getDummyGateInfo(),
+                    _getConnectionInfo(),
                     style: const TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w400,
@@ -869,13 +869,24 @@ class _TripCardState extends State<_TripCard> {
     }
   }
 
-  String _getDummyGateInfo() {
-    final random = Random();
-    final terminals = ['T1', 'T2', 'T3'];
-    final gates = ['A1', 'A7', 'B3', 'C12', 'D5', 'E8'];
-    final terminal = terminals[random.nextInt(terminals.length)];
-    final gate = gates[random.nextInt(gates.length)];
-    return '$terminal - Gate $gate';
+  String _getConnectionInfo() {
+    final flights = widget.trip.tripData.flights;
+    
+    // If there's only one flight, it's direct
+    if (flights.length == 1) {
+      return 'Direct (Non-stop)';
+    }
+    
+    // If there are multiple flights, show the connection points
+    if (flights.length == 2) {
+      // For 2 flights, show the connection point
+      final connectionAirport = flights[0].arrivalAirport;
+      return 'via $connectionAirport';
+    } else {
+      // For more than 2 flights, show the number of connections
+      final connectionCount = flights.length - 1;
+      return '$connectionCount connections';
+    }
   }
 
   List<Widget> _getSimplePassengerInitials() {
