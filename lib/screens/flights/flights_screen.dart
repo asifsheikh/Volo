@@ -633,7 +633,7 @@ class _TripCardState extends State<_TripCard> {
 
             const SizedBox(height: 20),
 
-            // Flight route with IATA codes, times, and dotted line
+            // Flight route with IATA codes, times, and dotted line (no plane icon)
             Row(
               children: [
                 // Departure information (grouped tightly)
@@ -678,30 +678,14 @@ class _TripCardState extends State<_TripCard> {
                   ),
                 ),
 
-                // Dotted line connecting departure to arrival with plane icon
-                Container(
-                  height: 2,
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      CustomPaint(
-                        painter: DottedLinePainter(),
-                      ),
-                      // Plane icon in the middle
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.flight,
-                          size: 16,
-                          color: Color(0xFF6B7280),
-                        ),
-                      ),
-                    ],
+                // Dotted line connecting departure to arrival
+                Expanded(
+                  child: Container(
+                    height: 2,
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
+                    child: CustomPaint(
+                      painter: DottedLinePainter(),
+                    ),
                   ),
                 ),
 
