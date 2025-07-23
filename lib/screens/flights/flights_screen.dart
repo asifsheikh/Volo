@@ -633,9 +633,51 @@ class _TripCardState extends State<_TripCard> {
 
             const SizedBox(height: 20),
 
-            // Flight route with dotted line and plane icon
-            Column(
+            // Flight route with IATA codes, times, and dotted line
+            Row(
               children: [
+                // Departure information (grouped tightly)
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // IATA code, time, and date grouped together
+                      Text(
+                        widget.firstFlight.departureAirport,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 24,
+                          height: 1.21,
+                          color: Color(0xFF1F2937),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        widget.departureTime,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                          height: 1.21,
+                          color: Color(0xFF1F2937),
+                        ),
+                      ),
+                      const SizedBox(height: 1),
+                      Text(
+                        widget.departureDate,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                          height: 1.25,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
                 // Dotted line connecting departure to arrival with plane icon
                 Container(
                   height: 2,
@@ -662,158 +704,108 @@ class _TripCardState extends State<_TripCard> {
                     ],
                   ),
                 ),
-                
-                const SizedBox(height: 8),
-                
-                // Duration chip positioned closer to dotted line
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF1F1F1),
-                      borderRadius: BorderRadius.circular(9999),
-                    ),
-                    child: Text(
-                      _formatDuration(widget.trip.tripData.totalDuration),
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 12,
-                        height: 1.25, // 15px line height
-                        color: Color(0xFF6B7280),
-                      ),
-                    ),
-                  ),
-                ),
-                
-                const SizedBox(height: 12),
-                
-                // Departure and arrival information grouped together
-                Row(
-                  children: [
-                    // Departure information (grouped tightly)
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // IATA code, time, and date grouped together
-                          Text(
-                            widget.firstFlight.departureAirport,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w600,
-                              fontSize: 24,
-                              height: 1.21,
-                              color: Color(0xFF1F2937),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            widget.departureTime,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              height: 1.21,
-                              color: Color(0xFF1F2937),
-                            ),
-                          ),
-                          const SizedBox(height: 1),
-                          Text(
-                            widget.departureDate,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 12,
-                              height: 1.25,
-                              color: Color(0xFF6B7280),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
 
-                    // Spacer for center alignment
-                    const SizedBox(width: 60),
-
-                    // Arrival information (grouped tightly)
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          // IATA code, time, and date grouped together
-                          Text(
-                            widget.lastFlight.arrivalAirport,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w600,
-                              fontSize: 24,
-                              height: 1.21,
-                              color: Color(0xFF1F2937),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            widget.arrivalTime,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              height: 1.21,
-                              color: Color(0xFF1F2937),
-                            ),
-                          ),
-                          const SizedBox(height: 1),
-                          Text(
-                            widget.arrivalDate,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 12,
-                              height: 1.25,
-                              color: Color(0xFF6B7280),
-                            ),
-                          ),
-                        ],
+                // Arrival information (grouped tightly)
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      // IATA code, time, and date grouped together
+                      Text(
+                        widget.lastFlight.arrivalAirport,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 24,
+                          height: 1.21,
+                          color: Color(0xFF1F2937),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                
-                const SizedBox(height: 12),
-                
-                // Bottom row: Gate info and passenger contacts
-                Row(
-                  children: [
-                    // Gate information
-                    Expanded(
-                      child: Text(
-                        _getDummyGateInfo(),
+                      const SizedBox(height: 2),
+                      Text(
+                        widget.arrivalTime,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                          height: 1.21,
+                          color: Color(0xFF1F2937),
+                        ),
+                      ),
+                      const SizedBox(height: 1),
+                      Text(
+                        widget.arrivalDate,
                         style: const TextStyle(
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w400,
                           fontSize: 12,
-                          height: 1.33,
+                          height: 1.25,
                           color: Color(0xFF6B7280),
                         ),
                       ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 12),
+            
+            // Duration badge
+            Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F1F1),
+                  borderRadius: BorderRadius.circular(9999),
+                ),
+                child: Text(
+                  _formatDuration(widget.trip.tripData.totalDuration),
+                  style: const TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 12,
+                    height: 1.25,
+                    color: Color(0xFF6B7280),
+                  ),
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 12),
+            
+            // Bottom row: Gate info and passenger contacts
+            Row(
+              children: [
+                // Gate information
+                Expanded(
+                  child: Text(
+                    _getDummyGateInfo(),
+                    style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      height: 1.33,
+                      color: Color(0xFF6B7280),
                     ),
-                    
-                    // Passenger initials
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ..._getSimplePassengerInitials(),
-                        const SizedBox(width: 4),
-                        const Icon(
-                          Icons.arrow_forward_ios,
-                          size: 14,
-                          color: Color(0xFF6B7280),
-                        ),
-                      ],
+                  ),
+                ),
+                
+                // Passenger initials
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ..._getSimplePassengerInitials(),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 14,
+                      color: Color(0xFF6B7280),
                     ),
                   ],
                 ),
+              ],
+            ),
               ],
             ),
           ],
