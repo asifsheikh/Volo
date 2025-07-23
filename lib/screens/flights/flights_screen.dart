@@ -165,7 +165,8 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
                        child: const Icon(
                          Icons.add,
                          color: Colors.white,
-                         size: 14,
+                         size: 20,
+                         weight: 900,
                        ),
                      ),
                    ),
