@@ -806,8 +806,6 @@ class _TripCardState extends State<_TripCard> {
                 ),
               ],
             ),
-              ],
-            ),
           ],
         ),
       ),
