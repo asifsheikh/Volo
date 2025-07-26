@@ -300,18 +300,70 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                   ),
                                   const SizedBox(height: 16),
                                   
-                                  // Subtitle
-                                  Text(
-                                    widget.args.contactNames.isNotEmpty 
-                                        ? "We'll handle the updates to your closed family members from now on."
-                                        : "We'll take care of your flight notifications from now on.",
-                                    style: GoogleFonts.inter(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 16,
-                                      height: 26 / 16,
-                                      color: const Color(0xFF4B5563),
-                                    ),
-                                    textAlign: TextAlign.center,
+                                  // Enhanced Subtitle
+                                  Column(
+                                    children: [
+                                      Text(
+                                        widget.args.contactNames.isNotEmpty 
+                                            ? "We'll handle the updates to your closed family members from now on."
+                                            : "We'll take care of your flight notifications from now on.",
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 16,
+                                          height: 26 / 16,
+                                          color: const Color(0xFF4B5563),
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      
+                                      // Enhanced Alert Information
+                                      if (widget.args.contactNames.isNotEmpty) ...[
+                                        Container(
+                                          padding: const EdgeInsets.all(16),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFF9FAFB),
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(
+                                              color: const Color(0xFFE5E7EB),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.notifications_active,
+                                                    size: 18,
+                                                    color: const Color(0xFF059393),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    'Real-time alerts will be sent via WhatsApp',
+                                                    style: GoogleFonts.inter(
+                                                      fontWeight: FontWeight.w600,
+                                                      fontSize: 14,
+                                                      color: const Color(0xFF374151),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 12),
+                                              _buildConfirmationAlertItem('✈️ Flight plan confirmation'),
+                                              _buildConfirmationAlertItem('🛫 Departure (boarding & takeoff)'),
+                                              _buildConfirmationAlertItem('🛬 Arrival and landing'),
+                                              _buildConfirmationAlertItem('⏰ Delays with updated times'),
+                                              _buildConfirmationAlertItem('❌ Cancellations'),
+                                              _buildConfirmationAlertItem('🔄 Diversions'),
+                                              _buildConfirmationAlertItem('🚪 Gate changes'),
+                                              _buildConfirmationAlertItem('📋 Schedule updates'),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ],
                                   ),
                                   const SizedBox(height: 32),
                                   
@@ -670,5 +722,37 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
     } else {
       return '${firstNames[0]}, ${firstNames[1]} & ${firstNames.length - 2} others';
     }
+  }
+
+  /// Build individual alert item widget for confirmation screen
+  Widget _buildConfirmationAlertItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 4,
+            height: 4,
+            margin: const EdgeInsets.only(top: 6, right: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF059393),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w400,
+                fontSize: 13,
+                color: const Color(0xFF6B7280),
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

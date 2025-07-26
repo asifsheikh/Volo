@@ -656,7 +656,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                         
                         const SizedBox(height: 32),
                         
-                        // Simple Disclaimer
+                        // Enhanced Disclaimer
                         Row(
                           children: [
                             Icon(
@@ -667,7 +667,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'What flight updates do we send?',
+                                'What alerts will be sent to your contacts?',
                                 style: const TextStyle(
                                   fontFamily: 'Inter',
                                   fontWeight: FontWeight.w500,
@@ -680,16 +680,42 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                         ),
                         const SizedBox(height: 12),
                         
-                        // Description
-                        Text(
-                          'You and your selected contacts will be notified if there\'s a schedule change, gate change, delay, or cancellation.',
-                          style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 13,
-                            color: Color(0xFF6B7280),
-                            height: 1.4,
-                          ),
+                        // Enhanced Description
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Your contacts will receive real-time updates via WhatsApp for:',
+                              style: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                color: Color(0xFF374151),
+                                height: 1.4,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            _buildAlertItem('✈️ Flight plan filed and confirmed'),
+                            _buildAlertItem('🛫 Flight departure (boarding and takeoff)'),
+                            _buildAlertItem('🛬 Flight arrival and landing'),
+                            _buildAlertItem('⏰ Delays (with updated departure times)'),
+                            _buildAlertItem('❌ Flight cancellations'),
+                            _buildAlertItem('🔄 Flight diversions'),
+                            _buildAlertItem('🚪 Gate changes'),
+                            _buildAlertItem('📋 Schedule modifications'),
+                            const SizedBox(height: 8),
+                            Text(
+                              'You\'ll also receive these same notifications directly in the app.',
+                              style: const TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w400,
+                                fontSize: 12,
+                                color: Color(0xFF6B7280),
+                                height: 1.4,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
                         ),
                         
                         // Bottom padding to account for the pinned button
@@ -749,6 +775,39 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                     ),
                   ],
                 ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build individual alert item widget
+  Widget _buildAlertItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 4,
+            height: 4,
+            margin: const EdgeInsets.only(top: 6, right: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF6B7280),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                fontSize: 12,
+                color: Color(0xFF6B7280),
+                height: 1.4,
               ),
             ),
           ),
