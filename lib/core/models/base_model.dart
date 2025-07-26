@@ -9,7 +9,9 @@ abstract class BaseModel {
   Map<String, dynamic> toJson();
 
   /// Create model from JSON
-  static T fromJson<T extends BaseModel>(Map<String, dynamic> json);
+  static T fromJson<T extends BaseModel>(Map<String, dynamic> json) {
+    throw UnimplementedError('fromJson must be implemented by subclasses');
+  }
 
   /// Validate model data
   bool isValid();

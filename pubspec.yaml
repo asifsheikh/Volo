@@ -34,7 +34,11 @@ dependencies:
   file_picker: ^8.0.0+1
   google_generative_ai: ^0.4.7
   lottie: ^3.3.1
-  provider: ^6.1.2
+  # State Management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+  equatable: ^2.0.5
+  dartz: ^0.10.1
   confetti: ^0.7.0
   flutter_local_notifications: ^17.2.2
   connectivity_plus: ^6.1.4
@@ -44,6 +48,9 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.13.1
+  # Code Generation
+  riverpod_generator: ^2.4.0
+  build_runner: ^2.4.13
 
 flutter:
   uses-material-design: true
