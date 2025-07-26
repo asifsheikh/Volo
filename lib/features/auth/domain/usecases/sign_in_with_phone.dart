@@ -1,9 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/error/failures.dart';
-import '../../../core/usecases/usecase.dart';
+import '../../../../core/error/failures.dart';
+import '../../../../core/usecases/usecase.dart';
 import '../entities/user_entity.dart';
 import '../repositories/auth_repository.dart';
 
@@ -41,7 +42,7 @@ class SignInWithPhone implements UseCase<UserEntity, SignInWithPhoneParams> {
 
 // Riverpod provider for the use case
 @riverpod
-SignInWithPhone signInWithPhone(SignInWithPhoneRef ref) {
+SignInWithPhone signInWithPhone(Ref ref) {
   final repository = ref.watch(authRepositoryProvider);
   return SignInWithPhone(repository);
 } 

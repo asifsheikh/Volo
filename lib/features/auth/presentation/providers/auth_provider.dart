@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../data/repositories/auth_repository_impl.dart';
 
 part 'auth_provider.g.dart';
 
@@ -70,7 +71,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       (failure) {
         state = state.copyWith(
           isLoading: false,
-          error: failure.message,
+          error: failure.message ?? 'An error occurred',
         );
       },
       (user) {
@@ -84,23 +85,25 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
   }
 
-  Future<void> sendOTP({required String phoneNumber}) async {
+  Future<String?> sendOTP({required String phoneNumber}) async {
     state = state.copyWith(isLoading: true, error: null);
 
     final result = await _authRepository.sendOTP(phoneNumber: phoneNumber);
 
-    result.fold(
+    return result.fold(
       (failure) {
         state = state.copyWith(
           isLoading: false,
-          error: failure.message,
+          error: failure.message ?? 'An error occurred',
         );
+        return null;
       },
-      (_) {
+      (verificationId) {
         state = state.copyWith(
           isLoading: false,
           error: null,
         );
+        return verificationId;
       },
     );
   }
@@ -114,7 +117,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       (failure) {
         state = state.copyWith(
           isLoading: false,
-          error: failure.message,
+          error: failure.message ?? 'An error occurred',
         );
       },
       (_) {
@@ -143,7 +146,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       (failure) {
         state = state.copyWith(
           isLoading: false,
-          error: failure.message,
+          error: failure.message ?? 'An error occurred',
         );
       },
       (user) {
@@ -163,7 +166,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
 // Provider
 @riverpod
-AuthNotifier authNotifier(AuthNotifierRef ref) {
+AuthNotifier authNotifier(Ref ref) {
   final repository = ref.watch(authRepositoryProvider);
   return AuthNotifier(repository);
 }

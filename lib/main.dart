@@ -27,8 +27,7 @@ class VoloApp extends ConsumerWidget {
     return MaterialApp(
       title: 'Volo',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme: AppTheme.theme,
       themeMode: ThemeMode.system,
       home: const AuthWrapper(),
     );

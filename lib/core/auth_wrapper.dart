@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_app_check/firebase_app_check.dart'; // Import App Check
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'dart:developer' as developer;
 import 'dart:async';
+
 import '../services/firebase_service.dart';
 import '../services/network_service.dart';
-import '../screens/auth/welcome_screen.dart';
+import '../features/auth/presentation/screens/welcome_screen.dart';
 import '../screens/main_navigation_screen.dart';
 
-class AuthWrapper extends StatefulWidget {
+import '../theme/app_theme.dart';
+
+class AuthWrapper extends ConsumerStatefulWidget {
   const AuthWrapper({Key? key}) : super(key: key);
 
   @override
-  State<AuthWrapper> createState() => _AuthWrapperState();
+  ConsumerState<AuthWrapper> createState() => _AuthWrapperState();
 }
 
-class _AuthWrapperState extends State<AuthWrapper> {
+class _AuthWrapperState extends ConsumerState<AuthWrapper> {
   bool _isLoading = true;
   bool _isOnboarded = false;
   bool _isOffline = false;
@@ -161,11 +165,10 @@ class _AuthWrapperState extends State<AuthWrapper> {
     return _buildHomeScreen();
   }
 
-  // ... (Your _buildLoadingScreen and _buildHomeScreen methods)
   /// Build loading screen while checking authentication state
   Widget _buildLoadingScreen() {
     return Scaffold(
-      backgroundColor: const Color(0xFFE5E7EB),
+      backgroundColor: AppTheme.background,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -188,18 +191,13 @@ class _AuthWrapperState extends State<AuthWrapper> {
             ),
             const SizedBox(height: 32),
             // Loading indicator
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1F2937)),
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppTheme.textPrimary),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Loading...',
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                fontSize: 16,
-                color: Color(0xFF6B7280),
-              ),
+              style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
             ),
           ],
         ),

@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/user_model.dart';
+import '../../../../core/di/providers.dart';
 
 part 'auth_remote_data_source.g.dart';
 
@@ -13,7 +15,7 @@ abstract class AuthRemoteDataSource {
     required String smsCode,
   });
   
-  Future<void> sendOTP({
+  Future<String> sendOTP({
     required String phoneNumber,
   });
   
@@ -70,10 +72,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> sendOTP({
+  Future<String> sendOTP({
     required String phoneNumber,
   }) async {
     try {
+      String? verificationId;
+      
       await _firebaseAuth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) async {
@@ -83,13 +87,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         verificationFailed: (FirebaseAuthException e) {
           throw Exception('Verification failed: ${e.message}');
         },
-        codeSent: (String verificationId, int? resendToken) {
-          // Code sent successfully
+        codeSent: (String vid, int? resendToken) {
+          verificationId = vid;
         },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          // Auto retrieval timeout
+        codeAutoRetrievalTimeout: (String vid) {
+          verificationId = vid;
         },
+        timeout: const Duration(seconds: 60),
       );
+      
+      // Wait a bit for the verification ID to be set
+      await Future.delayed(const Duration(milliseconds: 100));
+      
+      if (verificationId == null) {
+        throw Exception('Failed to get verification ID');
+      }
+      
+      return verificationId!;
     } catch (e) {
       throw Exception('Failed to send OTP: ${e.toString()}');
     }
@@ -147,7 +161,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
 // Riverpod provider for the data source
 @riverpod
-AuthRemoteDataSource authRemoteDataSource(AuthRemoteDataSourceRef ref) {
+AuthRemoteDataSource authRemoteDataSource(Ref ref) {
   final firebaseAuth = ref.watch(firebaseAuthProvider);
   final firestore = ref.watch(firestoreProvider);
   return AuthRemoteDataSourceImpl(firebaseAuth, firestore);

@@ -1,8 +1,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/error/failures.dart';
-import '../../../core/network/network_info.dart';
+import '../../../../core/error/failures.dart';
+import '../../../../core/network/network_info.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_data_source.dart';
@@ -38,13 +39,13 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> sendOTP({
+  Future<Either<Failure, String>> sendOTP({
     required String phoneNumber,
   }) async {
     if (await networkInfo.isConnected) {
       try {
-        await remoteDataSource.sendOTP(phoneNumber: phoneNumber);
-        return const Right(null);
+        final verificationId = await remoteDataSource.sendOTP(phoneNumber: phoneNumber);
+        return Right(verificationId);
       } catch (e) {
         return Left(AuthFailure(e.toString()));
       }
@@ -109,7 +110,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
 // Riverpod provider for the repository
 @riverpod
-AuthRepository authRepository(AuthRepositoryRef ref) {
+AuthRepository authRepository(Ref ref) {
   final remoteDataSource = ref.watch(authRemoteDataSourceProvider);
   final networkInfo = ref.watch(networkInfoProvider);
   return AuthRepositoryImpl(remoteDataSource, networkInfo);

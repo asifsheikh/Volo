@@ -6,7 +6,7 @@ part of 'sign_in_with_phone.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$signInWithPhoneHash() => r'a9890b9434f4dc093cc6ab8786d0d969d3def463';
+String _$signInWithPhoneHash() => r'0f9c0ea18e4f1c5a0ec2e9de75595a1782c0089a';
 
 /// See also [signInWithPhone].
 @ProviderFor(signInWithPhone)
