@@ -164,9 +164,8 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                             letterSpacing: 1.5,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
-                                                // Weather information for departure city
-                                                _buildWeatherInfo(args.departureAirportCode),
+                                        // Weather information for departure city
+                                        _buildWeatherInfo(args.departureAirportCode),
                                       ],
                                     ),
                                   ),
@@ -221,7 +220,6 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                             letterSpacing: 1.5,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
                                         // Weather information for arrival city
                                         _buildWeatherInfo(args.arrivalAirportCode),
                                       ],
@@ -1072,6 +1070,8 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
         final globalWeather = ref.watch(globalWeatherNotifierProvider);
         final weather = globalWeather[airportCode];
         
+        print('Weather Debug: Building weather for $airportCode, weather data: ${weather != null ? 'available' : 'null'}');
+        
         if (weather != null) {
           // Display weather information with improved formatting
           return Column(
@@ -1083,6 +1083,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                 width: 24,
                 height: 24,
                 errorBuilder: (context, error, stackTrace) {
+                  print('Weather Debug: Image failed to load for $airportCode: $error');
                   return const Icon(
                     Icons.cloud,
                     color: Colors.white,
@@ -1106,6 +1107,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
           );
         } else {
           // Show nothing when weather data is not available
+          print('Weather Debug: No weather data for $airportCode, showing SizedBox.shrink()');
           return const SizedBox.shrink();
         }
       },
