@@ -1073,37 +1073,19 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
         print('Weather Debug: Building weather for $airportCode, weather data: ${weather != null ? 'available' : 'null'}');
         
         if (weather != null) {
-          // Display weather information with improved formatting
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Weather icon from backend
-              Image.network(
-                weather.current.weather_icon_info.url,
-                width: 24,
-                height: 24,
-                errorBuilder: (context, error, stackTrace) {
-                  print('Weather Debug: Image failed to load for $airportCode: $error');
-                  return const Icon(
-                    Icons.cloud,
-                    color: Colors.white,
-                    size: 24,
-                  );
-                },
+          // Just show temperature with simple formatting
+          return Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              '${weather.current.temperature.round()}°C',
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+                color: Colors.white,
+                letterSpacing: 0.5,
               ),
-              const SizedBox(height: 2),
-              // Temperature with improved formatting
-              Text(
-                '${weather.current.temperature.round()}°C',
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w700, // Bolder than IATA codes
-                  fontSize: 18, // Larger than IATA codes (32px)
-                  color: Colors.white,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ],
+            ),
           );
         } else {
           // Show nothing when weather data is not available
