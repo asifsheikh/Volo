@@ -28,7 +28,7 @@ class WeatherCityCard extends ConsumerWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: _getWeatherGradient(weather.current.weather_condition),
+            colors: _getWeatherGradient(weather.current.weather_icon_info.code),
           ),
           boxShadow: [
             BoxShadow(
@@ -44,10 +44,18 @@ class WeatherCityCard extends ConsumerWidget {
             Positioned(
               right: -20,
               top: -20,
-              child: Icon(
-                _getWeatherIcon(weather.current.weather_icon),
-                size: 80,
+              child: Image.network(
+                weather.current.weather_icon_info.url,
+                width: 80,
+                height: 80,
                 color: Colors.white.withOpacity(0.2),
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    _getFallbackWeatherIcon(weather.current.weather_icon_info.code),
+                    size: 80,
+                    color: Colors.white.withOpacity(0.2),
+                  );
+                },
               ),
             ),
             // Content
@@ -96,7 +104,7 @@ class WeatherCityCard extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              weather.current.weather_description.toUpperCase(),
+                              weather.current.weather_icon_info.description.toUpperCase(),
                               style: AppTheme.bodySmall.copyWith(
                                 color: Colors.white.withOpacity(0.9),
                                 fontWeight: FontWeight.w500,
@@ -123,44 +131,85 @@ class WeatherCityCard extends ConsumerWidget {
     );
   }
 
-  List<Color> _getWeatherGradient(String weatherCondition) {
-    switch (weatherCondition.toLowerCase()) {
-      case 'clear':
+  List<Color> _getWeatherGradient(String weatherIconCode) {
+    // Weather-based theming using OpenWeatherMap icon codes
+    switch (weatherIconCode) {
+      // Clear sky
+      case '01d': // clear sky day
         return [
           const Color(0xFF4A90E2), // Sky blue
           const Color(0xFF87CEEB), // Light sky blue
         ];
-      case 'clouds':
-      case 'cloudy':
+      case '01n': // clear sky night
+        return [
+          const Color(0xFF1E3A8A), // Dark blue
+          const Color(0xFF3B82F6), // Blue
+        ];
+      
+      // Few clouds
+      case '02d': // few clouds day
+      case '02n': // few clouds night
         return [
           const Color(0xFF6B7280), // Gray
           const Color(0xFF9CA3AF), // Light gray
         ];
-      case 'rain':
-      case 'rainy':
-      case 'drizzle':
+      
+      // Scattered clouds
+      case '03d': // scattered clouds day
+      case '03n': // scattered clouds night
+        return [
+          const Color(0xFF6B7280), // Gray
+          const Color(0xFFD1D5DB), // Light gray
+        ];
+      
+      // Broken clouds
+      case '04d': // broken clouds day
+      case '04n': // broken clouds night
+        return [
+          const Color(0xFF4B5563), // Dark gray
+          const Color(0xFF9CA3AF), // Gray
+        ];
+      
+      // Shower rain
+      case '09d': // shower rain day
+      case '09n': // shower rain night
         return [
           const Color(0xFF374151), // Dark gray
           const Color(0xFF6B7280), // Gray
         ];
-      case 'snow':
-      case 'snowy':
+      
+      // Rain
+      case '10d': // rain day
+      case '10n': // rain night
+        return [
+          const Color(0xFF1F2937), // Very dark gray
+          const Color(0xFF4B5563), // Dark gray
+        ];
+      
+      // Thunderstorm
+      case '11d': // thunderstorm day
+      case '11n': // thunderstorm night
+        return [
+          const Color(0xFF1F2937), // Very dark gray
+          const Color(0xFF374151), // Dark gray
+        ];
+      
+      // Snow
+      case '13d': // snow day
+      case '13n': // snow night
         return [
           const Color(0xFFE5E7EB), // Light gray
           const Color(0xFFF3F4F6), // Very light gray
         ];
-      case 'haze':
-      case 'fog':
-      case 'mist':
+      
+      // Mist, fog, haze
+      case '50d': // mist day
+      case '50n': // mist night
         return [
           const Color(0xFF9CA3AF), // Gray
           const Color(0xFFD1D5DB), // Light gray
         ];
-      case 'thunderstorm':
-        return [
-          const Color(0xFF1F2937), // Dark gray
-          const Color(0xFF374151), // Gray
-        ];
+      
       default:
         return [
           const Color(0xFF4A90E2), // Default sky blue
@@ -169,19 +218,17 @@ class WeatherCityCard extends ConsumerWidget {
     }
   }
 
-  IconData _getWeatherIcon(String weatherIcon) {
-    // Map OpenWeatherMap icon codes to Flutter icons
-    switch (weatherIcon) {
+  IconData _getFallbackWeatherIcon(String weatherIconCode) {
+    // Fallback Flutter icons if network image fails
+    switch (weatherIconCode) {
       case '01d': // clear sky day
         return Icons.wb_sunny;
       case '01n': // clear sky night
         return Icons.nightlight_round;
       case '02d': // few clouds day
       case '02n': // few clouds night
-        return Icons.cloud;
       case '03d': // scattered clouds day
       case '03n': // scattered clouds night
-        return Icons.cloud;
       case '04d': // broken clouds day
       case '04n': // broken clouds night
         return Icons.cloud;

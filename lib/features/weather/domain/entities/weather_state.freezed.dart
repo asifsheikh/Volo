@@ -505,6 +505,7 @@ mixin _$WeatherCurrent {
   String get weather_condition => throw _privateConstructorUsedError;
   String get weather_description => throw _privateConstructorUsedError;
   String get weather_icon => throw _privateConstructorUsedError;
+  WeatherIconInfo get weather_icon_info => throw _privateConstructorUsedError;
   int get uv_index => throw _privateConstructorUsedError;
   int get cloudiness => throw _privateConstructorUsedError;
   String get sunrise => throw _privateConstructorUsedError;
@@ -538,11 +539,14 @@ abstract class $WeatherCurrentCopyWith<$Res> {
     String weather_condition,
     String weather_description,
     String weather_icon,
+    WeatherIconInfo weather_icon_info,
     int uv_index,
     int cloudiness,
     String sunrise,
     String sunset,
   });
+
+  $WeatherIconInfoCopyWith<$Res> get weather_icon_info;
 }
 
 /// @nodoc
@@ -570,6 +574,7 @@ class _$WeatherCurrentCopyWithImpl<$Res, $Val extends WeatherCurrent>
     Object? weather_condition = null,
     Object? weather_description = null,
     Object? weather_icon = null,
+    Object? weather_icon_info = null,
     Object? uv_index = null,
     Object? cloudiness = null,
     Object? sunrise = null,
@@ -617,6 +622,10 @@ class _$WeatherCurrentCopyWithImpl<$Res, $Val extends WeatherCurrent>
                 ? _value.weather_icon
                 : weather_icon // ignore: cast_nullable_to_non_nullable
                       as String,
+            weather_icon_info: null == weather_icon_info
+                ? _value.weather_icon_info
+                : weather_icon_info // ignore: cast_nullable_to_non_nullable
+                      as WeatherIconInfo,
             uv_index: null == uv_index
                 ? _value.uv_index
                 : uv_index // ignore: cast_nullable_to_non_nullable
@@ -636,6 +645,16 @@ class _$WeatherCurrentCopyWithImpl<$Res, $Val extends WeatherCurrent>
           )
           as $Val,
     );
+  }
+
+  /// Create a copy of WeatherCurrent
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $WeatherIconInfoCopyWith<$Res> get weather_icon_info {
+    return $WeatherIconInfoCopyWith<$Res>(_value.weather_icon_info, (value) {
+      return _then(_value.copyWith(weather_icon_info: value) as $Val);
+    });
   }
 }
 
@@ -659,11 +678,15 @@ abstract class _$$WeatherCurrentImplCopyWith<$Res>
     String weather_condition,
     String weather_description,
     String weather_icon,
+    WeatherIconInfo weather_icon_info,
     int uv_index,
     int cloudiness,
     String sunrise,
     String sunset,
   });
+
+  @override
+  $WeatherIconInfoCopyWith<$Res> get weather_icon_info;
 }
 
 /// @nodoc
@@ -690,6 +713,7 @@ class __$$WeatherCurrentImplCopyWithImpl<$Res>
     Object? weather_condition = null,
     Object? weather_description = null,
     Object? weather_icon = null,
+    Object? weather_icon_info = null,
     Object? uv_index = null,
     Object? cloudiness = null,
     Object? sunrise = null,
@@ -737,6 +761,10 @@ class __$$WeatherCurrentImplCopyWithImpl<$Res>
             ? _value.weather_icon
             : weather_icon // ignore: cast_nullable_to_non_nullable
                   as String,
+        weather_icon_info: null == weather_icon_info
+            ? _value.weather_icon_info
+            : weather_icon_info // ignore: cast_nullable_to_non_nullable
+                  as WeatherIconInfo,
         uv_index: null == uv_index
             ? _value.uv_index
             : uv_index // ignore: cast_nullable_to_non_nullable
@@ -772,6 +800,7 @@ class _$WeatherCurrentImpl implements _WeatherCurrent {
     required this.weather_condition,
     required this.weather_description,
     required this.weather_icon,
+    required this.weather_icon_info,
     required this.uv_index,
     required this.cloudiness,
     required this.sunrise,
@@ -802,6 +831,8 @@ class _$WeatherCurrentImpl implements _WeatherCurrent {
   @override
   final String weather_icon;
   @override
+  final WeatherIconInfo weather_icon_info;
+  @override
   final int uv_index;
   @override
   final int cloudiness;
@@ -812,7 +843,7 @@ class _$WeatherCurrentImpl implements _WeatherCurrent {
 
   @override
   String toString() {
-    return 'WeatherCurrent(temperature: $temperature, feels_like: $feels_like, humidity: $humidity, pressure: $pressure, wind_speed: $wind_speed, wind_direction: $wind_direction, visibility: $visibility, weather_condition: $weather_condition, weather_description: $weather_description, weather_icon: $weather_icon, uv_index: $uv_index, cloudiness: $cloudiness, sunrise: $sunrise, sunset: $sunset)';
+    return 'WeatherCurrent(temperature: $temperature, feels_like: $feels_like, humidity: $humidity, pressure: $pressure, wind_speed: $wind_speed, wind_direction: $wind_direction, visibility: $visibility, weather_condition: $weather_condition, weather_description: $weather_description, weather_icon: $weather_icon, weather_icon_info: $weather_icon_info, uv_index: $uv_index, cloudiness: $cloudiness, sunrise: $sunrise, sunset: $sunset)';
   }
 
   @override
@@ -840,6 +871,8 @@ class _$WeatherCurrentImpl implements _WeatherCurrent {
                 other.weather_description == weather_description) &&
             (identical(other.weather_icon, weather_icon) ||
                 other.weather_icon == weather_icon) &&
+            (identical(other.weather_icon_info, weather_icon_info) ||
+                other.weather_icon_info == weather_icon_info) &&
             (identical(other.uv_index, uv_index) ||
                 other.uv_index == uv_index) &&
             (identical(other.cloudiness, cloudiness) ||
@@ -862,6 +895,7 @@ class _$WeatherCurrentImpl implements _WeatherCurrent {
     weather_condition,
     weather_description,
     weather_icon,
+    weather_icon_info,
     uv_index,
     cloudiness,
     sunrise,
@@ -897,6 +931,7 @@ abstract class _WeatherCurrent implements WeatherCurrent {
     required final String weather_condition,
     required final String weather_description,
     required final String weather_icon,
+    required final WeatherIconInfo weather_icon_info,
     required final int uv_index,
     required final int cloudiness,
     required final String sunrise,
@@ -927,6 +962,8 @@ abstract class _WeatherCurrent implements WeatherCurrent {
   @override
   String get weather_icon;
   @override
+  WeatherIconInfo get weather_icon_info;
+  @override
   int get uv_index;
   @override
   int get cloudiness;
@@ -940,6 +977,255 @@ abstract class _WeatherCurrent implements WeatherCurrent {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$WeatherCurrentImplCopyWith<_$WeatherCurrentImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+WeatherIconInfo _$WeatherIconInfoFromJson(Map<String, dynamic> json) {
+  return _WeatherIconInfo.fromJson(json);
+}
+
+/// @nodoc
+mixin _$WeatherIconInfo {
+  String get code => throw _privateConstructorUsedError;
+  String get url => throw _privateConstructorUsedError;
+  String get description => throw _privateConstructorUsedError;
+  String get category => throw _privateConstructorUsedError;
+  bool get isDay => throw _privateConstructorUsedError;
+
+  /// Serializes this WeatherIconInfo to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of WeatherIconInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $WeatherIconInfoCopyWith<WeatherIconInfo> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $WeatherIconInfoCopyWith<$Res> {
+  factory $WeatherIconInfoCopyWith(
+    WeatherIconInfo value,
+    $Res Function(WeatherIconInfo) then,
+  ) = _$WeatherIconInfoCopyWithImpl<$Res, WeatherIconInfo>;
+  @useResult
+  $Res call({
+    String code,
+    String url,
+    String description,
+    String category,
+    bool isDay,
+  });
+}
+
+/// @nodoc
+class _$WeatherIconInfoCopyWithImpl<$Res, $Val extends WeatherIconInfo>
+    implements $WeatherIconInfoCopyWith<$Res> {
+  _$WeatherIconInfoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of WeatherIconInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? code = null,
+    Object? url = null,
+    Object? description = null,
+    Object? category = null,
+    Object? isDay = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            code: null == code
+                ? _value.code
+                : code // ignore: cast_nullable_to_non_nullable
+                      as String,
+            url: null == url
+                ? _value.url
+                : url // ignore: cast_nullable_to_non_nullable
+                      as String,
+            description: null == description
+                ? _value.description
+                : description // ignore: cast_nullable_to_non_nullable
+                      as String,
+            category: null == category
+                ? _value.category
+                : category // ignore: cast_nullable_to_non_nullable
+                      as String,
+            isDay: null == isDay
+                ? _value.isDay
+                : isDay // ignore: cast_nullable_to_non_nullable
+                      as bool,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$WeatherIconInfoImplCopyWith<$Res>
+    implements $WeatherIconInfoCopyWith<$Res> {
+  factory _$$WeatherIconInfoImplCopyWith(
+    _$WeatherIconInfoImpl value,
+    $Res Function(_$WeatherIconInfoImpl) then,
+  ) = __$$WeatherIconInfoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    String code,
+    String url,
+    String description,
+    String category,
+    bool isDay,
+  });
+}
+
+/// @nodoc
+class __$$WeatherIconInfoImplCopyWithImpl<$Res>
+    extends _$WeatherIconInfoCopyWithImpl<$Res, _$WeatherIconInfoImpl>
+    implements _$$WeatherIconInfoImplCopyWith<$Res> {
+  __$$WeatherIconInfoImplCopyWithImpl(
+    _$WeatherIconInfoImpl _value,
+    $Res Function(_$WeatherIconInfoImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of WeatherIconInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? code = null,
+    Object? url = null,
+    Object? description = null,
+    Object? category = null,
+    Object? isDay = null,
+  }) {
+    return _then(
+      _$WeatherIconInfoImpl(
+        code: null == code
+            ? _value.code
+            : code // ignore: cast_nullable_to_non_nullable
+                  as String,
+        url: null == url
+            ? _value.url
+            : url // ignore: cast_nullable_to_non_nullable
+                  as String,
+        description: null == description
+            ? _value.description
+            : description // ignore: cast_nullable_to_non_nullable
+                  as String,
+        category: null == category
+            ? _value.category
+            : category // ignore: cast_nullable_to_non_nullable
+                  as String,
+        isDay: null == isDay
+            ? _value.isDay
+            : isDay // ignore: cast_nullable_to_non_nullable
+                  as bool,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$WeatherIconInfoImpl implements _WeatherIconInfo {
+  const _$WeatherIconInfoImpl({
+    required this.code,
+    required this.url,
+    required this.description,
+    required this.category,
+    required this.isDay,
+  });
+
+  factory _$WeatherIconInfoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WeatherIconInfoImplFromJson(json);
+
+  @override
+  final String code;
+  @override
+  final String url;
+  @override
+  final String description;
+  @override
+  final String category;
+  @override
+  final bool isDay;
+
+  @override
+  String toString() {
+    return 'WeatherIconInfo(code: $code, url: $url, description: $description, category: $category, isDay: $isDay)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$WeatherIconInfoImpl &&
+            (identical(other.code, code) || other.code == code) &&
+            (identical(other.url, url) || other.url == url) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.category, category) ||
+                other.category == category) &&
+            (identical(other.isDay, isDay) || other.isDay == isDay));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, code, url, description, category, isDay);
+
+  /// Create a copy of WeatherIconInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$WeatherIconInfoImplCopyWith<_$WeatherIconInfoImpl> get copyWith =>
+      __$$WeatherIconInfoImplCopyWithImpl<_$WeatherIconInfoImpl>(
+        this,
+        _$identity,
+      );
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$WeatherIconInfoImplToJson(this);
+  }
+}
+
+abstract class _WeatherIconInfo implements WeatherIconInfo {
+  const factory _WeatherIconInfo({
+    required final String code,
+    required final String url,
+    required final String description,
+    required final String category,
+    required final bool isDay,
+  }) = _$WeatherIconInfoImpl;
+
+  factory _WeatherIconInfo.fromJson(Map<String, dynamic> json) =
+      _$WeatherIconInfoImpl.fromJson;
+
+  @override
+  String get code;
+  @override
+  String get url;
+  @override
+  String get description;
+  @override
+  String get category;
+  @override
+  bool get isDay;
+
+  /// Create a copy of WeatherIconInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$WeatherIconInfoImplCopyWith<_$WeatherIconInfoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

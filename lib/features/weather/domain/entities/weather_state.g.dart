@@ -51,6 +51,9 @@ _$WeatherCurrentImpl _$$WeatherCurrentImplFromJson(Map<String, dynamic> json) =>
       weather_condition: json['weather_condition'] as String,
       weather_description: json['weather_description'] as String,
       weather_icon: json['weather_icon'] as String,
+      weather_icon_info: WeatherIconInfo.fromJson(
+        json['weather_icon_info'] as Map<String, dynamic>,
+      ),
       uv_index: (json['uv_index'] as num).toInt(),
       cloudiness: (json['cloudiness'] as num).toInt(),
       sunrise: json['sunrise'] as String,
@@ -70,10 +73,31 @@ Map<String, dynamic> _$$WeatherCurrentImplToJson(
   'weather_condition': instance.weather_condition,
   'weather_description': instance.weather_description,
   'weather_icon': instance.weather_icon,
+  'weather_icon_info': instance.weather_icon_info,
   'uv_index': instance.uv_index,
   'cloudiness': instance.cloudiness,
   'sunrise': instance.sunrise,
   'sunset': instance.sunset,
+};
+
+_$WeatherIconInfoImpl _$$WeatherIconInfoImplFromJson(
+  Map<String, dynamic> json,
+) => _$WeatherIconInfoImpl(
+  code: json['code'] as String,
+  url: json['url'] as String,
+  description: json['description'] as String,
+  category: json['category'] as String,
+  isDay: json['isDay'] as bool,
+);
+
+Map<String, dynamic> _$$WeatherIconInfoImplToJson(
+  _$WeatherIconInfoImpl instance,
+) => <String, dynamic>{
+  'code': instance.code,
+  'url': instance.url,
+  'description': instance.description,
+  'category': instance.category,
+  'isDay': instance.isDay,
 };
 
 _$WeatherResponseImpl _$$WeatherResponseImplFromJson(

@@ -40,6 +40,7 @@ class WeatherCurrent with _$WeatherCurrent {
     required String weather_condition,
     required String weather_description,
     required String weather_icon,
+    required WeatherIconInfo weather_icon_info,
     required int uv_index,
     required int cloudiness,
     required String sunrise,
@@ -47,6 +48,19 @@ class WeatherCurrent with _$WeatherCurrent {
   }) = _WeatherCurrent;
 
   factory WeatherCurrent.fromJson(Map<String, dynamic> json) => _$WeatherCurrentFromJson(json);
+}
+
+@freezed
+class WeatherIconInfo with _$WeatherIconInfo {
+  const factory WeatherIconInfo({
+    required String code,
+    required String url,
+    required String description,
+    required String category,
+    required bool isDay,
+  }) = _WeatherIconInfo;
+
+  factory WeatherIconInfo.fromJson(Map<String, dynamic> json) => _$WeatherIconInfoFromJson(json);
 }
 
 @freezed
