@@ -41,7 +41,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
     ];
     
     // Watch weather data at the top level to prevent unnecessary rebuilds
-    final weatherAsync = ref.watch(weatherNotifierProvider(iataCodes));
+    final weatherAsync = ref.watch(weatherNotifierProvider(iataCodes).select((asyncValue) => asyncValue));
     
     // Check if at least one action is taken
     final bool hasActionTaken = addContactsState.enableNotifications || addContactsState.selectedContacts.isNotEmpty;

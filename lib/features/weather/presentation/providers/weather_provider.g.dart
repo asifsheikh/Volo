@@ -6,7 +6,7 @@ part of 'weather_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$weatherNotifierHash() => r'5a42f0ee3a1abb6473e206fc5248dcfed5e07151';
+String _$weatherNotifierHash() => r'f67d9509e40bd526f21ab8d4170737bff416f393';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,32 +29,25 @@ class _SystemHash {
   }
 }
 
-abstract class _$WeatherNotifier
-    extends BuildlessAutoDisposeAsyncNotifier<List<domain.WeatherState>> {
-  late final List<String> iataCodes;
-
-  FutureOr<List<domain.WeatherState>> build(List<String> iataCodes);
-}
-
-/// Provider for weather state management
+/// Legacy provider for backward compatibility
 ///
-/// Copied from [WeatherNotifier].
-@ProviderFor(WeatherNotifier)
+/// Copied from [weatherNotifier].
+@ProviderFor(weatherNotifier)
 const weatherNotifierProvider = WeatherNotifierFamily();
 
-/// Provider for weather state management
+/// Legacy provider for backward compatibility
 ///
-/// Copied from [WeatherNotifier].
+/// Copied from [weatherNotifier].
 class WeatherNotifierFamily
     extends Family<AsyncValue<List<domain.WeatherState>>> {
-  /// Provider for weather state management
+  /// Legacy provider for backward compatibility
   ///
-  /// Copied from [WeatherNotifier].
+  /// Copied from [weatherNotifier].
   const WeatherNotifierFamily();
 
-  /// Provider for weather state management
+  /// Legacy provider for backward compatibility
   ///
-  /// Copied from [WeatherNotifier].
+  /// Copied from [weatherNotifier].
   WeatherNotifierProvider call(List<String> iataCodes) {
     return WeatherNotifierProvider(iataCodes);
   }
@@ -81,21 +74,17 @@ class WeatherNotifierFamily
   String? get name => r'weatherNotifierProvider';
 }
 
-/// Provider for weather state management
+/// Legacy provider for backward compatibility
 ///
-/// Copied from [WeatherNotifier].
+/// Copied from [weatherNotifier].
 class WeatherNotifierProvider
-    extends
-        AutoDisposeAsyncNotifierProviderImpl<
-          WeatherNotifier,
-          List<domain.WeatherState>
-        > {
-  /// Provider for weather state management
+    extends AutoDisposeFutureProvider<List<domain.WeatherState>> {
+  /// Legacy provider for backward compatibility
   ///
-  /// Copied from [WeatherNotifier].
+  /// Copied from [weatherNotifier].
   WeatherNotifierProvider(List<String> iataCodes)
     : this._internal(
-        () => WeatherNotifier()..iataCodes = iataCodes,
+        (ref) => weatherNotifier(ref as WeatherNotifierRef, iataCodes),
         from: weatherNotifierProvider,
         name: r'weatherNotifierProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -120,18 +109,14 @@ class WeatherNotifierProvider
   final List<String> iataCodes;
 
   @override
-  FutureOr<List<domain.WeatherState>> runNotifierBuild(
-    covariant WeatherNotifier notifier,
+  Override overrideWith(
+    FutureOr<List<domain.WeatherState>> Function(WeatherNotifierRef provider)
+    create,
   ) {
-    return notifier.build(iataCodes);
-  }
-
-  @override
-  Override overrideWith(WeatherNotifier Function() create) {
     return ProviderOverride(
       origin: this,
       override: WeatherNotifierProvider._internal(
-        () => create()..iataCodes = iataCodes,
+        (ref) => create(ref as WeatherNotifierRef),
         from: from,
         name: null,
         dependencies: null,
@@ -143,11 +128,7 @@ class WeatherNotifierProvider
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<
-    WeatherNotifier,
-    List<domain.WeatherState>
-  >
-  createElement() {
+  AutoDisposeFutureProviderElement<List<domain.WeatherState>> createElement() {
     return _WeatherNotifierProviderElement(this);
   }
 
@@ -168,17 +149,13 @@ class WeatherNotifierProvider
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 mixin WeatherNotifierRef
-    on AutoDisposeAsyncNotifierProviderRef<List<domain.WeatherState>> {
+    on AutoDisposeFutureProviderRef<List<domain.WeatherState>> {
   /// The parameter `iataCodes` of this provider.
   List<String> get iataCodes;
 }
 
 class _WeatherNotifierProviderElement
-    extends
-        AutoDisposeAsyncNotifierProviderElement<
-          WeatherNotifier,
-          List<domain.WeatherState>
-        >
+    extends AutoDisposeFutureProviderElement<List<domain.WeatherState>>
     with WeatherNotifierRef {
   _WeatherNotifierProviderElement(super.provider);
 
@@ -186,5 +163,28 @@ class _WeatherNotifierProviderElement
   List<String> get iataCodes => (origin as WeatherNotifierProvider).iataCodes;
 }
 
+String _$globalWeatherNotifierHash() =>
+    r'f55085e91ea64d01d5d8287b2ee811be193f2a83';
+
+/// Global weather provider that manages all weather data
+///
+/// Copied from [GlobalWeatherNotifier].
+@ProviderFor(GlobalWeatherNotifier)
+final globalWeatherNotifierProvider =
+    AutoDisposeNotifierProvider<
+      GlobalWeatherNotifier,
+      Map<String, domain.WeatherState>
+    >.internal(
+      GlobalWeatherNotifier.new,
+      name: r'globalWeatherNotifierProvider',
+      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$globalWeatherNotifierHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+typedef _$GlobalWeatherNotifier =
+    AutoDisposeNotifier<Map<String, domain.WeatherState>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
