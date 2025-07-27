@@ -1040,19 +1040,60 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
   }
 
   Widget _buildManualWeatherButton(String airportCode) {
-    return ElevatedButton(
-      onPressed: () {
-        // Manually load weather data
-        final globalWeather = ref.read(globalWeatherNotifierProvider.notifier);
-        globalWeather.loadWeatherData([airportCode]);
+    return Consumer(
+      builder: (context, ref, child) {
+        final globalWeather = ref.watch(globalWeatherNotifierProvider);
+        final weather = globalWeather[airportCode];
+        
+        if (weather != null) {
+          // Display weather information
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Weather icon
+              Image.network(
+                weather.current.weather_icon_info.url,
+                width: 20,
+                height: 20,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(
+                    Icons.cloud,
+                    color: Colors.white,
+                    size: 20,
+                  );
+                },
+              ),
+              const SizedBox(width: 4),
+              // Temperature
+              Text(
+                '${weather.current.temperature.round()}°C',
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          );
+        } else {
+          // Show load button
+          return ElevatedButton(
+            onPressed: () {
+              // Manually load weather data
+              final globalWeatherNotifier = ref.read(globalWeatherNotifierProvider.notifier);
+              globalWeatherNotifier.loadWeatherData([airportCode]);
+            },
+            child: const Text('Load Weather'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white.withOpacity(0.2),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              minimumSize: const Size(0, 24),
+            ),
+          );
+        }
       },
-      child: const Text('Load Weather'),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white.withOpacity(0.2),
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        minimumSize: const Size(0, 24),
-      ),
     );
   }
 } 
