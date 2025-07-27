@@ -258,6 +258,11 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                         ),
                         
                         // Content below banner
+                      ],
+                    ),
+                  ),
+                ),
+                
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(20),
