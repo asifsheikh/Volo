@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/add_contacts_state.dart' as domain;
 import '../../domain/usecases/get_device_contacts.dart';
 import '../../domain/usecases/save_trip.dart';
-import '../widgets/contact_picker_dialog.dart';
+import '../../../widgets/contact_picker_dialog.dart';
 import '../../../../main.dart';
 
 part 'add_contacts_provider.g.dart';
