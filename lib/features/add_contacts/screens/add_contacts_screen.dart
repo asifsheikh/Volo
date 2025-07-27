@@ -7,6 +7,7 @@ import '../models/contact_model.dart';
 import '../../../services/trip_service.dart';
 import '../../../widgets/loading_dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../theme/app_theme.dart';
 
 // Arguments for AddContactsScreen
 class AddContactsScreenArgs {
@@ -247,7 +248,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
     final bool hasActionTaken = _enableNotifications || _selectedContacts.isNotEmpty;
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: AppTheme.background,
       body: Column(
         children: [
           // Scrollable content
@@ -258,10 +259,41 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                 SliverAppBar(
                   expandedHeight: bannerHeight,
                   floating: false,
-                  pinned: false,
-                  backgroundColor: Colors.transparent,
+                  pinned: true, // Keep title bar pinned when scrolling
+                  backgroundColor: AppTheme.background, // Background color when collapsed
                   elevation: 0,
                   automaticallyImplyLeading: false,
+                  leading: Container(
+                    width: 36,
+                    height: 36,
+                    margin: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.95),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ),
+                  title: const Text(
+                    'Add Contacts',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 20, // Bigger font size
+                      color: Colors.white, // White color
+                    ),
+                  ),
+                  centerTitle: false, // Left align the title
                   flexibleSpace: FlexibleSpaceBar(
                     background: Stack(
                       children: [
@@ -376,41 +408,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                           ],
                         ),
                         
-                        // Back button and title row (top left)
-                        Positioned(
-                          top: MediaQuery.of(context).padding.top + 16,
-                          left: 16,
-                          right: 16,
-                          child: Row(
-                            children: [
-                              // Circular back button
-                              Container(
-                                width: 36,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  padding: EdgeInsets.zero,
-                                  icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
-                                  onPressed: () => Navigator.of(context).pop(),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              // Left-aligned title
-                              Text(
-                                'Add Contacts',
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 20,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        // Removed old back button and title - now handled by SliverAppBar
                         
                         // City names at bottom of banner
                         Positioned(
@@ -807,7 +805,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFFE5E7EB),
+              color: AppTheme.background,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
