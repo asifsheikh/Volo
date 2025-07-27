@@ -299,9 +299,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 4), // Reduced from 8 to 4
                         
-                        const SizedBox(height: 16), // Reduced from 32 to 16
+                        const SizedBox(height: 12), // Reduced from 16 to 12
                         
                         // Your Own Updates Section
                         const Text(
@@ -313,7 +313,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                             color: Color(0xFF111827),
                           ),
                         ),
-                        const SizedBox(height: 12), // Reduced from 16 to 12
+                        const SizedBox(height: 8), // Reduced from 12 to 8
                         
                         // Checkbox for own updates
                         Row(
@@ -357,7 +357,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20), // Reduced from 32 to 20
+                        const SizedBox(height: 16), // Reduced from 20 to 16
                         
                         // Share With Close Ones Section
                         const Text(
@@ -497,7 +497,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                         _buildDisclaimerSection(addContactsState),
                         
                         // Bottom padding to account for the pinned button
-                        const SizedBox(height: 60), // Reduced from 100 to 60
+                        const SizedBox(height: 40), // Reduced from 60 to 40
                       ],
                     ),
                   ),
