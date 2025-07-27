@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import '../../models/trip/trip_model.dart';
 import '../../services/trip_service.dart';
 import '../../features/add_flight/add_flight_screen.dart';
-import '../../features/add_flight/controller/add_flight_controller.dart';
 import '../../theme/app_theme.dart';
 
 class FlightsScreen extends StatefulWidget {
@@ -92,10 +91,7 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
   void _navigateToAddFlight() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider(
-          create: (context) => AddFlightController(),
-          child: const AddFlightScreen(),
-        ),
+        builder: (context) => const AddFlightScreen(),
       ),
     ).then((_) {
       // Refresh trips when returning from add flight

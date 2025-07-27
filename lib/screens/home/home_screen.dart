@@ -7,7 +7,6 @@ import '../../services/firebase_service.dart';
 import '../../services/profile_picture_service.dart';
 import '../../services/network_service.dart';
 import '../../features/add_flight/add_flight_screen.dart';
-import '../../features/add_flight/controller/add_flight_controller.dart';
 import '../profile/profile_screen.dart';
 import '../../theme/app_theme.dart';
 
@@ -149,10 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => ChangeNotifierProvider(
-                                create: (context) => AddFlightController(),
-                                child: const AddFlightScreen(),
-                              ),
+                              builder: (context) => const AddFlightScreen(),
                             ),
                           );
                         },

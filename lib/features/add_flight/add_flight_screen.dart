@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'dart:developer' as developer;
@@ -10,8 +10,10 @@ import '../../services/flight_api_service.dart';
 import 'upload_ticket_service.dart';
 import '../../screens/home/flight_results_screen.dart';
 import '../../screens/home/flight_select_screen.dart';
-import 'controller/add_flight_controller.dart';
 import '../../features/flight_confirmation/screens/confirmation_screen.dart' show resetConfettiForNewJourney;
+import 'presentation/providers/add_flight_provider.dart';
+import 'domain/entities/airport_entity.dart';
+import 'domain/entities/flight_entity.dart';
 
 class Airport {
   final String city;
@@ -62,23 +64,20 @@ class Airport {
   }
 }
 
-class AddFlightScreen extends StatefulWidget {
+class AddFlightScreen extends ConsumerStatefulWidget {
   const AddFlightScreen({Key? key}) : super(key: key);
 
   @override
-  State<AddFlightScreen> createState() => _AddFlightScreenState();
+  ConsumerState<AddFlightScreen> createState() => _AddFlightScreenState();
 }
 
-class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderStateMixin {
+class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   DateTime? _selectedDate;
   String? _selectedDepartureCity;
   String? _selectedArrivalCity;
-  Airport? _selectedDepartureAirport;
-  Airport? _selectedArrivalAirport;
-  
-  List<Airport> _allAirports = [];
-  bool _isLoadingAirports = false;
+  AirportEntity? _selectedDepartureAirport;
+  AirportEntity? _selectedArrivalAirport;
 
   // Animation controllers for micro-interactions
   late AnimationController _uploadButtonController;
@@ -109,11 +108,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
     // Reset confetti flag for new journey
     resetConfettiForNewJourney();
     
-    // Use controller to load airports
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final controller = context.read<AddFlightController>();
-      controller.loadAirports(context);
-    });
+    // Reset confetti flag for new journey
+    resetConfettiForNewJourney();
   }
 
   @override
@@ -124,15 +120,15 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
   }
 
   /// Get popular airports for empty field suggestions
-  List<Airport> _getPopularAirports() {
+  List<AirportEntity> _getPopularAirports(List<AirportEntity> allAirports) {
     final popularIataCodes = [
       'JFK', 'LAX', 'LHR', 'CDG', 'DEL', 'BOM', 'SIN', 'HKG', 'DXB', 'FRA',
       'AMS', 'MAD', 'BCN', 'MIA', 'ORD', 'ATL', 'DFW', 'DEN', 'SFO', 'SEA'
     ];
     
-    final List<Airport> popularAirports = [];
+    final List<AirportEntity> popularAirports = [];
     for (final iata in popularIataCodes) {
-      final airport = _allAirports.where((a) => a.iata == iata).firstOrNull;
+      final airport = allAirports.where((a) => a.iata == iata).firstOrNull;
       if (airport != null) {
         popularAirports.add(airport);
       }
@@ -142,7 +138,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
   }
 
   /// Show popular airports when field is tapped and empty
-  void _showPopularAirports(BuildContext context, TextEditingController controller, Function(Airport) onSelected) {
+  void _showPopularAirports(BuildContext context, TextEditingController controller, Function(AirportEntity) onSelected) {
     // This will be handled by the suggestionsCallback when pattern is empty
     // The TypeAheadField will automatically show suggestions
   }
@@ -164,19 +160,24 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
     return displayText;
   }
 
-  void _onDepartureAirportSelected(Airport airport) {
-    final controller = context.read<AddFlightController>();
-    controller.onDepartureAirportSelected(airport);
+  void _onDepartureAirportSelected(AirportEntity airport) {
+    setState(() {
+      _selectedDepartureAirport = airport;
+      _selectedDepartureCity = airport.city;
+    });
   }
 
-  void _onArrivalAirportSelected(Airport airport) {
-    final controller = context.read<AddFlightController>();
-    controller.onArrivalAirportSelected(airport);
+  void _onArrivalAirportSelected(AirportEntity airport) {
+    setState(() {
+      _selectedArrivalAirport = airport;
+      _selectedArrivalCity = airport.city;
+    });
   }
 
   bool get _isFormValid {
-    final controller = context.read<AddFlightController>();
-    return controller.isFormValid;
+    return _selectedDepartureAirport != null && 
+           _selectedArrivalAirport != null && 
+           _selectedDate != null;
   }
 
   void _pickDate() async {
@@ -205,16 +206,15 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
       },
     );
     if (picked != null) {
-      final controller = context.read<AddFlightController>();
-      controller.setSelectedDate(picked);
+      setState(() {
+        _selectedDate = picked;
+      });
     }
   }
 
   Future<void> _searchFlights() async {
-    final controller = context.read<AddFlightController>();
-    
     // Use the selected airport objects directly
-    if (controller.selectedDepartureAirport == null || controller.selectedArrivalAirport == null) {
+    if (_selectedDepartureAirport == null || _selectedArrivalAirport == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Please select both departure and arrival airports to continue'),
@@ -230,8 +230,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
       return;
     }
     
-    final departureIata = controller.selectedDepartureAirport!.iata;
-    final arrivalIata = controller.selectedArrivalAirport!.iata;
+    final departureIata = _selectedDepartureAirport!.iata;
+    final arrivalIata = _selectedArrivalAirport!.iata;
     
     print('🔍 Search: $departureIata → $arrivalIata');
     Navigator.of(context).push(
@@ -240,12 +240,12 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
           searchFuture: FlightApiService.searchFlights(
             departureIata: departureIata,
             arrivalIata: arrivalIata,
-            date: DateFormat('yyyy-MM-dd').format(controller.selectedDate!),
-            flightNumber: controller.flightNumberController.text.isNotEmpty ? controller.flightNumberController.text : null,
+            date: DateFormat('yyyy-MM-dd').format(_selectedDate!),
+            flightNumber: '', // TODO: Add flight number field
           ),
-          departureCity: controller.departureCityController.text.trim(),
-          arrivalCity: controller.arrivalCityController.text.trim(),
-          date: DateFormat('yyyy-MM-dd').format(controller.selectedDate!),
+          departureCity: _selectedDepartureCity ?? '',
+          arrivalCity: _selectedArrivalCity ?? '',
+          date: DateFormat('yyyy-MM-dd').format(_selectedDate!),
         ),
       ),
     );
@@ -473,46 +473,48 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
                         ),
                       ),
                       const SizedBox(height: 28),
-                      Consumer<AddFlightController>(
-                        builder: (context, controller, child) {
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final airports = ref.watch(airportsProvider);
+                          final isLoading = ref.watch(addFlightLoadingProvider);
                           return _buildTypeAheadField(
                             label: 'From',
                             icon: Icons.flight_takeoff,
-                            controller: controller.departureCityController,
+                            controller: TextEditingController(text: _selectedDepartureCity ?? ''),
                             hintText: 'Search city or airport code',
                             onSelected: _onDepartureAirportSelected,
-                            isLoading: controller.isLoadingAirports,
-                            isAirportSelected: controller.selectedDepartureAirport != null,
+                            isLoading: isLoading,
+                            isAirportSelected: _selectedDepartureAirport != null,
+                            airports: airports,
                           );
                         },
                       ),
                       const SizedBox(height: 24),
-                      Consumer<AddFlightController>(
-                        builder: (context, controller, child) {
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final airports = ref.watch(airportsProvider);
+                          final isLoading = ref.watch(addFlightLoadingProvider);
                           return _buildTypeAheadField(
                             label: 'To',
                             icon: Icons.flight_land,
-                            controller: controller.arrivalCityController,
+                            controller: TextEditingController(text: _selectedArrivalCity ?? ''),
                             hintText: 'Search city or airport code',
                             onSelected: _onArrivalAirportSelected,
-                            isLoading: controller.isLoadingAirports,
-                            isAirportSelected: controller.selectedArrivalAirport != null,
+                            isLoading: isLoading,
+                            isAirportSelected: _selectedArrivalAirport != null,
+                            airports: airports,
                           );
                         },
                       ),
                       const SizedBox(height: 24),
                       _buildDateField(),
                       const SizedBox(height: 24),
-                      Consumer<AddFlightController>(
-                        builder: (context, controller, child) {
-                          return _buildLabeledField(
-                            label: 'Flight Number (Optional)',
-                            optional: true,
-                            icon: Icons.flight,
-                            controller: controller.flightNumberController,
-                            hintText: 'e.g. UA1234',
-                          );
-                        },
+                      _buildLabeledField(
+                        label: 'Flight Number (Optional)',
+                        optional: true,
+                        icon: Icons.flight,
+                        controller: TextEditingController(),
+                        hintText: 'e.g. UA1234',
                       ),
                       const SizedBox(height: 16),
                       // Helper text for flight number and general guidance
@@ -544,13 +546,14 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
               width: double.infinity,
               color: const Color(0xFFE5E7EB),
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-              child: Consumer<AddFlightController>(
-                builder: (context, controller, child) {
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final isFormValid = _isFormValid;
                   return SizedBox(
                     width: 350,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: controller.isFormValid
+                      onPressed: isFormValid
                           ? () {
                               if (_formKey.currentState!.validate()) {
                                 _searchFlights();
@@ -597,12 +600,11 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
     required IconData icon,
     required TextEditingController controller,
     required String hintText,
-    required Function(Airport) onSelected,
+    required Function(AirportEntity) onSelected,
     required bool isLoading,
     required bool isAirportSelected, // New parameter to track if airport is selected
+    required List<AirportEntity> airports,
   }) {
-    return Consumer<AddFlightController>(
-      builder: (context, flightController, child) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -628,7 +630,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
               ],
             ),
             const SizedBox(height: 8),
-            TypeAheadField<Airport>(
+            TypeAheadField<AirportEntity>(
               controller: controller,
               hideOnEmpty: true, // Hide suggestions when empty to prevent "No items found"
               builder: (context, controller, focusNode) {
@@ -715,12 +717,16 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
                 );
               },
               suggestionsCallback: (pattern) async {
-                if (pattern.length < 1) {
-                  return [];
+                if (pattern.isEmpty) {
+                  return _getPopularAirports(airports);
                 }
-                return await flightController.getAirportSuggestions(pattern);
+                return airports.where((airport) =>
+                  airport.city.toLowerCase().contains(pattern.toLowerCase()) ||
+                  airport.airport.toLowerCase().contains(pattern.toLowerCase()) ||
+                  airport.iata.toLowerCase().contains(pattern.toLowerCase())
+                ).toList();
               },
-              itemBuilder: (context, Airport airport) {
+              itemBuilder: (context, AirportEntity airport) {
                 return ListTile(
                   dense: true,
                   contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -746,7 +752,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
                       : null,
                 );
               },
-              onSelected: (Airport airport) {
+              onSelected: (AirportEntity airport) {
                 onSelected(airport);
               },
             ),
@@ -918,20 +924,16 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
                 Icon(Icons.calendar_today, color: Color(0xFF9CA3AF), size: 20),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Consumer<AddFlightController>(
-                    builder: (context, controller, child) {
-                      return Text(
-                        controller.selectedDate != null
-                            ? DateFormat('MMM dd, yyyy').format(controller.selectedDate!)
-                            : 'Select date',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                          color: controller.selectedDate != null ? Color(0xFF1F2937) : Color(0xFFADAEBC),
-                        ),
-                      );
-                    },
+                  child: Text(
+                    _selectedDate != null
+                        ? DateFormat('MMM dd, yyyy').format(_selectedDate!)
+                        : 'Select date',
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      color: _selectedDate != null ? Color(0xFF1F2937) : Color(0xFFADAEBC),
+                    ),
                   ),
                 ),
               ],
@@ -944,7 +946,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> with TickerProviderSt
 
   /// Populate form fields from extracted ticket data
   void _populateFormFromTicket(Map<String, dynamic> ticketData) {
-    final controller = context.read<AddFlightController>();
-    controller.populateFormFromTicket(ticketData);
+    // TODO: Implement ticket data population
+    // This would populate the form fields with extracted data
   }
 } 
