@@ -166,6 +166,19 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                         ),
                                         // Weather information for departure city
                                         _buildWeatherInfo(args.departureAirportCode),
+                                        const Spacer(),
+                                        // City name at bottom
+                                        Text(
+                                          args.departureCity.toUpperCase(),
+                                          style: const TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                            letterSpacing: 1.0,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
                                       ],
                                     ),
                                   ),
@@ -222,6 +235,19 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                         ),
                                         // Weather information for arrival city
                                         _buildWeatherInfo(args.arrivalAirportCode),
+                                        const Spacer(),
+                                        // City name at bottom
+                                        Text(
+                                          args.arrivalCity.toUpperCase(),
+                                          style: const TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                            letterSpacing: 1.0,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
                                       ],
                                     ),
                                   ),
@@ -231,48 +257,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                           ],
                         ),
                         
-                        // City names at bottom of banner
-                        Positioned(
-                          bottom: 40,
-                          left: 0,
-                          right: 0,
-                          child: Column(
-                            children: [
-                              Text(
-                                '${args.departureCity.toUpperCase()} → ${args.arrivalCity.toUpperCase()}',
-                                style: const TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  letterSpacing: 1.5,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 12),
-                              Container(
-                                width: 120,
-                                height: 2,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.transparent,
-                                      Colors.white.withOpacity(0.8),
-                                      Colors.transparent,
-                                    ],
-                                    stops: const [0.0, 0.5, 1.0],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                
-                // Content below banner
+                        // Content below banner
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(20),
