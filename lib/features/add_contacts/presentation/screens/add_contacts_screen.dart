@@ -153,7 +153,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                           color: Colors.white,
                                           size: 48,
                                         ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 16),
                                         Text(
                                           args.departureAirportCode.toUpperCase(),
                                           style: const TextStyle(
@@ -164,6 +164,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                             letterSpacing: 1.5,
                                           ),
                                         ),
+                                        const SizedBox(height: 8),
                                         // Weather information for departure city
                                         _buildWeatherInfo(args.departureAirportCode),
                                         const Spacer(),
@@ -222,7 +223,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                           color: Colors.white,
                                           size: 48,
                                         ),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(height: 16),
                                         Text(
                                           args.arrivalAirportCode.toUpperCase(),
                                           style: const TextStyle(
@@ -233,6 +234,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                             letterSpacing: 1.5,
                                           ),
                                         ),
+                                        const SizedBox(height: 8),
                                         // Weather information for arrival city
                                         _buildWeatherInfo(args.arrivalAirportCode),
                                         const Spacer(),
@@ -1064,17 +1066,14 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
         
         if (weather != null) {
           // Just show temperature with simple formatting
-          return Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Text(
-              '${weather.current.temperature.round()}°C',
-              style: const TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w800, // Slightly bolder
-                fontSize: 20, // Larger font size
-                color: Colors.white,
-                letterSpacing: 0.5,
-              ),
+          return Text(
+            '${weather.current.temperature.round()}°C',
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w800, // Slightly bolder
+              fontSize: 20, // Larger font size
+              color: Colors.white,
+              letterSpacing: 0.5,
             ),
           );
         } else {
