@@ -11,7 +11,6 @@ import '../../../../services/trip_service.dart';
 import '../../../../widgets/loading_dialog.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../features/weather/presentation/providers/weather_provider.dart';
-import '../../../../features/weather/presentation/widgets/weather_city_card.dart';
 import '../../../../features/weather/domain/entities/weather_state.dart' as weather_domain;
 
 /// Add Contacts Screen using Riverpod + Clean Architecture
@@ -147,6 +146,47 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                             letterSpacing: 1.5,
                                           ),
                                         ),
+                                        const SizedBox(height: 4),
+                                        // Weather information for departure city
+                                        weatherAsync.when(
+                                          data: (weatherData) {
+                                            final departureWeather = weatherData.firstWhere(
+                                              (w) => w.iataCode == args.departureAirportCode,
+                                              orElse: () => weatherData.first,
+                                            );
+                                            return Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                // Weather icon
+                                                Image.network(
+                                                  departureWeather.current.weather_icon_info.url,
+                                                  width: 20,
+                                                  height: 20,
+                                                  errorBuilder: (context, error, stackTrace) {
+                                                    return const Icon(
+                                                      Icons.cloud,
+                                                      color: Colors.white,
+                                                      size: 20,
+                                                    );
+                                                  },
+                                                ),
+                                                const SizedBox(width: 4),
+                                                // Temperature
+                                                Text(
+                                                  '${departureWeather.current.temperature.round()}°C',
+                                                  style: const TextStyle(
+                                                    fontFamily: 'Inter',
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 16,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                          loading: () => const SizedBox.shrink(),
+                                          error: (error, stackTrace) => const SizedBox.shrink(),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -200,6 +240,47 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                             color: Colors.white,
                                             letterSpacing: 1.5,
                                           ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        // Weather information for arrival city
+                                        weatherAsync.when(
+                                          data: (weatherData) {
+                                            final arrivalWeather = weatherData.firstWhere(
+                                              (w) => w.iataCode == args.arrivalAirportCode,
+                                              orElse: () => weatherData.last,
+                                            );
+                                            return Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                // Weather icon
+                                                Image.network(
+                                                  arrivalWeather.current.weather_icon_info.url,
+                                                  width: 20,
+                                                  height: 20,
+                                                  errorBuilder: (context, error, stackTrace) {
+                                                    return const Icon(
+                                                      Icons.cloud,
+                                                      color: Colors.white,
+                                                      size: 20,
+                                                    );
+                                                  },
+                                                ),
+                                                const SizedBox(width: 4),
+                                                // Temperature
+                                                Text(
+                                                  '${arrivalWeather.current.temperature.round()}°C',
+                                                  style: const TextStyle(
+                                                    fontFamily: 'Inter',
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 16,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                          loading: () => const SizedBox.shrink(),
+                                          error: (error, stackTrace) => const SizedBox.shrink(),
                                         ),
                                       ],
                                     ),
@@ -259,9 +340,6 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 8),
-                        
-                        // Weather Section
-                        _buildWeatherSection(weatherAsync),
                         
                         const SizedBox(height: 32),
                         
@@ -1039,135 +1117,6 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                 color: Color(0xFF6B7280),
                 height: 1.4,
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWeatherSection(AsyncValue<List<weather_domain.WeatherState>> weatherAsync) {
-    return weatherAsync.when(
-      data: (weatherData) {
-        if (weatherData.isEmpty) {
-          return const SizedBox.shrink();
-        }
-
-        // Find departure and arrival weather
-        final departureWeather = weatherData.firstWhere(
-          (w) => w.iataCode == widget.args.departureAirportCode,
-          orElse: () => weatherData.first,
-        );
-        final arrivalWeather = weatherData.firstWhere(
-          (w) => w.iataCode == widget.args.arrivalAirportCode,
-          orElse: () => weatherData.last,
-        );
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Weather at your destinations',
-              style: AppTheme.titleLarge.copyWith(
-                color: AppTheme.textPrimary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: WeatherCityCard(
-                    weather: departureWeather,
-                    isDeparture: true,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: WeatherCityCard(
-                    weather: arrivalWeather,
-                    isDeparture: false,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-      loading: () => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Weather at your destinations',
-            style: AppTheme.titleLarge.copyWith(
-              color: AppTheme.textPrimary,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: Colors.grey[200],
-                  ),
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: Colors.grey[200],
-                  ),
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      error: (error, stackTrace) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Weather at your destinations',
-            style: AppTheme.titleLarge.copyWith(
-              color: AppTheme.textPrimary,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.red[50],
-              border: Border.all(color: Colors.red[200]!),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.error_outline, color: Colors.red[600], size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Unable to load weather information',
-                    style: TextStyle(
-                      color: Colors.red[700],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
         ],
