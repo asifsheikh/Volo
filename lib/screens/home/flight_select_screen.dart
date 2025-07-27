@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import '../../services/flight_api_service.dart';
 import '../../services/network_service.dart';
 import '../../widgets/network_error_widget.dart';
-import '../../features/add_contacts/screens/add_contacts_screen.dart';
+import '../../features/add_contacts/presentation/screens/add_contacts_screen.dart';
 import '../../theme/app_theme.dart';
 
 class FlightSelectScreen extends StatefulWidget {

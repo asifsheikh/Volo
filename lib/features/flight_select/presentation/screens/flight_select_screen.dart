@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../theme/app_theme.dart';
-import '../../../../features/add_contacts/screens/add_contacts_screen.dart';
+import '../../../../features/add_contacts/presentation/screens/add_contacts_screen.dart';
 import '../providers/flight_select_provider.dart';
 import '../../domain/entities/flight_select_state.dart' as domain;
 
