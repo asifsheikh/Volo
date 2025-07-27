@@ -14,13 +14,13 @@ abstract class BaseModel {
   }
 
   /// Validate model data
-  bool isValid();
+  bool isValid() => true; // Default implementation
 
   /// Get validation errors
-  List<String> getValidationErrors();
+  List<String> getValidationErrors() => []; // Default implementation
 
   /// Create a copy of the model with modifications
-  T copyWith<T extends BaseModel>();
+  BaseModel copyWith(); // Simplified signature
 
   @override
   bool operator ==(Object other) {
@@ -38,7 +38,7 @@ abstract class BaseModel {
 }
 
 /// Base class for API response models
-abstract class ApiResponse<T> {
+class ApiResponse<T> {
   final bool success;
   final String? message;
   final T? data;
@@ -67,11 +67,18 @@ abstract class ApiResponse<T> {
     );
   }
 
-  Map<String, dynamic> toJson();
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'message': message,
+      'data': data,
+      'error': error,
+    };
+  }
 }
 
 /// Base class for paginated responses
-abstract class PaginatedResponse<T> extends ApiResponse<List<T>> {
+class PaginatedResponse<T> extends ApiResponse<List<T>> {
   final int page;
   final int limit;
   final int total;

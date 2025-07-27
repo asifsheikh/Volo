@@ -6,8 +6,8 @@ import 'dart:core';
 import '../../services/firebase_service.dart';
 import '../../services/profile_picture_service.dart';
 import '../../services/network_service.dart';
-import '../../features/add_flight/add_flight_screen.dart';
-import '../../features/add_flight/controller/add_flight_controller.dart';
+// import '../../features/add_flight/add_flight_screen.dart';
+// import '../../features/add_flight/controller/add_flight_controller.dart';
 import '../profile/profile_screen.dart';
 import '../../theme/app_theme.dart';
 
@@ -147,14 +147,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 60, // Slightly increased height for prominence
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => ChangeNotifierProvider(
-                                create: (context) => AddFlightController(),
-                                child: const AddFlightScreen(),
-                              ),
+                          // Temporarily show a placeholder message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Add Flight feature is being updated. Coming soon!'),
+                              duration: Duration(seconds: 2),
                             ),
                           );
+                          // TODO: Re-enable when AddFlightScreen is properly migrated to Riverpod
+                          // Navigator.of(context).push(
+                          //   MaterialPageRoute(
+                          //     builder: (context) => ChangeNotifierProvider(
+                          //       create: (context) => AddFlightController(),
+                          //       child: const AddFlightScreen(),
+                          //     ),
+                          //   ),
+                          // );
                         },
                         icon: const Icon(
                           Icons.flight_takeoff, 

@@ -17,7 +17,7 @@ class Flight extends BaseModel {
   final String? bookingToken;
   final CarbonEmissions? carbonEmissions;
 
-  const Flight({
+  Flight({
     required this.id,
     required this.flightNumber,
     required this.airline,
@@ -97,6 +97,11 @@ class Flight extends BaseModel {
   }
 
   @override
+  BaseModel copyWith() {
+    return this;
+  }
+
+  @override
   Flight copyWith({
     String? id,
     String? flightNumber,
@@ -135,7 +140,7 @@ class CarbonEmissions extends BaseModel {
   final double kgCO2;
   final String unit;
 
-  const CarbonEmissions({
+  CarbonEmissions({
     required this.kgCO2,
     required this.unit,
   });
@@ -162,6 +167,11 @@ class CarbonEmissions extends BaseModel {
   List<String> getValidationErrors() {
     if (kgCO2 < 0) return ['Carbon emissions cannot be negative'];
     return [];
+  }
+
+  @override
+  BaseModel copyWith() {
+    return this;
   }
 
   @override

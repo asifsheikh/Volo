@@ -7,6 +7,7 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../entities/user_entity.dart';
 import '../repositories/auth_repository.dart';
+import '../../data/repositories/auth_repository_impl.dart';
 
 part 'sign_in_with_phone.g.dart';
 
