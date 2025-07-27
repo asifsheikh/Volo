@@ -289,7 +289,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w700,
-                      fontSize: 20, // Bigger font size
+                      fontSize: 20,
                       color: Colors.white, // White color
                     ),
                   ),
@@ -517,22 +517,6 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                         ),
                         const SizedBox(height: 32),
                         
-                        // Divider between sections
-                        Container(
-                          height: 1,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.transparent,
-                                const Color(0xFFE5E7EB),
-                                Colors.transparent,
-                              ],
-                              stops: const [0.0, 0.5, 1.0],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        
                         // Share With Close Ones Section
                         const Text(
                           'Share With Close Ones',
@@ -669,22 +653,6 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                           }).toList(),
                         ],
                         
-                        const SizedBox(height: 32),
-                        
-                        // Divider before disclaimer
-                        Container(
-                          height: 1,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.transparent,
-                                const Color(0xFFE5E7EB),
-                                Colors.transparent,
-                              ],
-                              stops: const [0.0, 0.5, 1.0],
-                            ),
-                          ),
-                        ),
                         const SizedBox(height: 32),
                         
                         // Expandable Disclaimer Section
