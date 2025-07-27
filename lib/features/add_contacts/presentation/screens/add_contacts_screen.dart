@@ -34,15 +34,6 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     final bannerHeight = screenHeight * 0.4; // 40% of screen height
     
-    // Get IATA codes for departure and arrival cities
-    final iataCodes = [
-      args.departureAirportCode,
-      args.arrivalAirportCode,
-    ];
-    
-    // Watch weather data at the top level to prevent unnecessary rebuilds
-    final weatherAsync = ref.watch(weatherNotifierProvider(iataCodes).select((asyncValue) => asyncValue));
-    
     // Check if at least one action is taken
     final bool hasActionTaken = addContactsState.enableNotifications || addContactsState.selectedContacts.isNotEmpty;
     
@@ -148,7 +139,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                         ),
                                         const SizedBox(height: 4),
                                         // Weather information for departure city
-                                        _buildWeatherInfo(args.departureAirportCode, weatherAsync),
+                                        _buildManualWeatherButton(args.departureAirportCode),
                                       ],
                                     ),
                                   ),
@@ -205,7 +196,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                         ),
                                         const SizedBox(height: 4),
                                         // Weather information for arrival city
-                                        _buildWeatherInfo(args.arrivalAirportCode, weatherAsync),
+                                        _buildManualWeatherButton(args.arrivalAirportCode),
                                       ],
                                     ),
                                   ),
@@ -1048,48 +1039,20 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
     );
   }
 
-  Widget _buildWeatherInfo(String airportCode, AsyncValue<List<weather_domain.WeatherState>> weatherAsync) {
-    return weatherAsync.when(
-      data: (weatherData) {
-        if (weatherData.isEmpty) return const SizedBox.shrink();
-        
-        final weather = weatherData.firstWhere(
-          (w) => w.iataCode == airportCode,
-          orElse: () => weatherData.first,
-        );
-        
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Weather icon
-            Image.network(
-              weather.current.weather_icon_info.url,
-              width: 20,
-              height: 20,
-              errorBuilder: (context, error, stackTrace) {
-                return const Icon(
-                  Icons.cloud,
-                  color: Colors.white,
-                  size: 20,
-                );
-              },
-            ),
-            const SizedBox(width: 4),
-            // Temperature
-            Text(
-              '${weather.current.temperature.round()}°C',
-              style: const TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        );
+  Widget _buildManualWeatherButton(String airportCode) {
+    return ElevatedButton(
+      onPressed: () {
+        // Manually load weather data
+        final globalWeather = ref.read(globalWeatherNotifierProvider.notifier);
+        globalWeather.loadWeatherData([airportCode]);
       },
-      loading: () => const SizedBox.shrink(),
-      error: (error, stackTrace) => const SizedBox.shrink(),
+      child: const Text('Load Weather'),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white.withOpacity(0.2),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        minimumSize: const Size(0, 24),
+      ),
     );
   }
 } 
