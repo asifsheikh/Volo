@@ -144,47 +144,58 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                       ],
                                     ),
                                   ),
-                                  child: Center(
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        // Top section with flight icon
-                                        const Icon(
-                                          Icons.flight_takeoff,
-                                          color: Colors.white,
-                                          size: 48,
+                                  child: Stack(
+                                    children: [
+                                      // Main content (icon, IATA, temperature) - centered
+                                      Center(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            // Flight icon
+                                            const Icon(
+                                              Icons.flight_takeoff,
+                                              color: Colors.white,
+                                              size: 48,
+                                            ),
+                                            const SizedBox(height: 12), // Reduced margin
+                                            
+                                            // IATA code
+                                            Text(
+                                              args.departureAirportCode.toUpperCase(),
+                                              style: const TextStyle(
+                                                fontFamily: 'Inter',
+                                                fontWeight: FontWeight.w900,
+                                                fontSize: 32,
+                                                color: Colors.white,
+                                                letterSpacing: 1.5,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            // Weather information
+                                            _buildWeatherInfo(args.departureAirportCode),
+                                          ],
                                         ),
-                                        const SizedBox(height: 20),
-                                        
-                                        // Center section with IATA code and temperature
-                                        Text(
-                                          args.departureAirportCode.toUpperCase(),
-                                          style: const TextStyle(
-                                            fontFamily: 'Inter',
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: 32,
-                                            color: Colors.white,
-                                            letterSpacing: 1.5,
+                                      ),
+                                      
+                                      // City name at bottom
+                                      Positioned(
+                                        bottom: 20,
+                                        left: 0,
+                                        right: 0,
+                                        child: Center(
+                                          child: Text(
+                                            args.departureCity.toUpperCase(),
+                                            style: const TextStyle(
+                                              fontFamily: 'Inter',
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 16,
+                                              color: Colors.white,
+                                              letterSpacing: 1.0,
+                                            ),
                                           ),
                                         ),
-                                        const SizedBox(height: 8),
-                                        // Weather information for departure city
-                                        _buildWeatherInfo(args.departureAirportCode),
-                                        const SizedBox(height: 20),
-                                        
-                                        // Bottom section with city name
-                                        Text(
-                                          args.departureCity.toUpperCase(),
-                                          style: const TextStyle(
-                                            fontFamily: 'Inter',
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 16,
-                                            color: Colors.white,
-                                            letterSpacing: 1.0,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -217,47 +228,58 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                       ],
                                     ),
                                   ),
-                                  child: Center(
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        // Top section with flight icon
-                                        const Icon(
-                                          Icons.flight_land,
-                                          color: Colors.white,
-                                          size: 48,
+                                  child: Stack(
+                                    children: [
+                                      // Main content (icon, IATA, temperature) - centered
+                                      Center(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            // Flight icon
+                                            const Icon(
+                                              Icons.flight_land,
+                                              color: Colors.white,
+                                              size: 48,
+                                            ),
+                                            const SizedBox(height: 12), // Reduced margin
+                                            
+                                            // IATA code
+                                            Text(
+                                              args.arrivalAirportCode.toUpperCase(),
+                                              style: const TextStyle(
+                                                fontFamily: 'Inter',
+                                                fontWeight: FontWeight.w900,
+                                                fontSize: 32,
+                                                color: Colors.white,
+                                                letterSpacing: 1.5,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            // Weather information
+                                            _buildWeatherInfo(args.arrivalAirportCode),
+                                          ],
                                         ),
-                                        const SizedBox(height: 20),
-                                        
-                                        // Center section with IATA code and temperature
-                                        Text(
-                                          args.arrivalAirportCode.toUpperCase(),
-                                          style: const TextStyle(
-                                            fontFamily: 'Inter',
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: 32,
-                                            color: Colors.white,
-                                            letterSpacing: 1.5,
+                                      ),
+                                      
+                                      // City name at bottom
+                                      Positioned(
+                                        bottom: 20,
+                                        left: 0,
+                                        right: 0,
+                                        child: Center(
+                                          child: Text(
+                                            args.arrivalCity.toUpperCase(),
+                                            style: const TextStyle(
+                                              fontFamily: 'Inter',
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 16,
+                                              color: Colors.white,
+                                              letterSpacing: 1.0,
+                                            ),
                                           ),
                                         ),
-                                        const SizedBox(height: 8),
-                                        // Weather information for arrival city
-                                        _buildWeatherInfo(args.arrivalAirportCode),
-                                        const SizedBox(height: 20),
-                                        
-                                        // Bottom section with city name
-                                        Text(
-                                          args.arrivalCity.toUpperCase(),
-                                          style: const TextStyle(
-                                            fontFamily: 'Inter',
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 16,
-                                            color: Colors.white,
-                                            letterSpacing: 1.0,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
