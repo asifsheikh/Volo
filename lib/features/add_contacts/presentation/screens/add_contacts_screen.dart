@@ -27,6 +27,33 @@ class AddContactsScreen extends ConsumerStatefulWidget {
 }
 
 class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
+  bool _weatherLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load weather data automatically after the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadWeatherData();
+    });
+  }
+
+  void _loadWeatherData() {
+    if (!_weatherLoaded) {
+      final args = widget.args;
+      final iataCodes = [args.departureAirportCode, args.arrivalAirportCode];
+      
+      print('Add Contacts Debug: Auto-loading weather for IATA codes: $iataCodes');
+      
+      final globalWeatherNotifier = ref.read(globalWeatherNotifierProvider.notifier);
+      globalWeatherNotifier.loadWeatherData(iataCodes);
+      
+      setState(() {
+        _weatherLoaded = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final addContactsState = ref.watch(addContactsProviderProvider);
@@ -138,8 +165,8 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                           ),
                                         ),
                                         const SizedBox(height: 4),
-                                        // Weather information for departure city
-                                        _buildManualWeatherButton(args.departureAirportCode),
+                                                // Weather information for departure city
+                                                _buildWeatherInfo(args.departureAirportCode),
                                       ],
                                     ),
                                   ),
@@ -196,7 +223,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                         ),
                                         const SizedBox(height: 4),
                                         // Weather information for arrival city
-                                        _buildManualWeatherButton(args.arrivalAirportCode),
+                                        _buildWeatherInfo(args.arrivalAirportCode),
                                       ],
                                     ),
                                   ),
@@ -1039,7 +1066,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
     );
   }
 
-  Widget _buildManualWeatherButton(String airportCode) {
+  Widget _buildWeatherInfo(String airportCode) {
     return Consumer(
       builder: (context, ref, child) {
         final globalWeather = ref.watch(globalWeatherNotifierProvider);
@@ -1077,19 +1104,13 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
             ],
           );
         } else {
-          // Show load button
-          return ElevatedButton(
-            onPressed: () {
-              // Manually load weather data
-              final globalWeatherNotifier = ref.read(globalWeatherNotifierProvider.notifier);
-              globalWeatherNotifier.loadWeatherData([airportCode]);
-            },
-            child: const Text('Load Weather'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white.withOpacity(0.2),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              minimumSize: const Size(0, 24),
+          // Show loading indicator
+          return const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
           );
         }
