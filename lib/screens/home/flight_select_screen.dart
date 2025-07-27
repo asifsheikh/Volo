@@ -4,6 +4,7 @@ import '../../services/flight_api_service.dart';
 import '../../services/network_service.dart';
 import '../../widgets/network_error_widget.dart';
 import '../../features/add_contacts/presentation/screens/add_contacts_screen.dart';
+import '../../features/add_contacts/domain/entities/add_contacts_state.dart' as domain;
 import '../../theme/app_theme.dart';
 
 class FlightSelectScreen extends StatefulWidget {
@@ -512,7 +513,7 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => AddContactsScreen(
-                          args: AddContactsScreenArgs(
+                          args: domain.AddContactsArgs(
                             selectedFlight: option,
                             departureCity: depCity,
                             departureAirportCode: depIata,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../features/add_contacts/presentation/screens/add_contacts_screen.dart';
+import '../../../../features/add_contacts/domain/entities/add_contacts_state.dart' as add_contacts_domain;
 import '../providers/flight_select_provider.dart';
 import '../../domain/entities/flight_select_state.dart' as domain;
 
@@ -547,7 +548,7 @@ class _FlightSelectScreenState extends ConsumerState<FlightSelectScreen> with Ti
                     print('Flight Select Debug: departureAirportCode = $departureAirportCode');
                     print('Flight Select Debug: arrivalAirportCode = $arrivalAirportCode');
                     
-                    final args = AddContactsScreenArgs(
+                    final args = add_contacts_domain.AddContactsArgs(
                       selectedFlight: flight,
                       departureCity: widget.departureCity,
                       departureAirportCode: departureAirportCode,
