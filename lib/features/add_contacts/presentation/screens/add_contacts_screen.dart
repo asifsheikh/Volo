@@ -12,6 +12,7 @@ import '../../../../widgets/loading_dialog.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../features/weather/presentation/providers/weather_provider.dart';
 import '../../../../features/weather/presentation/widgets/weather_city_card.dart';
+import '../../../../features/weather/domain/entities/weather_state.dart' as weather_domain;
 
 /// Add Contacts Screen using Riverpod + Clean Architecture
 class AddContactsScreen extends ConsumerStatefulWidget {
@@ -33,6 +34,15 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
     final args = widget.args;
     final screenHeight = MediaQuery.of(context).size.height;
     final bannerHeight = screenHeight * 0.4; // 40% of screen height
+    
+    // Get IATA codes for departure and arrival cities
+    final iataCodes = [
+      args.departureAirportCode,
+      args.arrivalAirportCode,
+    ];
+    
+    // Watch weather data at the top level to prevent unnecessary rebuilds
+    final weatherAsync = ref.watch(weatherProviderProvider(iataCodes));
     
     // Check if at least one action is taken
     final bool hasActionTaken = addContactsState.enableNotifications || addContactsState.selectedContacts.isNotEmpty;
@@ -251,7 +261,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                         const SizedBox(height: 8),
                         
                         // Weather Section
-                        _buildWeatherSection(),
+                        _buildWeatherSection(weatherAsync),
                         
                         const SizedBox(height: 32),
                         
@@ -1036,143 +1046,132 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
     );
   }
 
-  Widget _buildWeatherSection() {
-    // Get IATA codes for departure and arrival cities
-    final iataCodes = [
-      widget.args.departureAirportCode,
-      widget.args.arrivalAirportCode,
-    ];
+  Widget _buildWeatherSection(AsyncValue<List<weather_domain.WeatherState>> weatherAsync) {
+    return weatherAsync.when(
+      data: (weatherData) {
+        if (weatherData.isEmpty) {
+          return const SizedBox.shrink();
+        }
 
-    return Consumer(
-      builder: (context, ref, child) {
-        final weatherAsync = ref.watch(weatherProviderProvider(iataCodes));
-        
-        return weatherAsync.when(
-          data: (weatherData) {
-            if (weatherData.isEmpty) {
-              return const SizedBox.shrink();
-            }
+        // Find departure and arrival weather
+        final departureWeather = weatherData.firstWhere(
+          (w) => w.iataCode == widget.args.departureAirportCode,
+          orElse: () => weatherData.first,
+        );
+        final arrivalWeather = weatherData.firstWhere(
+          (w) => w.iataCode == widget.args.arrivalAirportCode,
+          orElse: () => weatherData.last,
+        );
 
-            // Find departure and arrival weather
-            final departureWeather = weatherData.firstWhere(
-              (w) => w.iataCode == widget.args.departureAirportCode,
-              orElse: () => weatherData.first,
-            );
-            final arrivalWeather = weatherData.firstWhere(
-              (w) => w.iataCode == widget.args.arrivalAirportCode,
-              orElse: () => weatherData.last,
-            );
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Weather at your destinations',
+              style: AppTheme.titleLarge.copyWith(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
               children: [
-                Text(
-                  'Weather at your destinations',
-                  style: AppTheme.titleLarge.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: WeatherCityCard(
+                    weather: departureWeather,
+                    isDeparture: true,
                   ),
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: WeatherCityCard(
-                        weather: departureWeather,
-                        isDeparture: true,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: WeatherCityCard(
-                        weather: arrivalWeather,
-                        isDeparture: false,
-                      ),
-                    ),
-                  ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: WeatherCityCard(
+                    weather: arrivalWeather,
+                    isDeparture: false,
+                  ),
                 ),
               ],
-            );
-          },
-          loading: () => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Weather at your destinations',
-                style: AppTheme.titleLarge.copyWith(
-                  color: AppTheme.textPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 120,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.grey[200],
-                      ),
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Container(
-                      height: 120,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.grey[200],
-                      ),
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          error: (error, stackTrace) => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Weather at your destinations',
-                style: AppTheme.titleLarge.copyWith(
-                  color: AppTheme.textPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.red[50],
-                  border: Border.all(color: Colors.red[200]!),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.error_outline, color: Colors.red[400], size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Unable to load weather data',
-                        style: AppTheme.bodyMedium.copyWith(
-                          color: Colors.red[700],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         );
       },
+      loading: () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Weather at your destinations',
+            style: AppTheme.titleLarge.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 120,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.grey[200],
+                  ),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(
+                  height: 120,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.grey[200],
+                  ),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      error: (error, stackTrace) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Weather at your destinations',
+            style: AppTheme.titleLarge.copyWith(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.red[50],
+              border: Border.all(color: Colors.red[200]!),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.red[600], size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Unable to load weather information',
+                    style: TextStyle(
+                      color: Colors.red[700],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 } 
