@@ -788,16 +788,17 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
             children: [
               const Icon(Icons.info_outline, color: Color(0xFF6B7280), size: 20),
               const SizedBox(width: 8),
-              const Text(
-                'What alerts will be sent to your contacts?',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                  color: Color(0xFF111827),
+              Expanded(
+                child: const Text(
+                  'What alerts will be sent to your contacts?',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: Color(0xFF111827),
+                  ),
                 ),
               ),
-              const Spacer(),
               IconButton(
                 onPressed: () => ref.read(addContactsProviderProvider.notifier).toggleDisclaimer(),
                 icon: Icon(

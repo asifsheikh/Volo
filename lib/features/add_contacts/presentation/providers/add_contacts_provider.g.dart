@@ -7,7 +7,7 @@ part of 'add_contacts_provider.dart';
 // **************************************************************************
 
 String _$addContactsProviderHash() =>
-    r'0d45cd44b9c2c1e7e55f1501f2924ae6fa21799a';
+    r'1574ecea5ae74b6261fec79a018cab1902a381a6';
 
 /// Provider for add contacts state management
 ///
