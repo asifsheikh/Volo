@@ -29,6 +29,9 @@ class AddContactsScreen extends ConsumerStatefulWidget {
 class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
   @override
   Widget build(BuildContext context) {
+    print('🚨🚨🚨 ADD CONTACTS SCREEN BUILD METHOD CALLED 🚨🚨🚨');
+    print('🚨🚨🚨 ADD CONTACTS SCREEN BUILD METHOD CALLED 🚨🚨🚨');
+    print('🚨🚨🚨 ADD CONTACTS SCREEN BUILD METHOD CALLED 🚨🚨🚨');
     print('=== ADD CONTACTS SCREEN DEBUG: Build method called ===');
     print('=== ADD CONTACTS SCREEN DEBUG: Args = ${widget.args} ===');
     
@@ -147,6 +150,47 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // VERY VISIBLE TEST WIDGET
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.blue[900],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.yellow, width: 3),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '🚨 TEST WIDGET - SHOULD BE VISIBLE 🚨',
+                                style: TextStyle(
+                                  color: Colors.yellow,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'If you see this, the weather section should work',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Args: ${widget.args}',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        
                         // Weather Section
                         _buildWeatherSection(),
                         
