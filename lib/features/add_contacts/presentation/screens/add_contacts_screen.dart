@@ -1105,15 +1105,8 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
             ],
           );
         } else {
-          // Show loading indicator (smaller and less intrusive)
-          return const SizedBox(
-            width: 16,
-            height: 16,
-            child: CircularProgressIndicator(
-              strokeWidth: 1.5,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            ),
-          );
+          // Show nothing when weather data is not available
+          return const SizedBox.shrink();
         }
       },
     );
