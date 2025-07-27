@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home/home_screen.dart';
+import '../features/home/presentation/screens/home_screen.dart';
 import 'flights/flights_screen.dart';
 import '../theme/app_theme.dart';
 
