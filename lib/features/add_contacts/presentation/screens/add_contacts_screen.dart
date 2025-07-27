@@ -10,6 +10,8 @@ import '../../domain/usecases/save_trip.dart';
 import '../../../../services/trip_service.dart';
 import '../../../../widgets/loading_dialog.dart';
 import '../../../../theme/app_theme.dart';
+import '../../../../features/weather/presentation/providers/weather_provider.dart';
+import '../../../../features/weather/presentation/widgets/weather_city_card.dart';
 
 /// Add Contacts Screen using Riverpod + Clean Architecture
 class AddContactsScreen extends ConsumerStatefulWidget {
@@ -142,6 +144,11 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Weather Section
+                        _buildWeatherSection(),
+                        
+                        const SizedBox(height: 24),
+                        
                         // Notifications Section
                         _buildNotificationsSection(addContactsState),
                         
@@ -777,6 +784,146 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildWeatherSection() {
+    // Get IATA codes for departure and arrival cities
+    final iataCodes = [
+      widget.args.departureAirportCode,
+      widget.args.arrivalAirportCode,
+    ];
+
+    return Consumer(
+      builder: (context, ref, child) {
+        final weatherAsync = ref.watch(weatherProviderProvider(iataCodes));
+        
+        return weatherAsync.when(
+          data: (weatherData) {
+            if (weatherData.isEmpty) {
+              return const SizedBox.shrink();
+            }
+
+            // Find departure and arrival weather
+            final departureWeather = weatherData.firstWhere(
+              (w) => w.iataCode == widget.args.departureAirportCode,
+              orElse: () => weatherData.first,
+            );
+            final arrivalWeather = weatherData.firstWhere(
+              (w) => w.iataCode == widget.args.arrivalAirportCode,
+              orElse: () => weatherData.last,
+            );
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Weather at your destinations',
+                  style: AppTheme.titleLarge.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: WeatherCityCard(
+                        weather: departureWeather,
+                        isDeparture: true,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: WeatherCityCard(
+                        weather: arrivalWeather,
+                        isDeparture: false,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+          loading: () => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Weather at your destinations',
+                style: AppTheme.titleLarge.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 120,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey[200],
+                      ),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Container(
+                      height: 120,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey[200],
+                      ),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          error: (error, stackTrace) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Weather at your destinations',
+                style: AppTheme.titleLarge.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.red[50],
+                  border: Border.all(color: Colors.red[200]!),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red[400], size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Unable to load weather data',
+                        style: AppTheme.bodyMedium.copyWith(
+                          color: Colors.red[700],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 } 
