@@ -6,7 +6,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
 import '../models/confirmation_args.dart';
-import '../../../weather/presentation/providers/weather_provider.dart';
+import '../../weather/presentation/providers/weather_provider.dart';
 
 // Global flag to track if confetti has been shown for the current journey
 bool _hasShownConfettiForJourney = false;
