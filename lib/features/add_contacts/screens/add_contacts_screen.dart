@@ -250,53 +250,6 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
       backgroundColor: const Color(0xFFF7F8FA),
       body: Column(
         children: [
-          // Fixed App Bar with title
-          Container(
-            color: const Color(0xFFF7F8FA),
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 16,
-              left: 20,
-              right: 20,
-              bottom: 16,
-            ),
-            child: Row(
-              children: [
-                // Back button
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                // Title
-                const Text(
-                  'Add Contacts',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w700,
-                    fontSize: 20,
-                    color: Color(0xFF111827),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
           // Scrollable content
           Expanded(
             child: CustomScrollView(
@@ -423,22 +376,39 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                           ],
                         ),
                         
-                        // Back button (top left) - removed title since it's now in fixed app bar
+                        // Back button and title row (top left)
                         Positioned(
                           top: MediaQuery.of(context).padding.top + 16,
                           left: 16,
-                          child: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.9),
-                              shape: BoxShape.circle,
-                            ),
-                            child: IconButton(
-                              padding: EdgeInsets.zero,
-                              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
-                              onPressed: () => Navigator.of(context).pop(),
-                            ),
+                          right: 16,
+                          child: Row(
+                            children: [
+                              // Circular back button
+                              Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.9),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
+                                  onPressed: () => Navigator.of(context).pop(),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              // Left-aligned title
+                              Text(
+                                'Add Contacts',
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 20,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         
