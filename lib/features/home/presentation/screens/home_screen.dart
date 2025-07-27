@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:developer' as developer;
 import '../../../../theme/app_theme.dart';
 import '../../../../features/add_flight/add_flight_screen.dart';
-import '../../../../screens/profile/profile_screen.dart';
+import '../../../../features/profile/presentation/screens/profile_screen.dart';
 import '../providers/home_provider.dart';
 import '../../domain/repositories/home_repository.dart';
 import '../../data/repositories/home_repository_impl.dart';
