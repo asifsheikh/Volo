@@ -1073,43 +1073,44 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
         final weather = globalWeather[airportCode];
         
         if (weather != null) {
-          // Display weather information
-          return Row(
+          // Display weather information with improved formatting
+          return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Weather icon
+              // Weather icon from backend
               Image.network(
                 weather.current.weather_icon_info.url,
-                width: 20,
-                height: 20,
+                width: 24,
+                height: 24,
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(
                     Icons.cloud,
                     color: Colors.white,
-                    size: 20,
+                    size: 24,
                   );
                 },
               ),
-              const SizedBox(width: 4),
-              // Temperature
+              const SizedBox(height: 2),
+              // Temperature with improved formatting
               Text(
                 '${weather.current.temperature.round()}°C',
                 style: const TextStyle(
                   fontFamily: 'Inter',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
+                  fontWeight: FontWeight.w700, // Bolder than IATA codes
+                  fontSize: 18, // Larger than IATA codes (32px)
                   color: Colors.white,
+                  letterSpacing: 0.5,
                 ),
               ),
             ],
           );
         } else {
-          // Show loading indicator
+          // Show loading indicator (smaller and less intrusive)
           return const SizedBox(
-            width: 20,
-            height: 20,
+            width: 16,
+            height: 16,
             child: CircularProgressIndicator(
-              strokeWidth: 2,
+              strokeWidth: 1.5,
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
           );
