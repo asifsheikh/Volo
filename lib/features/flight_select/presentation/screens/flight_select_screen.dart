@@ -541,17 +541,26 @@ class _FlightSelectScreenState extends ConsumerState<FlightSelectScreen> with Ti
                 child: ElevatedButton.icon(
                   onPressed: () {
                     // Navigate to add contacts screen with required args
+                    final departureAirportCode = flight.flights.first.departureAirport.id;
+                    final arrivalAirportCode = flight.flights.last.arrivalAirport.id;
+                    
+                    print('Flight Select Debug: departureAirportCode = $departureAirportCode');
+                    print('Flight Select Debug: arrivalAirportCode = $arrivalAirportCode');
+                    
                     final args = AddContactsScreenArgs(
                       selectedFlight: flight,
                       departureCity: widget.departureCity,
-                      departureAirportCode: flight.flights.first.departureAirport.id,
+                      departureAirportCode: departureAirportCode,
                       departureImage: '',
                       departureThumbnail: '',
                       arrivalCity: widget.arrivalCity,
-                      arrivalAirportCode: flight.flights.last.arrivalAirport.id,
+                      arrivalAirportCode: arrivalAirportCode,
                       arrivalImage: '',
                       arrivalThumbnail: '',
                     );
+                    
+                    print('Flight Select Debug: AddContactsScreenArgs created with IATA codes: ${args.departureAirportCode}, ${args.arrivalAirportCode}');
+                    
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => AddContactsScreen(args: args),

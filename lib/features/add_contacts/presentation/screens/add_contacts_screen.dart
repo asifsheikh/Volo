@@ -810,8 +810,42 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
             print('Weather Debug: weatherData = $weatherData');
             
             if (weatherData.isEmpty) {
-              print('Weather Debug: No weather data, returning empty widget');
-              return const SizedBox.shrink();
+              print('Weather Debug: No weather data, showing error widget instead of empty');
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Weather at your destinations',
+                    style: AppTheme.titleLarge.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.orange[50],
+                      border: Border.all(color: Colors.orange[200]!),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.warning_amber, color: Colors.orange[400], size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'No weather data available for IATA codes: $iataCodes',
+                            style: AppTheme.bodyMedium.copyWith(
+                              color: Colors.orange[700],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
             }
 
             // Find departure and arrival weather

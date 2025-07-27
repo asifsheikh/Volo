@@ -10,5 +10,8 @@ Future<List<domain.WeatherState>> weatherProvider(
   WeatherProviderRef ref,
   List<String> iataCodes,
 ) async {
-  return await ref.watch(getWeatherDataProvider(iataCodes).future);
+  print('Weather Provider Debug: Called with IATA codes = $iataCodes');
+  final result = await ref.watch(getWeatherDataProvider(iataCodes).future);
+  print('Weather Provider Debug: Returning ${result.length} weather states');
+  return result;
 } 

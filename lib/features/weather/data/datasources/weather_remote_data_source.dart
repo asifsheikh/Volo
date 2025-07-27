@@ -20,6 +20,8 @@ class WeatherRemoteDataSource extends _$WeatherRemoteDataSource {
   /// Get weather data for multiple cities
   Future<List<domain.WeatherState>> getWeatherData(List<String> iataCodes) async {
     try {
+      print('Weather API Debug: Starting API call for IATA codes: $iataCodes');
+      
       final uri = Uri.parse('$_baseUrl$_weatherEndpoint').replace(
         queryParameters: {
           'iataCodes': iataCodes.join(','),
@@ -28,11 +30,20 @@ class WeatherRemoteDataSource extends _$WeatherRemoteDataSource {
         },
       );
 
+      print('Weather API Debug: API URL = $uri');
+
       final response = await http.get(uri);
+      
+      print('Weather API Debug: Response status code = ${response.statusCode}');
+      print('Weather API Debug: Response body = ${response.body}');
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
+        print('Weather API Debug: Parsed JSON data = $jsonData');
+        
         final weatherResponse = domain.WeatherResponse.fromJson(jsonData);
+        print('Weather API Debug: Weather response success = ${weatherResponse.success}');
+        print('Weather API Debug: Number of cities = ${weatherResponse.data.cities.length}');
 
         if (weatherResponse.success) {
           return weatherResponse.data.cities;
@@ -43,6 +54,7 @@ class WeatherRemoteDataSource extends _$WeatherRemoteDataSource {
         throw Exception('Failed to load weather data: ${response.statusCode}');
       }
     } catch (e) {
+      print('Weather API Debug: Error occurred = $e');
       throw Exception('Weather data error: $e');
     }
   }

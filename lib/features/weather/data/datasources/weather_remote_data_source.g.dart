@@ -7,7 +7,7 @@ part of 'weather_remote_data_source.dart';
 // **************************************************************************
 
 String _$weatherRemoteDataSourceHash() =>
-    r'7e7923b4ef0926a8243c7dccc000b4392b20b82c';
+    r'b313fd01edfca3f6551042f2d5aa6c10cf0af5ce';
 
 /// Remote data source for weather API
 ///
