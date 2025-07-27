@@ -29,12 +29,6 @@ class AddContactsScreen extends ConsumerStatefulWidget {
 class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
   @override
   Widget build(BuildContext context) {
-    print('🚨🚨🚨 ADD CONTACTS SCREEN BUILD METHOD CALLED 🚨🚨🚨');
-    print('🚨🚨🚨 ADD CONTACTS SCREEN BUILD METHOD CALLED 🚨🚨🚨');
-    print('🚨🚨🚨 ADD CONTACTS SCREEN BUILD METHOD CALLED 🚨🚨🚨');
-    print('=== ADD CONTACTS SCREEN DEBUG: Build method called ===');
-    print('=== ADD CONTACTS SCREEN DEBUG: Args = ${widget.args} ===');
-    
     final addContactsState = ref.watch(addContactsProviderProvider);
     final screenHeight = MediaQuery.of(context).size.height;
     final bannerHeight = screenHeight * 0.4; // 40% of screen height
@@ -150,47 +144,6 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // VERY VISIBLE TEST WIDGET
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(20),
-                          margin: const EdgeInsets.only(bottom: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.blue[900],
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.yellow, width: 3),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '🚨 TEST WIDGET - SHOULD BE VISIBLE 🚨',
-                                style: TextStyle(
-                                  color: Colors.yellow,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'If you see this, the weather section should work',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Args: ${widget.args}',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        
                         // Weather Section
                         _buildWeatherSection(),
                         
@@ -835,64 +788,142 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
   }
 
   Widget _buildWeatherSection() {
-    print('=== WEATHER SECTION DEBUG: Method is being called ===');
-    
     // Get IATA codes for departure and arrival cities
     final iataCodes = [
       widget.args.departureAirportCode,
       widget.args.arrivalAirportCode,
     ];
 
-    print('Weather Debug: IATA codes = $iataCodes');
-    print('Weather Debug: departureAirportCode = ${widget.args.departureAirportCode}');
-    print('Weather Debug: arrivalAirportCode = ${widget.args.arrivalAirportCode}');
+    return Consumer(
+      builder: (context, ref, child) {
+        final weatherAsync = ref.watch(weatherProviderProvider(iataCodes));
+        
+        return weatherAsync.when(
+          data: (weatherData) {
+            if (weatherData.isEmpty) {
+              return const SizedBox.shrink();
+            }
 
-    // First, let's show a simple test widget to see if this section is being rendered
-    return Container(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.red[100],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red, width: 2),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '🌤️ WEATHER TEST WIDGET',
-            style: TextStyle(
-              color: Colors.red[800],
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
+            // Find departure and arrival weather
+            final departureWeather = weatherData.firstWhere(
+              (w) => w.iataCode == widget.args.departureAirportCode,
+              orElse: () => weatherData.first,
+            );
+            final arrivalWeather = weatherData.firstWhere(
+              (w) => w.iataCode == widget.args.arrivalAirportCode,
+              orElse: () => weatherData.last,
+            );
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Weather at your destinations',
+                  style: AppTheme.titleLarge.copyWith(
+                    color: AppTheme.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: WeatherCityCard(
+                        weather: departureWeather,
+                        isDeparture: true,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: WeatherCityCard(
+                        weather: arrivalWeather,
+                        isDeparture: false,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+          loading: () => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Weather at your destinations',
+                style: AppTheme.titleLarge.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 120,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey[200],
+                      ),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Container(
+                      height: 120,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.grey[200],
+                      ),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            'IATA Codes: $iataCodes',
-            style: TextStyle(
-              color: Colors.red[700],
-              fontSize: 14,
-            ),
+          error: (error, stackTrace) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Weather at your destinations',
+                style: AppTheme.titleLarge.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.red[50],
+                  border: Border.all(color: Colors.red[200]!),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red[400], size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Unable to load weather data',
+                        style: AppTheme.bodyMedium.copyWith(
+                          color: Colors.red[700],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Departure: ${widget.args.departureAirportCode}',
-            style: TextStyle(
-              color: Colors.red[700],
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Arrival: ${widget.args.arrivalAirportCode}',
-            style: TextStyle(
-              color: Colors.red[700],
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 } 
