@@ -148,12 +148,15 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
+                                        // Top section with flight icon
                                         const Icon(
                                           Icons.flight_takeoff,
                                           color: Colors.white,
                                           size: 48,
                                         ),
-                                        const SizedBox(height: 16),
+                                        const SizedBox(height: 20),
+                                        
+                                        // Center section with IATA code and temperature
                                         Text(
                                           args.departureAirportCode.toUpperCase(),
                                           style: const TextStyle(
@@ -167,8 +170,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                         const SizedBox(height: 8),
                                         // Weather information for departure city
                                         _buildWeatherInfo(args.departureAirportCode),
-                                        const Spacer(),
-                                        // City name at bottom
+                                        const SizedBox(height: 20),
+                                        
+                                        // Bottom section with city name
                                         Text(
                                           args.departureCity.toUpperCase(),
                                           style: const TextStyle(
@@ -179,7 +183,6 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                             letterSpacing: 1.0,
                                           ),
                                         ),
-                                        const SizedBox(height: 20),
                                       ],
                                     ),
                                   ),
@@ -218,12 +221,15 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
+                                        // Top section with flight icon
                                         const Icon(
                                           Icons.flight_land,
                                           color: Colors.white,
                                           size: 48,
                                         ),
-                                        const SizedBox(height: 16),
+                                        const SizedBox(height: 20),
+                                        
+                                        // Center section with IATA code and temperature
                                         Text(
                                           args.arrivalAirportCode.toUpperCase(),
                                           style: const TextStyle(
@@ -237,8 +243,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                         const SizedBox(height: 8),
                                         // Weather information for arrival city
                                         _buildWeatherInfo(args.arrivalAirportCode),
-                                        const Spacer(),
-                                        // City name at bottom
+                                        const SizedBox(height: 20),
+                                        
+                                        // Bottom section with city name
                                         Text(
                                           args.arrivalCity.toUpperCase(),
                                           style: const TextStyle(
@@ -249,7 +256,6 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                             letterSpacing: 1.0,
                                           ),
                                         ),
-                                        const SizedBox(height: 20),
                                       ],
                                     ),
                                   ),
