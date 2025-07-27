@@ -1,8 +1,11 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:flutter/material.dart';
 import '../../domain/entities/add_contacts_state.dart' as domain;
 import '../../domain/usecases/get_device_contacts.dart';
 import '../../domain/usecases/save_trip.dart';
+import '../widgets/contact_picker_dialog.dart';
+import '../../../../main.dart';
 
 part 'add_contacts_provider.g.dart';
 
@@ -118,12 +121,18 @@ class AddContactsProvider extends _$AddContactsProvider {
           .map((contact) => contact.phoneNumber!)
           .toList();
 
-      // For now, just pick the first contact with a phone number
-      // In a real implementation, you'd show a contact picker dialog
-      final selectedContact = contactsWithPhones.firstWhere(
-        (contact) => !selectedPhoneNumbers.contains(contact.phones.first.number),
-        orElse: () => contactsWithPhones.first,
+      // Show contact picker dialog
+      final selectedContact = await showDialog<Contact>(
+        context: navigatorKey.currentContext!,
+        builder: (context) => ContactPickerDialog(
+          contacts: contactsWithPhones,
+          selectedPhoneNumbers: selectedPhoneNumbers,
+        ),
       );
+
+      if (selectedContact == null) {
+        return; // User cancelled
+      }
 
       final phoneNumber = selectedContact.phones.first.number;
       final contactName = selectedContact.displayName.isNotEmpty 

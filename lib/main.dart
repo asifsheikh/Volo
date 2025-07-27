@@ -5,6 +5,9 @@ import 'firebase_options.dart';
 import 'core/auth_wrapper.dart';
 import 'theme/app_theme.dart';
 
+// Global navigator key for accessing context from providers
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -29,6 +32,7 @@ class VoloApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
       themeMode: ThemeMode.system,
+      navigatorKey: navigatorKey,
       home: const AuthWrapper(),
     );
   }
