@@ -1080,8 +1080,8 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
               '${weather.current.temperature.round()}°C',
               style: const TextStyle(
                 fontFamily: 'Inter',
-                fontWeight: FontWeight.w700,
-                fontSize: 18,
+                fontWeight: FontWeight.w800, // Slightly bolder
+                fontSize: 20, // Larger font size
                 color: Colors.white,
                 letterSpacing: 0.5,
               ),
