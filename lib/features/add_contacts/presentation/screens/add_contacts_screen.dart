@@ -200,56 +200,40 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                           ],
                         ),
                         
-                        // Flight path indicator
+                        // City names at bottom of banner
                         Positioned(
-                          bottom: 20,
+                          bottom: 40,
                           left: 0,
                           right: 0,
-                          child: Center(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.9),
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
+                          child: Column(
+                            children: [
+                              Text(
+                                '${args.departureCity.toUpperCase()} → ${args.arrivalCity.toUpperCase()}',
+                                style: const TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  letterSpacing: 1.5,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    args.departureCity,
-                                    style: const TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                      color: Color(0xFF374151),
-                                    ),
+                              const SizedBox(height: 12),
+                              Container(
+                                width: 120,
+                                height: 2,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.transparent,
+                                      Colors.white.withOpacity(0.8),
+                                      Colors.transparent,
+                                    ],
+                                    stops: const [0.0, 0.5, 1.0],
                                   ),
-                                  const SizedBox(width: 8),
-                                  const Icon(
-                                    Icons.arrow_forward,
-                                    size: 16,
-                                    color: Color(0xFF6B7280),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    args.arrivalCity,
-                                    style: const TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                      color: Color(0xFF374151),
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
-                            ),
+                            ],
                           ),
                         ),
                       ],
@@ -257,25 +241,207 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                   ),
                 ),
                 
-                // Main content
+                // Content below banner
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const SizedBox(height: 8),
+                        
                         // Weather Section
                         _buildWeatherSection(),
                         
-                        const SizedBox(height: 24),
-                        
-                        // Notifications Section
-                        _buildNotificationsSection(addContactsState),
-                        
                         const SizedBox(height: 32),
                         
-                        // Contacts Section
-                        _buildContactsSection(addContactsState),
+                        // Your Own Updates Section
+                        const Text(
+                          'Your Own Updates',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18,
+                            color: Color(0xFF111827),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        
+                        // Checkbox for own updates
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: addContactsState.enableNotifications,
+                              onChanged: (value) {
+                                ref.read(addContactsProviderProvider.notifier).toggleNotifications();
+                              },
+                              activeColor: const Color(0xFF008080),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Send me updates about this flight',
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                      color: Color(0xFF111827),
+                                    ),
+                                  ),
+                                  SizedBox(height: 2),
+                                  Text(
+                                    "I'll receive all flight updates and notifications for this journey.",
+                                    style: TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 13,
+                                      color: Color(0xFF6B7280),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 32),
+                        
+                        // Share With Close Ones Section
+                        const Text(
+                          'Share With Close Ones',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18,
+                            color: Color(0xFF111827),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        
+                        const Text(
+                          'Notify my close ones (via WhatsApp)',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        
+                        // Compact Add Contact Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: OutlinedButton.icon(
+                            onPressed: () => ref.read(addContactsProviderProvider.notifier).pickContact(),
+                            icon: const Icon(Icons.add, color: Color(0xFF008080), size: 20),
+                            label: const Text(
+                              'Add Contact',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Color(0xFF008080),
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFF008080), width: 1.5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              backgroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                        
+                        // Selected Contacts
+                        if (addContactsState.selectedContacts.isNotEmpty) ...[
+                          const SizedBox(height: 20),
+                          
+                          ...addContactsState.selectedContacts.asMap().entries.map((entry) {
+                            final int index = entry.key;
+                            final contact = entry.value;
+                            
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: const Color(0xFFE5E7EB)),
+                              ),
+                              child: Row(
+                                children: [
+                                  // Avatar with emoji
+                                  Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF008080).withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',
+                                        style: const TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                          color: Color(0xFF008080),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  
+                                  // Contact info
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          contact.name,
+                                          style: const TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            color: Color(0xFF111827),
+                                          ),
+                                        ),
+                                        if (contact.phoneNumber != null) ...[
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            contact.phoneNumber!,
+                                            style: const TextStyle(
+                                              fontFamily: 'Inter',
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 12,
+                                              color: Color(0xFF6B7280),
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                  
+                                  // Remove button
+                                  IconButton(
+                                    onPressed: () => ref.read(addContactsProviderProvider.notifier).removeContact(index),
+                                    icon: const Icon(Icons.close, size: 20, color: Color(0xFF6B7280)),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ],
                         
                         const SizedBox(height: 32),
                         
