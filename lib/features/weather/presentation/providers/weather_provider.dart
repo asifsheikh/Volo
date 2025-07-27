@@ -15,13 +15,4 @@ class WeatherNotifier extends _$WeatherNotifier {
     print('Weather Provider Debug: Returning ${result.length} weather states');
     return result;
   }
-}
-
-/// Legacy provider for backward compatibility
-@riverpod
-Future<List<domain.WeatherState>> weatherProvider(
-  WeatherProviderRef ref,
-  List<String> iataCodes,
-) async {
-  return ref.watch(weatherNotifierProvider(iataCodes).future);
 } 
