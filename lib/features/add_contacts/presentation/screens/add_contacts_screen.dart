@@ -30,8 +30,12 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
   @override
   Widget build(BuildContext context) {
     final addContactsState = ref.watch(addContactsProviderProvider);
+    final args = widget.args;
     final screenHeight = MediaQuery.of(context).size.height;
     final bannerHeight = screenHeight * 0.4; // 40% of screen height
+    
+    // Check if at least one action is taken
+    final bool hasActionTaken = addContactsState.enableNotifications || addContactsState.selectedContacts.isNotEmpty;
     
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -84,51 +88,167 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                     background: Stack(
                       children: [
                         // Background Images
-                        Positioned.fill(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  const Color(0xFF059393),
-                                  const Color(0xFF059393).withOpacity(0.8),
-                                ],
+                        Row(
+                          children: [
+                            // Departing City (Left 50%)
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: NetworkImage(args.departureImage.isNotEmpty 
+                                        ? args.departureImage 
+                                        : args.departureThumbnail.isNotEmpty
+                                            ? args.departureThumbnail
+                                            : 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=400&fit=crop'),
+                                    fit: BoxFit.cover,
+                                    onError: (exception, stackTrace) {
+                                      // Fallback to gradient
+                                    },
+                                  ),
+                                ),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                      colors: [
+                                        Colors.black.withOpacity(0.4),
+                                        Colors.transparent,
+                                      ],
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.flight_takeoff,
+                                          color: Colors.white,
+                                          size: 48,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          args.departureAirportCode.toUpperCase(),
+                                          style: const TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 32,
+                                            color: Colors.white,
+                                            letterSpacing: 1.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                            
+                            // Arriving City (Right 50%)
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: NetworkImage(args.arrivalImage.isNotEmpty 
+                                        ? args.arrivalImage 
+                                        : args.arrivalThumbnail.isNotEmpty
+                                            ? args.arrivalThumbnail
+                                            : 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=400&fit=crop'),
+                                    fit: BoxFit.cover,
+                                    onError: (exception, stackTrace) {
+                                      // Fallback to gradient
+                                    },
+                                  ),
+                                ),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.centerRight,
+                                      end: Alignment.centerLeft,
+                                      colors: [
+                                        Colors.black.withOpacity(0.4),
+                                        Colors.transparent,
+                                      ],
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.flight_land,
+                                          color: Colors.white,
+                                          size: 48,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          args.arrivalAirportCode.toUpperCase(),
+                                          style: const TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 32,
+                                            color: Colors.white,
+                                            letterSpacing: 1.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         
-                        // Content
-                        Positioned.fill(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  'Keep your loved ones updated',
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 28,
-                                    color: Colors.white,
-                                    height: 1.2,
+                        // Flight path indicator
+                        Positioned(
+                          bottom: 20,
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.9),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
                                   ),
-                                ),
-                                const SizedBox(height: 12),
-                                Text(
-                                  'Add contacts to receive real-time flight updates and notifications.',
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 16,
-                                    color: Colors.white.withOpacity(0.9),
-                                    height: 1.4,
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    args.departureCity,
+                                    style: const TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                      color: Color(0xFF374151),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 8),
+                                  const Icon(
+                                    Icons.arrow_forward,
+                                    size: 16,
+                                    color: Color(0xFF6B7280),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    args.arrivalCity,
+                                    style: const TextStyle(
+                                      fontFamily: 'Inter',
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                      color: Color(0xFF374151),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -189,22 +309,22 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
             child: SizedBox(
               width: double.infinity,
               height: 56,
-                          child: ElevatedButton(
-              onPressed: ref.read(addContactsProviderProvider.notifier).hasActionTaken ? () => _saveTripAndContinue() : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ref.read(addContactsProviderProvider.notifier).hasActionTaken ? const Color(0xFF059393) : const Color(0xFF9CA3AF),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+              child: ElevatedButton(
+                onPressed: hasActionTaken ? () => _saveTripAndContinue() : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: hasActionTaken ? const Color(0xFF059393) : const Color(0xFF9CA3AF),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: hasActionTaken ? 10 : 0,
+                  shadowColor: hasActionTaken ? Colors.black.withOpacity(0.1) : Colors.transparent,
                 ),
-                elevation: ref.read(addContactsProviderProvider.notifier).hasActionTaken ? 10 : 0,
-                shadowColor: ref.read(addContactsProviderProvider.notifier).hasActionTaken ? Colors.black.withOpacity(0.1) : Colors.transparent,
-              ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
                       Icons.check, 
-                      color: ref.read(addContactsProviderProvider.notifier).hasActionTaken ? Colors.white : const Color(0xFF6B7280), 
+                      color: hasActionTaken ? Colors.white : const Color(0xFF6B7280), 
                       size: 20
                     ),
                     const SizedBox(width: 12),
@@ -214,7 +334,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
-                        color: ref.read(addContactsProviderProvider.notifier).hasActionTaken ? Colors.white : const Color(0xFF6B7280),
+                        color: hasActionTaken ? Colors.white : const Color(0xFF6B7280),
                       ),
                     ),
                   ],
