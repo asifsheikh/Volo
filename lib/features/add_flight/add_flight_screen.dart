@@ -169,7 +169,6 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     }
     
     // If no match found, return the original text (fallback)
-    print('⚠️ Could not extract IATA code from: $displayText');
     return displayText;
   }
 
@@ -251,8 +250,6 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     
     final departureIata = _selectedDepartureAirport!.iata;
     final arrivalIata = _selectedArrivalAirport!.iata;
-    
-    print('🔍 Search: $departureIata → $arrivalIata');
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => FlightSelectScreen(
@@ -493,10 +490,9 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                       ),
                       const SizedBox(height: 28),
                       Consumer(
-                        builder: (context, ref, child) {
-                          final airports = ref.watch(airportsProvider);
-                          final isLoading = ref.watch(addFlightLoadingProvider);
-                          print('🔍 Departure Consumer: airports.length = ${airports.length}, isLoading = $isLoading');
+                                        builder: (context, ref, child) {
+                  final airports = ref.watch(airportsProvider);
+                  final isLoading = ref.watch(addFlightLoadingProvider);
                           return _buildTypeAheadField(
                             label: 'From',
                             icon: Icons.flight_takeoff,
@@ -511,10 +507,9 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                       ),
                       const SizedBox(height: 24),
                       Consumer(
-                        builder: (context, ref, child) {
-                          final airports = ref.watch(airportsProvider);
-                          final isLoading = ref.watch(addFlightLoadingProvider);
-                          print('🔍 Arrival Consumer: airports.length = ${airports.length}, isLoading = $isLoading');
+                                        builder: (context, ref, child) {
+                  final airports = ref.watch(airportsProvider);
+                  final isLoading = ref.watch(addFlightLoadingProvider);
                           return _buildTypeAheadField(
                             label: 'To',
                             icon: Icons.flight_land,
@@ -654,7 +649,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
         const SizedBox(height: 8),
         TypeAheadField<AirportEntity>(
           controller: controller,
-          hideOnEmpty: false, // Show suggestions even when empty
+          hideOnEmpty: true, // Don't show suggestions when empty (prevents "No items found")
           debounceDuration: const Duration(milliseconds: 300), // Debounce search
           builder: (context, controller, focusNode) {
             return Container(
@@ -735,46 +730,60 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                     // If empty and no airport selected, show popular airports
                     _showPopularAirports(context, controller, onSelected);
                   }
+                  // If airport is selected, don't do anything on tap - let user type to edit
                 },
                 onChanged: (value) {
-                  // Clear selection when user starts typing
-                  if (controller == _departureController) {
-                    setState(() {
-                      _selectedDepartureAirport = null;
-                    });
-                  } else if (controller == _arrivalController) {
-                    setState(() {
-                      _selectedArrivalAirport = null;
-                    });
+                  // Clear selection when user starts typing (but only if they're actually changing the text)
+                  if (controller == _departureController && _selectedDepartureAirport != null) {
+                    final selectedText = _selectedDepartureAirport!.displayName;
+                    if (value != selectedText) {
+                      setState(() {
+                        _selectedDepartureAirport = null;
+                        _selectedDepartureCity = null;
+                      });
+                    }
+                  } else if (controller == _arrivalController && _selectedArrivalAirport != null) {
+                    final selectedText = _selectedArrivalAirport!.displayName;
+                    if (value != selectedText) {
+                      setState(() {
+                        _selectedArrivalAirport = null;
+                        _selectedArrivalCity = null;
+                      });
+                    }
                   }
                 },
               ),
             );
           },
           suggestionsCallback: (pattern) async {
-            print('🔍 TypeAheadField suggestionsCallback called with pattern: "$pattern"');
-            print('🔍 Total airports available: ${airports.length}');
-            
-            // If field already has a selected airport, don't show suggestions
-            if (isAirportSelected && pattern.isEmpty) {
-              print('🔍 Field already has selected airport, not showing suggestions');
-              return [];
-            }
-            
-            // Debug: Check if IATA codes are loaded correctly
-            if (pattern.toLowerCase() == 'pnq') {
-              final puneAirport = airports.where((a) => a.city.toLowerCase() == 'pune').firstOrNull;
-              if (puneAirport != null) {
-                print('🔍 Debug: Found Pune airport - IATA: "${puneAirport.iata}", City: "${puneAirport.city}"');
-              } else {
-                print('🔍 Debug: Pune airport not found in airports list');
+            // If field already has a selected airport and pattern matches the selected airport, don't show suggestions
+            if (isAirportSelected && pattern.isNotEmpty) {
+              // Check if the pattern matches the currently selected airport's display name
+              final selectedAirport = controller == _departureController ? _selectedDepartureAirport : _selectedArrivalAirport;
+              if (selectedAirport != null) {
+                final selectedDisplayName = selectedAirport.displayName.toLowerCase();
+                final patternLower = pattern.toLowerCase();
+                
+                // If pattern matches the selected airport, don't show suggestions
+                if (selectedDisplayName.contains(patternLower) || patternLower.contains(selectedDisplayName)) {
+                  return [];
+                }
               }
             }
             
+            // If field already has a selected airport and pattern is empty, don't show suggestions
+            if (isAirportSelected && pattern.isEmpty) {
+              return [];
+            }
+            
             if (pattern.isEmpty) {
-              final popularAirports = _getPopularAirports(airports);
-              print('🔍 Returning ${popularAirports.length} popular airports');
-              return popularAirports;
+              // Only show popular airports if no airport is selected
+              if (!isAirportSelected) {
+                final popularAirports = _getPopularAirports(airports);
+                return popularAirports;
+              } else {
+                return [];
+              }
             }
             
             final patternLower = pattern.toLowerCase();
@@ -823,7 +832,6 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
             ];
             final limitedMatches = allMatches.take(10).toList();
             
-            print('🔍 Found ${limitedMatches.length} matching airports for "$pattern" (${iataExactMatches.length} IATA exact, ${cityExactMatches.length} city exact, ${iataStartsWithMatches.length} IATA startsWith, ${cityStartsWithMatches.length} city startsWith, ${containsMatches.length} contains)');
             return limitedMatches;
           },
           itemBuilder: (context, AirportEntity airport) {
