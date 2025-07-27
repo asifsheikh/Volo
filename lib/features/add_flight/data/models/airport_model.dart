@@ -21,7 +21,7 @@ class AirportModel extends AirportEntity {
     return AirportModel(
       city: json['city'] ?? '',
       airport: json['airport'] ?? '',
-      iata: json['iata_code'] ?? '',
+      iata: json['iata'] ?? json['iata_code'] ?? '', // Support both formats
       countryCode: json['country_code'] ?? '',
       countryName: json['country_name'] ?? '',
     );

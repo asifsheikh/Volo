@@ -16,18 +16,8 @@ class AirportEntity extends Equatable {
   });
 
   String get displayName {
-    // If airport name is the same as city, just show city with IATA
-    if (airport.toLowerCase() == city.toLowerCase()) {
-      return '$city ($iata)';
-    }
-    
-    // If airport name contains city name, show the full airport name
-    if (airport.toLowerCase().contains(city.toLowerCase())) {
-      return '$city ($iata) – $airport';
-    }
-    
-    // Otherwise show city and airport separately
-    return '$city ($iata) – $airport';
+    // Show city name with IATA code
+    return '$city ($iata)';
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../core/di/providers.dart';
 import '../models/airport_model.dart';
@@ -26,18 +27,40 @@ class AddFlightRemoteDataSourceImpl implements AddFlightRemoteDataSource {
   @override
   Future<List<AirportModel>> getAirports() async {
     try {
-      // For now, load from local JSON file
-      // In the future, this could be an API call
+      // Try to load from API first
       final response = await httpClient.get(Uri.parse('$baseUrl/airports'));
       
       if (response.statusCode == 200) {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => AirportModel.fromApiJson(json)).toList();
       } else {
-        throw Exception('Failed to load airports');
+        // Fallback to local JSON file
+        return _loadAirportsFromLocalFile();
       }
     } catch (e) {
-      throw Exception('Failed to load airports: $e');
+      print('⚠️ API call failed, using local airports data: $e');
+      // Fallback to local JSON file
+      return _loadAirportsFromLocalFile();
+    }
+  }
+
+  Future<List<AirportModel>> _loadAirportsFromLocalFile() async {
+    try {
+      // Load from local JSON file
+      final String jsonString = await _loadJsonAsset('assets/airports_global.json');
+      final List<dynamic> jsonList = json.decode(jsonString);
+      return jsonList.map((json) => AirportModel.fromApiJson(json)).toList();
+    } catch (e) {
+      throw Exception('Failed to load airports from local file: $e');
+    }
+  }
+
+  Future<String> _loadJsonAsset(String assetPath) async {
+    try {
+      // Use Flutter's rootBundle to load assets
+      return await rootBundle.loadString(assetPath);
+    } catch (e) {
+      throw Exception('Failed to read asset file: $e');
     }
   }
 

@@ -73,6 +73,9 @@ class AddFlightScreen extends ConsumerStatefulWidget {
 
 class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  final _departureController = TextEditingController();
+  final _arrivalController = TextEditingController();
+  final _flightNumberController = TextEditingController();
   DateTime? _selectedDate;
   String? _selectedDepartureCity;
   String? _selectedArrivalCity;
@@ -116,6 +119,9 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
   void dispose() {
     _uploadButtonController.dispose();
     _scanButtonController.dispose();
+    _departureController.dispose();
+    _arrivalController.dispose();
+    _flightNumberController.dispose();
     super.dispose();
   }
 
@@ -164,6 +170,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     setState(() {
       _selectedDepartureAirport = airport;
       _selectedDepartureCity = airport.city;
+      _departureController.text = airport.displayName;
     });
   }
 
@@ -171,6 +178,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     setState(() {
       _selectedArrivalAirport = airport;
       _selectedArrivalCity = airport.city;
+      _arrivalController.text = airport.displayName;
     });
   }
 
@@ -314,7 +322,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(12),
                                         ),
-                                        shadowColor: Colors.black.withOpacity(0.05),
+                                        shadowColor: Colors.black.withValues(alpha: 0.05),
                                         elevation: 1,
                                         padding: EdgeInsets.zero,
                                       ),
@@ -389,7 +397,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(12),
                                         ),
-                                        shadowColor: Colors.black.withOpacity(0.05),
+                                        shadowColor: Colors.black.withValues(alpha: 0.05),
                                         elevation: 1,
                                         padding: EdgeInsets.zero,
                                       ),
@@ -477,10 +485,11 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                         builder: (context, ref, child) {
                           final airports = ref.watch(airportsProvider);
                           final isLoading = ref.watch(addFlightLoadingProvider);
+                          print('🔍 Departure Consumer: airports.length = ${airports.length}, isLoading = $isLoading');
                           return _buildTypeAheadField(
                             label: 'From',
                             icon: Icons.flight_takeoff,
-                            controller: TextEditingController(text: _selectedDepartureCity ?? ''),
+                            controller: _departureController,
                             hintText: 'Search city or airport code',
                             onSelected: _onDepartureAirportSelected,
                             isLoading: isLoading,
@@ -494,10 +503,11 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                         builder: (context, ref, child) {
                           final airports = ref.watch(airportsProvider);
                           final isLoading = ref.watch(addFlightLoadingProvider);
+                          print('🔍 Arrival Consumer: airports.length = ${airports.length}, isLoading = $isLoading');
                           return _buildTypeAheadField(
                             label: 'To',
                             icon: Icons.flight_land,
-                            controller: TextEditingController(text: _selectedArrivalCity ?? ''),
+                            controller: _arrivalController,
                             hintText: 'Search city or airport code',
                             onSelected: _onArrivalAirportSelected,
                             isLoading: isLoading,
@@ -513,7 +523,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                         label: 'Flight Number (Optional)',
                         optional: true,
                         icon: Icons.flight,
-                        controller: TextEditingController(),
+                        controller: _flightNumberController,
                         hintText: 'e.g. UA1234',
                       ),
                       const SizedBox(height: 16),
@@ -566,7 +576,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                           borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: 10,
-                        shadowColor: Colors.black.withOpacity(0.1),
+                        shadowColor: Colors.black.withValues(alpha: 0.1),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -605,183 +615,253 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     required bool isAirportSelected, // New parameter to track if airport is selected
     required List<AirportEntity> airports,
   }) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            Row(
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 14,
-                    color: Color(0xFF4B5563),
-                  ),
-                ),
-                Text(' *',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 14,
-                    color: Color(0xFF9CA3AF),
-                  ),
-                ),
-              ],
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                fontSize: 14,
+                color: Color(0xFF4B5563),
+              ),
             ),
-            const SizedBox(height: 8),
-            TypeAheadField<AirportEntity>(
-              controller: controller,
-              hideOnEmpty: true, // Hide suggestions when empty to prevent "No items found"
-              builder: (context, controller, focusNode) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Color(0xFFE5E7EB)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 2,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.transparent,
-                      hintText: hintText,
-                      hintStyle: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16,
-                        color: Color(0xFFADAEBC),
-                      ),
-                      prefixIcon: Icon(icon, color: Color(0xFF9CA3AF), size: 20),
-                      suffixIcon: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (isLoading)
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF9CA3AF)),
-                                ),
-                              ),
-                            ),
-                          // Success indicator (green checkmark)
-                          if (isAirportSelected && !isLoading)
-                            Container(
-                              margin: EdgeInsets.only(right: 8),
-                              child: Icon(
-                                Icons.check_circle,
-                                color: Color(0xFF10B981),
-                                size: 20,
-                              ),
-                            ),
-                          // Dropdown indicator
-                          Container(
-                            margin: EdgeInsets.only(right: 12),
-                            child: Icon(
-                              Icons.keyboard_arrow_down,
-                              color: isAirportSelected ? Color(0xFF10B981) : Color(0xFF9CA3AF),
-                              size: 24,
-                            ),
-                          ),
-                        ],
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                    ),
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                      color: Color(0xFF1F2937),
-                    ),
-                    onTap: () {
-                      // Show suggestions when field is tapped
-                      if (controller.text.isEmpty) {
-                        // If empty, show popular airports
-                        _showPopularAirports(context, controller, onSelected);
-                      }
-                    },
-                  ),
-                );
-              },
-              suggestionsCallback: (pattern) async {
-                if (pattern.isEmpty) {
-                  return _getPopularAirports(airports);
-                }
-                return airports.where((airport) =>
-                  airport.city.toLowerCase().contains(pattern.toLowerCase()) ||
-                  airport.airport.toLowerCase().contains(pattern.toLowerCase()) ||
-                  airport.iata.toLowerCase().contains(pattern.toLowerCase())
-                ).toList();
-              },
-              itemBuilder: (context, AirportEntity airport) {
-                return ListTile(
-                  dense: true,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  title: Text(
-                    airport.displayName,
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: Color(0xFF1F2937),
-                    ),
-                  ),
-                  subtitle: airport.airport.toLowerCase() != airport.city.toLowerCase()
-                      ? Text(
-                          airport.airport,
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            color: Color(0xFF6B7280),
-                          ),
-                        )
-                      : null,
-                );
-              },
-              onSelected: (AirportEntity airport) {
-                onSelected(airport);
-              },
+            Text(' *',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w400,
+                fontSize: 14,
+                color: Color(0xFF9CA3AF),
+              ),
             ),
-            // Helper text for fields that need attention
-            if (!isAirportSelected && controller.text.isNotEmpty && !isLoading) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: Color(0xFF6B7280),
-                    size: 14,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Please select a specific airport',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 12,
-                      color: Color(0xFF6B7280),
-                    ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        TypeAheadField<AirportEntity>(
+          controller: controller,
+          hideOnEmpty: false, // Show suggestions even when empty
+          debounceDuration: const Duration(milliseconds: 300), // Debounce search
+          builder: (context, controller, focusNode) {
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Color(0xFFE5E7EB)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 2,
+                    offset: Offset(0, 1),
                   ),
                 ],
               ),
+              child: TextField(
+                controller: controller,
+                focusNode: focusNode,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.transparent,
+                  hintText: hintText,
+                  hintStyle: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                    color: Color(0xFFADAEBC),
+                  ),
+                  prefixIcon: Icon(icon, color: Color(0xFF9CA3AF), size: 20),
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isLoading)
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF9CA3AF)),
+                            ),
+                          ),
+                        ),
+                      // Success indicator (green checkmark)
+                      if (isAirportSelected && !isLoading)
+                        Container(
+                          margin: EdgeInsets.only(right: 8),
+                          child: Icon(
+                            Icons.check_circle,
+                            color: Color(0xFF10B981),
+                            size: 20,
+                          ),
+                        ),
+                      // Dropdown indicator
+                      Container(
+                        margin: EdgeInsets.only(right: 12),
+                        child: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: isAirportSelected ? Color(0xFF10B981) : Color(0xFF9CA3AF),
+                          size: 24,
+                        ),
+                      ),
+                    ],
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                ),
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 16,
+                  color: Color(0xFF1F2937),
+                ),
+                onTap: () {
+                  // Show suggestions when field is tapped
+                  if (controller.text.isEmpty) {
+                    // If empty, show popular airports
+                    _showPopularAirports(context, controller, onSelected);
+                  }
+                },
+                onChanged: (value) {
+                  // Clear selection when user starts typing
+                  if (controller == _departureController) {
+                    setState(() {
+                      _selectedDepartureAirport = null;
+                    });
+                  } else if (controller == _arrivalController) {
+                    setState(() {
+                      _selectedArrivalAirport = null;
+                    });
+                  }
+                },
+              ),
+            );
+          },
+          suggestionsCallback: (pattern) async {
+            print('🔍 TypeAheadField suggestionsCallback called with pattern: "$pattern"');
+            print('🔍 Total airports available: ${airports.length}');
+            
+            // Debug: Check if IATA codes are loaded correctly
+            if (pattern.toLowerCase() == 'pnq') {
+              final puneAirport = airports.where((a) => a.city.toLowerCase() == 'pune').firstOrNull;
+              if (puneAirport != null) {
+                print('🔍 Debug: Found Pune airport - IATA: "${puneAirport.iata}", City: "${puneAirport.city}"');
+              } else {
+                print('🔍 Debug: Pune airport not found in airports list');
+              }
+            }
+            
+            if (pattern.isEmpty) {
+              final popularAirports = _getPopularAirports(airports);
+              print('🔍 Returning ${popularAirports.length} popular airports');
+              return popularAirports;
+            }
+            
+            final patternLower = pattern.toLowerCase();
+            final List<AirportEntity> iataExactMatches = [];
+            final List<AirportEntity> cityExactMatches = [];
+            final List<AirportEntity> iataStartsWithMatches = [];
+            final List<AirportEntity> cityStartsWithMatches = [];
+            final List<AirportEntity> containsMatches = [];
+            
+            for (final airport in airports) {
+              final cityLower = airport.city.toLowerCase();
+              final airportLower = airport.airport.toLowerCase();
+              final iataLower = airport.iata.toLowerCase();
+              
+              // IATA code exact match (highest priority)
+              if (iataLower == patternLower) {
+                iataExactMatches.add(airport);
+              }
+              // City exact match (second priority)
+              else if (cityLower == patternLower) {
+                cityExactMatches.add(airport);
+              }
+              // IATA code starts with (third priority)
+              else if (iataLower.startsWith(patternLower)) {
+                iataStartsWithMatches.add(airport);
+              }
+              // City starts with (fourth priority)
+              else if (cityLower.startsWith(patternLower)) {
+                cityStartsWithMatches.add(airport);
+              }
+              // Contains matches (lowest priority)
+              else if (cityLower.contains(patternLower) || 
+                       airportLower.contains(patternLower) || 
+                       iataLower.contains(patternLower)) {
+                containsMatches.add(airport);
+              }
+            }
+            
+            // Combine results in order of priority, limit to 10 results
+            final allMatches = [
+              ...iataExactMatches, 
+              ...cityExactMatches, 
+              ...iataStartsWithMatches, 
+              ...cityStartsWithMatches, 
+              ...containsMatches
+            ];
+            final limitedMatches = allMatches.take(10).toList();
+            
+            print('🔍 Found ${limitedMatches.length} matching airports for "$pattern" (${iataExactMatches.length} IATA exact, ${cityExactMatches.length} city exact, ${iataStartsWithMatches.length} IATA startsWith, ${cityStartsWithMatches.length} city startsWith, ${containsMatches.length} contains)');
+            return limitedMatches;
+          },
+          itemBuilder: (context, AirportEntity airport) {
+            return ListTile(
+              dense: true,
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              title: Text(
+                '${airport.city} (${airport.iata})',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  color: Color(0xFF1F2937),
+                ),
+              ),
+              subtitle: airport.airport.toLowerCase() != airport.city.toLowerCase()
+                  ? Text(
+                      airport.airport,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                        color: Color(0xFF6B7280),
+                      ),
+                    )
+                  : null,
+            );
+          },
+          onSelected: (AirportEntity airport) {
+            onSelected(airport);
+          },
+        ),
+        // Helper text for fields that need attention
+        if (!isAirportSelected && controller.text.isNotEmpty && !isLoading) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(
+                Icons.info_outline,
+                color: Color(0xFF6B7280),
+                size: 14,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'Please select a specific airport',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 12,
+                  color: Color(0xFF6B7280),
+                ),
+              ),
             ],
-          ],
-        );
-      },
+          ),
+        ],
+      ],
     );
   }
 
@@ -836,7 +916,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
             border: Border.all(color: Color(0xFFE5E7EB)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 2,
                 offset: Offset(0, 1),
               ),
@@ -912,7 +992,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
               border: Border.all(color: Color(0xFFE5E7EB)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 2,
                   offset: Offset(0, 1),
                 ),
@@ -949,4 +1029,4 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     // TODO: Implement ticket data population
     // This would populate the form fields with extracted data
   }
-} 
+}

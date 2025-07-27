@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../../core/usecases/usecase.dart';
 import '../../domain/entities/airport_entity.dart';
 import '../../domain/entities/flight_entity.dart';
 import '../../domain/usecases/get_airports.dart';
