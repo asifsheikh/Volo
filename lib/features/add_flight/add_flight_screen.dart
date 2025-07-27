@@ -76,6 +76,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
   final _departureController = TextEditingController();
   final _arrivalController = TextEditingController();
   final _flightNumberController = TextEditingController();
+  final _flightNumberFocusNode = FocusNode();
   DateTime? _selectedDate;
   String? _selectedDepartureCity;
   String? _selectedArrivalCity;
@@ -122,6 +123,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     _departureController.dispose();
     _arrivalController.dispose();
     _flightNumberController.dispose();
+    _flightNumberFocusNode.dispose();
     super.dispose();
   }
 
@@ -134,10 +136,15 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     
     final List<AirportEntity> popularAirports = [];
     for (final iata in popularIataCodes) {
-      final airport = allAirports.where((a) => a.iata == iata).firstOrNull;
+      final airport = allAirports.where((a) => a.iata.toUpperCase() == iata).firstOrNull;
       if (airport != null) {
         popularAirports.add(airport);
       }
+    }
+    
+    // If no popular airports found, return first 10 airports as fallback
+    if (popularAirports.isEmpty && allAirports.isNotEmpty) {
+      return allAirports.take(10).toList();
     }
     
     return popularAirports;
@@ -216,6 +223,10 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     if (picked != null) {
       setState(() {
         _selectedDate = picked;
+      });
+      // Focus on flight number field for better UX progression
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _flightNumberFocusNode.requestFocus();
       });
     }
   }
@@ -525,6 +536,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                         icon: Icons.flight,
                         controller: _flightNumberController,
                         hintText: 'e.g. UA1234',
+                        focusNode: _flightNumberFocusNode,
                       ),
                       const SizedBox(height: 16),
                       // Helper text for flight number and general guidance
@@ -718,9 +730,9 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                   color: Color(0xFF1F2937),
                 ),
                 onTap: () {
-                  // Show suggestions when field is tapped
-                  if (controller.text.isEmpty) {
-                    // If empty, show popular airports
+                  // Show suggestions when field is tapped, but only if no airport is selected
+                  if (controller.text.isEmpty && !isAirportSelected) {
+                    // If empty and no airport selected, show popular airports
                     _showPopularAirports(context, controller, onSelected);
                   }
                 },
@@ -742,6 +754,12 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
           suggestionsCallback: (pattern) async {
             print('🔍 TypeAheadField suggestionsCallback called with pattern: "$pattern"');
             print('🔍 Total airports available: ${airports.length}');
+            
+            // If field already has a selected airport, don't show suggestions
+            if (isAirportSelected && pattern.isEmpty) {
+              print('🔍 Field already has selected airport, not showing suggestions');
+              return [];
+            }
             
             // Debug: Check if IATA codes are loaded correctly
             if (pattern.toLowerCase() == 'pnq') {
@@ -872,6 +890,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     required TextEditingController controller,
     required String hintText,
     ValueChanged<String>? onChanged,
+    FocusNode? focusNode,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -930,6 +949,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
               Expanded(
                 child: TextFormField(
                   controller: controller,
+                  focusNode: focusNode,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: hintText,
