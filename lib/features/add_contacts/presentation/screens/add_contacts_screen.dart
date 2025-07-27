@@ -301,7 +301,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                       children: [
                         const SizedBox(height: 4), // Reduced from 8 to 4
                         
-                        const SizedBox(height: 12), // Reduced from 16 to 12
+                        const SizedBox(height: 8), // Reduced from 12 to 8 - specifically targeting banner to title spacing
                         
                         // Your Own Updates Section
                         const Text(
