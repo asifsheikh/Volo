@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import '../../domain/entities/add_contacts_state.dart' as domain;
 import '../../domain/usecases/get_device_contacts.dart';
 import '../../domain/usecases/save_trip.dart';
@@ -86,5 +87,66 @@ class AddContactsProvider extends _$AddContactsProvider {
   /// Get if any action has been taken
   bool get hasActionTaken {
     return state.enableNotifications || state.selectedContacts.isNotEmpty;
+  }
+
+  /// Pick a contact from device
+  Future<void> pickContact() async {
+    try {
+      // Request permission to access contacts
+      if (!await FlutterContacts.requestPermission(readonly: true)) {
+        setError('We need access to your contacts to add people to notify.');
+        return;
+      }
+
+      // Get all contacts with phone numbers
+      final List<Contact> contacts = await FlutterContacts.getContacts(
+        withProperties: true,
+        withPhoto: false,
+      );
+
+      // Filter contacts that have phone numbers
+      final contactsWithPhones = contacts.where((contact) => contact.phones.isNotEmpty).toList();
+
+      if (contactsWithPhones.isEmpty) {
+        setError('No contacts with phone numbers found in your device.');
+        return;
+      }
+
+      // Get list of already selected phone numbers
+      final selectedPhoneNumbers = state.selectedContacts
+          .where((contact) => contact.phoneNumber != null)
+          .map((contact) => contact.phoneNumber!)
+          .toList();
+
+      // For now, just pick the first contact with a phone number
+      // In a real implementation, you'd show a contact picker dialog
+      final selectedContact = contactsWithPhones.firstWhere(
+        (contact) => !selectedPhoneNumbers.contains(contact.phones.first.number),
+        orElse: () => contactsWithPhones.first,
+      );
+
+      final phoneNumber = selectedContact.phones.first.number;
+      final contactName = selectedContact.displayName.isNotEmpty 
+          ? selectedContact.displayName 
+          : (selectedContact.name.first.isNotEmpty || selectedContact.name.last.isNotEmpty)
+              ? '${selectedContact.name.first} ${selectedContact.name.last}'.trim()
+              : 'Unknown Contact';
+      
+      // Check if contact already exists
+      if (contactExists(domain.Contact(name: contactName, phoneNumber: phoneNumber))) {
+        setError('This contact is already added to your list.');
+        return;
+      }
+      
+      // Add the contact
+      addContact(domain.Contact(
+        name: contactName,
+        phoneNumber: phoneNumber,
+      ));
+      
+      clearError();
+    } catch (e) {
+      setError('Unable to access contacts. Please try again.');
+    }
   }
 } 

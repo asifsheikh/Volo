@@ -775,86 +775,48 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
 
   Widget _buildDisclaimerSection(domain.AddContactsState state) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF059393).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.info,
-                  color: Color(0xFF059393),
-                  size: 20,
+              const Icon(Icons.info_outline, color: Color(0xFF6B7280), size: 20),
+              const SizedBox(width: 8),
+              const Text(
+                'What alerts will be sent to your contacts?',
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: Color(0xFF111827),
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Privacy & Permissions',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        color: Color(0xFF111827),
-                      ),
-                    ),
-                    Text(
-                      'How we use your data',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 14,
-                        color: Color(0xFF6B7280),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const Spacer(),
               IconButton(
-                onPressed: () {
-                  ref.read(addContactsProviderProvider.notifier).toggleDisclaimer();
-                },
+                onPressed: () => ref.read(addContactsProviderProvider.notifier).toggleDisclaimer(),
                 icon: Icon(
                   state.isDisclaimerExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                   color: const Color(0xFF6B7280),
+                  size: 20,
                 ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
             ],
           ),
-          
           if (state.isDisclaimerExpanded) ...[
-            const SizedBox(height: 16),
-            Text(
-              'We only access your contacts to send flight updates to the people you choose. Your contact data is never shared with third parties and is only used for the purpose you authorize.',
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                fontSize: 14,
-                color: Color(0xFF6B7280),
-                height: 1.5,
-              ),
-            ),
+            const SizedBox(height: 12),
+            _buildAlertItem('Flight status updates (delays, cancellations)'),
+            _buildAlertItem('Boarding pass notifications'),
+            _buildAlertItem('Gate change alerts'),
+            _buildAlertItem('Baggage claim information'),
+            _buildAlertItem('Custom messages from you'),
           ],
         ],
       ),
