@@ -45,6 +45,7 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
   final List<ContactModel> _selectedContacts = [];
   bool _enableNotifications = false; // Track notification preference
   bool _showFlightUpdates = false; // Track expandable card state
+  bool _isDisclaimerExpanded = false; // Track disclaimer expansion state
 
   Future<void> _pickContact() async {
     try {
@@ -249,6 +250,53 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
       backgroundColor: const Color(0xFFF7F8FA),
       body: Column(
         children: [
+          // Fixed App Bar with title
+          Container(
+            color: const Color(0xFFF7F8FA),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 16,
+              left: 20,
+              right: 20,
+              bottom: 16,
+            ),
+            child: Row(
+              children: [
+                // Back button
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Title
+                const Text(
+                  'Add Contacts',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w700,
+                    fontSize: 20,
+                    color: Color(0xFF111827),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
           // Scrollable content
           Expanded(
             child: CustomScrollView(
@@ -375,39 +423,22 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                           ],
                         ),
                         
-                        // Back button and title row (top left)
+                        // Back button (top left) - removed title since it's now in fixed app bar
                         Positioned(
                           top: MediaQuery.of(context).padding.top + 16,
                           left: 16,
-                          right: 16,
-                          child: Row(
-                            children: [
-                              // Circular back button
-                              Container(
-                                width: 36,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  padding: EdgeInsets.zero,
-                                  icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
-                                  onPressed: () => Navigator.of(context).pop(),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              // Left-aligned title
-                              Text(
-                                'Add Contacts',
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 20,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.9),
+                              shape: BoxShape.circle,
+                            ),
+                            child: IconButton(
+                              padding: EdgeInsets.zero,
+                              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
                           ),
                         ),
                         
@@ -515,6 +546,22 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                               ),
                             ),
                           ],
+                        ),
+                        const SizedBox(height: 32),
+                        
+                        // Divider between sections
+                        Container(
+                          height: 1,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.transparent,
+                                const Color(0xFFE5E7EB),
+                                Colors.transparent,
+                              ],
+                              stops: const [0.0, 0.5, 1.0],
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 32),
                         
@@ -656,66 +703,123 @@ class _AddContactsScreenState extends State<AddContactsScreen> {
                         
                         const SizedBox(height: 32),
                         
-                        // Enhanced Disclaimer
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.info_outline,
-                              color: const Color(0xFF6B7280),
-                              size: 18,
+                        // Divider before disclaimer
+                        Container(
+                          height: 1,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.transparent,
+                                const Color(0xFFE5E7EB),
+                                Colors.transparent,
+                              ],
+                              stops: const [0.0, 0.5, 1.0],
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'What alerts will be sent to your contacts?',
-                                style: const TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 14,
-                                  color: Color(0xFF374151),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        
+                        // Expandable Disclaimer Section
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFFE5E7EB)),
+                          ),
+                          child: Column(
+                            children: [
+                              // Clickable header
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _isDisclaimerExpanded = !_isDisclaimerExpanded;
+                                  });
+                                },
+                                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.info_outline,
+                                        color: const Color(0xFF6B7280),
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          'What alerts will be sent to your contacts?',
+                                          style: const TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            color: Color(0xFF374151),
+                                          ),
+                                        ),
+                                      ),
+                                      Icon(
+                                        _isDisclaimerExpanded 
+                                            ? Icons.keyboard_arrow_up 
+                                            : Icons.keyboard_arrow_down,
+                                        color: const Color(0xFF6B7280),
+                                        size: 20,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        
-                        // Enhanced Description
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Your contacts will receive real-time updates via WhatsApp for:',
-                              style: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 13,
-                                color: Color(0xFF374151),
-                                height: 1.4,
+                              
+                              // Expandable content
+                              AnimatedCrossFade(
+                                duration: const Duration(milliseconds: 300),
+                                crossFadeState: _isDisclaimerExpanded 
+                                    ? CrossFadeState.showSecond 
+                                    : CrossFadeState.showFirst,
+                                firstChild: const SizedBox.shrink(),
+                                secondChild: Container(
+                                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Divider(color: Color(0xFFE5E7EB), height: 1),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        'Your contacts will receive real-time updates via WhatsApp for:',
+                                        style: const TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 13,
+                                          color: Color(0xFF374151),
+                                          height: 1.4,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      _buildAlertItem('✈️ Flight plan filed and confirmed'),
+                                      _buildAlertItem('🛫 Flight departure (boarding and takeoff)'),
+                                      _buildAlertItem('🛬 Flight arrival and landing'),
+                                      _buildAlertItem('⏰ Delays (with updated departure times)'),
+                                      _buildAlertItem('❌ Flight cancellations'),
+                                      _buildAlertItem('🔄 Flight diversions'),
+                                      _buildAlertItem('🚪 Gate changes'),
+                                      _buildAlertItem('📋 Schedule modifications'),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'You\'ll also receive these same notifications directly in the app.',
+                                        style: const TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 12,
+                                          color: Color(0xFF6B7280),
+                                          height: 1.4,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            _buildAlertItem('✈️ Flight plan filed and confirmed'),
-                            _buildAlertItem('🛫 Flight departure (boarding and takeoff)'),
-                            _buildAlertItem('🛬 Flight arrival and landing'),
-                            _buildAlertItem('⏰ Delays (with updated departure times)'),
-                            _buildAlertItem('❌ Flight cancellations'),
-                            _buildAlertItem('🔄 Flight diversions'),
-                            _buildAlertItem('🚪 Gate changes'),
-                            _buildAlertItem('📋 Schedule modifications'),
-                            const SizedBox(height: 8),
-                            Text(
-                              'You\'ll also receive these same notifications directly in the app.',
-                              style: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 12,
-                                color: Color(0xFF6B7280),
-                                height: 1.4,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         
                         // Bottom padding to account for the pinned button
