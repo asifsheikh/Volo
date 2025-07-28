@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_app_check/firebase_app_check.dart';
 import 'otp_screen.dart';
 import '../../services/network_service.dart';
 import '../../theme/app_theme.dart';
+import '../../features/auth/presentation/providers/auth_provider.dart';
 import 'dart:developer' as developer;
 
 /// Login Screen for Volo App
@@ -17,145 +17,23 @@ import 'dart:developer' as developer;
 /// - Comprehensive error handling for production use
 /// - User-friendly error messages and loading states
 /// - Automatic phone number formatting and validation
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   // Controllers and state variables
   final TextEditingController _phoneController = TextEditingController();
   String? _errorText;
   String _countryCode = '+91'; // Default to India
   bool _isLoading = false;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
     super.initState();
-  }
-
-
-
-
-
-  /// Converts Firebase error codes to user-friendly error messages
-  ///
-  /// This method handles all possible Firebase authentication error codes
-  /// and provides clear, actionable error messages for users.
-  ///
-  /// [e] - The FirebaseAuthException containing the error details
-  /// Returns a user-friendly error message string
-  String _getUserFriendlyErrorMessage(FirebaseAuthException e) {
-    switch (e.code) {
-    // Phone number validation errors
-      case 'invalid-phone-number':
-        return 'Please enter a valid phone number';
-
-    // Rate limiting and quota errors
-      case 'too-many-requests':
-        return 'Too many attempts. Please wait a few minutes and try again';
-      case 'quota-exceeded':
-        return 'Service temporarily unavailable. Please try again later';
-
-    // App verification and reCAPTCHA errors
-      case 'missing-activity-for-recaptcha':
-        return 'App verification failed. Please try again';
-      case 'invalid-app-credential':
-        return 'App verification failed. Please try again';
-
-    // Network and connectivity errors
-      case 'network-request-failed':
-        return 'No internet connection. Please check your network settings and try again.';
-
-    // Firebase configuration errors
-      case 'operation-not-allowed':
-        return 'Phone authentication is not enabled. Please contact support';
-      case 'app-not-authorized':
-        return 'App not authorized. Please update the app or contact support';
-
-    // Verification code errors (for OTP screen)
-      case 'invalid-verification-code':
-        return 'Invalid verification code. Please try again';
-      case 'session-expired':
-        return 'Session expired. Please try again';
-      case 'invalid-verification-id':
-        return 'Verification failed. Please try again';
-
-    // User account errors
-      case 'user-disabled':
-        return 'This account has been disabled. Please contact support';
-      case 'user-not-found':
-        return 'User not found. Please check your phone number';
-      case 'account-exists-with-different-credential':
-        return 'An account already exists with this phone number';
-      case 'requires-recent-login':
-        return 'Please log in again to continue';
-
-    // Credential errors
-      case 'invalid-credential':
-        return 'Invalid credentials. Please try again';
-      case 'weak-password':
-        return 'Password is too weak';
-      case 'email-already-in-use':
-        return 'Email is already in use';
-      case 'invalid-email':
-        return 'Invalid email address';
-
-    // Operation and timeout errors
-      case 'operation-cancelled':
-        return 'Operation was cancelled';
-      case 'timeout':
-        return 'Request timed out. Please try again';
-      case 'unavailable':
-        return 'Service is currently unavailable. Please try again later';
-
-    // System and internal errors
-      case 'internal-error':
-        return 'An internal error occurred. Please try again';
-      case 'invalid-argument':
-        return 'Invalid input. Please check your phone number';
-      case 'not-found':
-        return 'Service not found. Please try again';
-      case 'already-exists':
-        return 'Account already exists';
-      case 'permission-denied':
-        return 'Permission denied. Please try again';
-      case 'resource-exhausted':
-        return 'Service limit reached. Please try again later';
-      case 'failed-precondition':
-        return 'Operation failed. Please try again';
-      case 'aborted':
-        return 'Operation was aborted. Please try again';
-      case 'out-of-range':
-        return 'Input out of range. Please check your phone number';
-      case 'unimplemented':
-        return 'Feature not implemented. Please contact support';
-      case 'data-loss':
-        return 'Data loss occurred. Please try again';
-      case 'unauthenticated':
-        return 'Authentication required. Please try again';
-
-      default:
-      // Handle specific error messages in the exception
-        if (e.message?.contains('BILLING_NOT_ENABLED') == true) {
-          return 'Phone authentication is not enabled for this project. Please contact support.';
-        }
-        if (e.message?.contains('Invalid app info') == true) {
-          return 'App verification failed. Please try again.';
-        }
-        if (e.message?.contains('rate limit') == true || e.message?.contains('too many requests') == true) {
-          return 'Too many requests. Please wait a few minutes and try again.';
-        }
-              if (e.message?.contains('network') == true || e.message?.contains('connection') == true) {
-        return 'No internet connection. Please check your network settings and try again.';
-      }
-
-      // Generic error message for unknown errors
-        return 'Failed to send OTP. Please try again.';
-    }
   }
 
   /// Handles the continue button press and initiates phone authentication
@@ -163,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
   /// This method:
   /// 1. Validates the phone number input
   /// 2. Formats the phone number with country code
-  /// 3. Calls Firebase phone authentication
+  /// 3. Calls Firebase phone authentication via Riverpod
   /// 4. Handles all possible outcomes (success, failure, auto-verification)
   /// 5. Shows appropriate user feedback
   Future<void> _onContinue() async {
@@ -202,7 +80,6 @@ class _LoginScreenState extends State<LoginScreen> {
       
       // Debug logging
       developer.log('LoginScreen: Attempting to send OTP to: $fullPhoneNumber', name: 'VoloAuth');
-      developer.log('LoginScreen: Firebase Auth instance: ${_auth.app.name}', name: 'VoloAuth');
       developer.log('LoginScreen: Debug mode: ${kDebugMode}', name: 'VoloAuth');
 
       // In debug mode, allow test phone numbers
@@ -225,81 +102,33 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      // Send OTP via Firebase Phone Authentication
-      await _auth.verifyPhoneNumber(
-        phoneNumber: fullPhoneNumber,
+      // Send OTP via Riverpod Auth Provider
+      final authNotifier = ref.read(authNotifierProvider);
+      final verificationId = await authNotifier.sendOTP(phoneNumber: fullPhoneNumber);
+      
+      if (verificationId != null) {
+        developer.log('LoginScreen: OTP sent successfully, verificationId: $verificationId', name: 'VoloAuth');
+        setState(() {
+          _isLoading = false;
+        });
 
-        // Auto-verification callback (Android only)
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          developer.log('LoginScreen: Auto-verification completed', name: 'VoloAuth');
-          // Auto-verification if SMS is not required (e.g., test numbers)
-          await _auth.signInWithCredential(credential);
-          if (mounted) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => OtpScreen(
-                  phoneNumber: fullPhoneNumber,
-                  verificationId: null, // Auto-verified
-                ),
-              ),
-            );
-          }
-        },
-
-        // Error handling callback
-        verificationFailed: (FirebaseAuthException e) {
-          developer.log('LoginScreen: Verification failed - Code: ${e.code}, Message: ${e.message}', name: 'VoloAuth');
-          setState(() {
-            _isLoading = false;
-            _errorText = _getUserFriendlyErrorMessage(e);
-          });
-        },
-
-        // Success callback - OTP sent successfully
-        codeSent: (String verificationId, int? resendToken) {
-          developer.log('LoginScreen: OTP sent successfully, verificationId: $verificationId', name: 'VoloAuth');
-          setState(() {
-            _isLoading = false;
-          });
-
-          // Success - no snack bar needed
-
-          // Navigate to OTP verification screen
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => OtpScreen(
-                phoneNumber: fullPhoneNumber,
-                verificationId: verificationId,
-              ),
+        // Navigate to OTP verification screen
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => OtpScreen(
+              phoneNumber: fullPhoneNumber,
+              verificationId: verificationId,
             ),
-          );
-        },
-
-        // Auto-retrieval timeout callback
-        codeAutoRetrievalTimeout: (String verificationId) {
-          developer.log('LoginScreen: Auto-retrieval timeout', name: 'VoloAuth');
-          setState(() {
-            _isLoading = false;
-          });
-
-          // Show timeout message to user
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Auto-retrieval timeout. Please enter the code manually.'),
-              backgroundColor: Colors.orange,
-              duration: Duration(seconds: 3),
-            ),
-          );
-        },
-
-        timeout: const Duration(seconds: 60), // 60 second timeout
-      );
-    } on FirebaseAuthException catch (e) {
-      developer.log('LoginScreen: FirebaseAuthException - Code: ${e.code}, Message: ${e.message}', name: 'VoloAuth');
-      setState(() {
-        _isLoading = false;
-        _errorText = _getUserFriendlyErrorMessage(e);
-      });
+          ),
+        );
+      } else {
+        // Error occurred, get error from auth state
+        final authState = ref.read(authStateProvider);
+        setState(() {
+          _isLoading = false;
+          _errorText = authState.error ?? 'Failed to send OTP. Please try again.';
+        });
+      }
     } catch (e) {
       developer.log('LoginScreen: General Error: $e', name: 'VoloAuth');
       setState(() {
@@ -311,6 +140,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Watch auth state for errors
+    final authState = ref.watch(authStateProvider);
+    
+    // Update error text if auth state has an error
+    if (authState.error != null && _errorText != authState.error) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _errorText = authState.error;
+          _isLoading = false;
+        });
+      });
+    }
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
