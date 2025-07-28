@@ -21,6 +21,7 @@ import '../../services/flight_api_service.dart';
 import '../../widgets/loading_dialog.dart';
 import '../../widgets/network_error_widget.dart';
 import 'domain/entities/airport_entity.dart';
+import 'data/models/airport_model.dart';
 import 'controller/add_flight_controller.dart';
 import 'flight_selection_dialog.dart';
 import 'flight_ticket_extraction_service.dart';
@@ -1095,7 +1096,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
       if (departureAirportCode != null && departureAirportCode.isNotEmpty) {
         final departureAirport = airports.firstWhere(
           (airport) => airport.iata.toUpperCase() == departureAirportCode.toUpperCase(),
-          orElse: () => AirportEntity(
+          orElse: () => AirportModel(
             city: flightData['departureCity'] ?? '',
             airport: flightData['departureCity'] ?? '',
             iata: departureAirportCode,
@@ -1111,7 +1112,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
       if (arrivalAirportCode != null && arrivalAirportCode.isNotEmpty) {
         final arrivalAirport = airports.firstWhere(
           (airport) => airport.iata.toUpperCase() == arrivalAirportCode.toUpperCase(),
-          orElse: () => AirportEntity(
+          orElse: () => AirportModel(
             city: flightData['arrivalCity'] ?? '',
             airport: flightData['arrivalCity'] ?? '',
             iata: arrivalAirportCode,
