@@ -47,7 +47,12 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     super.initState();
     // Clear any stale errors when the screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      print('OTPScreen: Clearing errors on init');
       ref.read(authNotifierProvider).clearError();
+      
+      // Check current auth state
+      final currentState = ref.read(authStateProvider);
+      print('OTPScreen: Current auth state - error: ${currentState.error}, isLoading: ${currentState.isLoading}');
     });
   }
 
@@ -220,6 +225,14 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
       print('OTPScreen: Error detected - $error');
       print('OTPScreen: _hasAttemptedVerification: $_hasAttemptedVerification');
       print('OTPScreen: isLoading: $isLoading');
+      
+      // Clear error if it's not from a verification attempt
+      if (!_hasAttemptedVerification) {
+        print('OTPScreen: Clearing error that appeared before verification attempt');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ref.read(authNotifierProvider).clearError();
+        });
+      }
     }
 
     return Scaffold(

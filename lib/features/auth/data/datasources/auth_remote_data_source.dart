@@ -136,9 +136,22 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<UserModel?> getCurrentUser() async {
+    print('AuthRemoteDataSource: getCurrentUser called');
     final user = _firebaseAuth.currentUser;
-    if (user == null) return null;
-    return UserModel.fromFirebaseUser(user);
+    if (user == null) {
+      print('AuthRemoteDataSource: No current user, returning null');
+      return null;
+    }
+    try {
+      print('AuthRemoteDataSource: Converting current user to UserModel');
+      final userModel = UserModel.fromFirebaseUser(user);
+      print('AuthRemoteDataSource: Successfully converted current user to UserModel');
+      return userModel;
+    } catch (e) {
+      print('AuthRemoteDataSource: Error converting current user to UserModel: $e');
+      print('AuthRemoteDataSource: Error stack trace: ${StackTrace.current}');
+      rethrow;
+    }
   }
 
   @override
@@ -178,8 +191,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Stream<UserModel?> get authStateChanges {
     return _firebaseAuth.authStateChanges().map((user) {
-      if (user == null) return null;
-      return UserModel.fromFirebaseUser(user);
+      print('AuthRemoteDataSource: Auth state change - user: ${user?.uid}');
+      if (user == null) {
+        print('AuthRemoteDataSource: User is null, returning null');
+        return null;
+      }
+      try {
+        print('AuthRemoteDataSource: Converting user to UserModel');
+        final userModel = UserModel.fromFirebaseUser(user);
+        print('AuthRemoteDataSource: Successfully converted user to UserModel');
+        return userModel;
+      } catch (e) {
+        print('AuthRemoteDataSource: Error converting user to UserModel: $e');
+        print('AuthRemoteDataSource: Error stack trace: ${StackTrace.current}');
+        rethrow;
+      }
     });
   }
 }
