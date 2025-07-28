@@ -8,6 +8,7 @@ import 'dart:async';
 import '../services/firebase_service.dart';
 import '../services/network_service.dart';
 import '../features/auth/presentation/screens/welcome_screen.dart';
+import '../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../screens/main_navigation_screen.dart';
 
 import '../theme/app_theme.dart';
@@ -87,15 +88,32 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       _authStateSubscription = FirebaseAuth.instance.authStateChanges().listen((User? user) async {
         developer.log('AuthWrapper: Auth state changed: ${user == null ? "Logged out" : "Logged in"}', name: 'VoloAuth');
         if (user != null) {
-          // User is authenticated - go directly to home screen (skip onboarding check)
-          developer.log('AuthWrapper: User authenticated, going to home screen', name: 'VoloAuth');
-          if (mounted) {
-            setState(() {
-              _currentUser = user;
-              _isOnboarded = true; // Assume onboarded for authenticated users
-              _isOffline = false;
-              _isLoading = false;
-            });
+          // User is authenticated, check if they have a profile in Firestore
+          try {
+            final userProfile = await FirebaseService.getUserProfile();
+            final hasProfile = userProfile != null;
+            
+            developer.log('AuthWrapper: User authenticated, has profile: $hasProfile', name: 'VoloAuth');
+            
+            if (mounted) {
+              setState(() {
+                _currentUser = user;
+                _isOnboarded = hasProfile; // Only onboarded if they have a profile
+                _isOffline = false;
+                _isLoading = false;
+              });
+            }
+          } catch (e) {
+            developer.log('AuthWrapper: Error checking user profile: $e', name: 'VoloAuth');
+            // If there's an error checking profile, assume user needs onboarding
+            if (mounted) {
+              setState(() {
+                _currentUser = user;
+                _isOnboarded = false; // Assume not onboarded if error
+                _isOffline = false;
+                _isLoading = false;
+              });
+            }
           }
         } else {
           // User is not authenticated
@@ -138,8 +156,14 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       return const WelcomeScreen();
     }
 
-    // User is authenticated - go directly to home screen (skip onboarding check)
-    developer.log('AuthWrapper: Routing to HomeScreen - User authenticated', name: 'VoloAuth');
+    // User is authenticated but not onboarded (no profile in Firestore)
+    if (!_isOnboarded) {
+      developer.log('AuthWrapper: Routing to OnboardingScreen - User authenticated but not onboarded', name: 'VoloAuth');
+      return OnboardingScreen(phoneNumber: _currentUser!.phoneNumber ?? '');
+    }
+
+    // User is authenticated and onboarded - go to home screen
+    developer.log('AuthWrapper: Routing to HomeScreen - User authenticated and onboarded', name: 'VoloAuth');
     if (_isOffline) {
       developer.log('AuthWrapper: User is in offline mode', name: 'VoloAuth');
     }
