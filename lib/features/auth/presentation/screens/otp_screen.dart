@@ -109,12 +109,18 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     }
 
     try {
+      // Clear any existing errors before starting verification
+      ref.read(authNotifierProvider).clearError();
+
       // Verify OTP via Riverpod
       await ref.read(authNotifierProvider).signInWithPhone(
         phoneNumber: widget.phoneNumber,
         verificationId: widget.verificationId,
         smsCode: _otp,
       );
+
+      // Clear any errors after successful verification
+      ref.read(authNotifierProvider).clearError();
 
       // Handle post-authentication routing
       await _handlePostAuthentication();
@@ -209,6 +215,13 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     final isLoading = authState.isLoading;
     final error = authState.error;
 
+    // Debug logging to understand error state
+    if (error != null) {
+      print('OTPScreen: Error detected - $error');
+      print('OTPScreen: _hasAttemptedVerification: $_hasAttemptedVerification');
+      print('OTPScreen: isLoading: $isLoading');
+    }
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
@@ -275,8 +288,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                   setState(() {
                                     _otp = value;
                                     if (_otp.length == 6) {
-                                                                          // Clear error when user types
-                                    ref.read(authNotifierProvider).clearError();
+                                      // Clear error when user types
+                                      ref.read(authNotifierProvider).clearError();
                                     }
                                   });
                                 },
@@ -285,7 +298,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                   fieldHeight: 56,
                                   fieldWidth: 52,
-                                  activeColor: error != null ? AppTheme.destructive : AppTheme.textSecondary,
+                                  activeColor: AppTheme.textSecondary,
                                   selectedColor: AppTheme.textPrimary,
                                   inactiveColor: AppTheme.textSecondary,
                                   activeFillColor: AppTheme.cardBackground,
