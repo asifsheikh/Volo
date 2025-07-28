@@ -27,16 +27,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
   String _countryCode = '+91'; // Default to India
   String? _verificationId;
+  bool _hasAttemptedSubmission = false; // Track if user has tried to submit
 
   @override
   void initState() {
     super.initState();
+    // Clear any stale errors when the screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(authNotifierProvider).clearError();
+    });
   }
 
   @override
   void dispose() {
     _phoneController.dispose();
     super.dispose();
+  }
+
+  /// Check if the phone number is valid for enabling the button
+  bool get _isPhoneNumberValid {
+    final phoneNumber = _phoneController.text.trim();
+    // Basic validation: at least 10 digits for most countries
+    return phoneNumber.length >= 10 && phoneNumber.length <= 15;
   }
 
   /// Handles the continue button press and initiates phone authentication
@@ -48,6 +60,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   /// 4. Handles all possible outcomes (success, failure, auto-verification)
   /// 5. Shows appropriate user feedback
   Future<void> _onContinue() async {
+    // Set flag that user has attempted submission
+    setState(() {
+      _hasAttemptedSubmission = true;
+    });
+
     // Validate phone number input
     if (_phoneController.text.isEmpty) {
       // Show error via Riverpod state
@@ -172,10 +189,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide(
-                                    color: error != null ? Colors.red : Colors.transparent,
+                                    color: (error != null && _hasAttemptedSubmission) ? Colors.red : Colors.transparent,
                                   ),
                                 ),
-                                errorText: error,
+                                errorText: (error != null && _hasAttemptedSubmission) ? error : null,
                                 errorStyle: const TextStyle(color: Colors.red),
                               ),
                               onChanged: (phone) {
@@ -206,8 +223,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           width: double.infinity,
                           height: 60,
                           child: ElevatedButton(
-                            onPressed: isLoading ? null : _onContinue,
-                            style: AppTheme.primaryButton,
+                            onPressed: (isLoading || !_isPhoneNumberValid) ? null : _onContinue,
+                            style: AppTheme.primaryButton.copyWith(
+                              backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+                                if (states.contains(MaterialState.disabled)) {
+                                  return AppTheme.primary.withOpacity(0.5);
+                                }
+                                return AppTheme.primary;
+                              }),
+                            ),
                             child: isLoading
                                 ? const SizedBox(
                                     width: 20,
@@ -219,7 +243,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   )
                                 : Text(
                                     'Send OTP',
-                                    style: AppTheme.titleLarge.copyWith(color: AppTheme.textOnPrimary),
+                                    style: AppTheme.titleLarge.copyWith(
+                                      color: _isPhoneNumberValid ? AppTheme.textOnPrimary : AppTheme.textOnPrimary.withOpacity(0.7),
+                                    ),
                                   ),
                           ),
                         ),
