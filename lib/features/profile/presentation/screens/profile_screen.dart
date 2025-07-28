@@ -11,9 +11,9 @@ import '../../../../services/profile_picture_service.dart';
 import '../../../../services/remote_config_service.dart';
 import '../../../../features/ai_demo/ai_demo_screen.dart';
 import '../../../../theme/app_theme.dart';
-import '../screens/push_notification_test_screen.dart';
-import '../../../../screens/profile/settings_screen.dart';
-import '../../../../screens/profile/debug_tools_screen.dart';
+import 'push_notification_test_screen.dart';
+import 'settings_screen.dart';
+import 'debug_tools_screen.dart';
 
 /// Profile Screen using Riverpod + Clean Architecture
 class ProfileScreen extends ConsumerStatefulWidget {
