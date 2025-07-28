@@ -69,6 +69,8 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
       appBar: AppBar(
         backgroundColor: AppTheme.background,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
