@@ -9,6 +9,8 @@ import '../../services/remote_config_service.dart';
 import '../../features/ai_demo/ai_demo_screen.dart';
 import '../../theme/app_theme.dart';
 import 'push_notification_test_screen.dart';
+import 'settings_screen.dart';
+import 'debug_tools_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String username;
@@ -425,433 +427,345 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         centerTitle: false,
       ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Profile Picture Section
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Profile picture with teal border
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xFF008080), // Teal border
+                              width: 3,
+                            ),
+                          ),
+                          child: CircleAvatar(
+                            radius: 48,
+                            backgroundColor: Colors.white,
+                            backgroundImage: _profilePictureUrl != null
+                                ? NetworkImage(_profilePictureUrl!)
+                                : null,
+                            child: _profilePictureUrl == null
+                                ? Icon(
+                                    Icons.person,
+                                    size: 48,
+                                    color: Color(0xFF9CA3AF),
+                                  )
+                                : null,
+                          ),
+                        ),
+                        // Camera button
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: _isUpdatingProfilePicture ? null : _updateProfilePicture,
+                              child: Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  color: _isUpdatingProfilePicture 
+                                      ? Color(0xFF9CA3AF)
+                                      : Color(0xFF008080),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 6,
+                                      offset: Offset(0, 4),
+                                    ),
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 4,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: _isUpdatingProfilePicture
+                                    ? const SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      )
+                                    : const Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    child: Column(
+                    const SizedBox(height: 16),
+                    Text(
+                      widget.username,
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 24,
+                        color: Color(0xFF111827),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            CircleAvatar(
-                              radius: 48,
-                              backgroundColor: Colors.white,
-                              backgroundImage: _profilePictureUrl != null
-                                  ? NetworkImage(_profilePictureUrl!)
-                                  : null,
-                              child: _profilePictureUrl == null
-                                  ? Icon(
-                                      Icons.person,
-                                      size: 48,
-                                      color: Color(0xFF9CA3AF),
-                                    )
-                                  : null,
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(16),
-                                  onTap: _isUpdatingProfilePicture ? null : _updateProfilePicture,
-                                  child: Container(
-                                    width: 32,
-                                    height: 32,
-                                    decoration: BoxDecoration(
-                                      color: _isUpdatingProfilePicture 
-                                          ? Color(0xFF9CA3AF)
-                                          : Color(0xFF008080),
-                                      shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 6,
-                                          offset: Offset(0, 4),
-                                        ),
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 4,
-                                          offset: Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: _isUpdatingProfilePicture
-                                        ? const SizedBox(
-                                            width: 16,
-                                            height: 16,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                            ),
-                                          )
-                                        : const Icon(
-                                            Icons.camera_alt,
-                                            color: Colors.white,
-                                            size: 18,
-                                          ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
+                        const Icon(Icons.phone, size: 18, color: Color(0xFF6B7280)),
+                        const SizedBox(width: 6),
                         Text(
-                          widget.username,
+                          widget.phoneNumber,
                           style: const TextStyle(
                             fontFamily: 'Inter',
-                            fontWeight: FontWeight.w700,
-                            fontSize: 24,
-                            color: Color(0xFF111827),
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
+                            color: Color(0xFF6B7280),
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'To change your phone number, please log out and log in again.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 15,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              
+              // Main Sections
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Column(
+                  children: [
+                    // My Circle
+                    ListTile(
+                      leading: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Color(0x33008080),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.groups,
+                            color: Color(0xFF008080),
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                      title: const Text(
+                        'My Circle',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 18,
+                          color: Color(0xFF333333),
+                        ),
+                      ),
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Color(0xFF9CA3AF),
+                        size: 16,
+                      ),
+                      onTap: () {
+                        // TODO: Navigate to My Circle screen
+                      },
+                    ),
+                    const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                    
+                    // My Flight Journey
+                    ListTile(
+                      leading: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Color(0x33008080),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.flight_takeoff,
+                            color: Color(0xFF008080),
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                      title: const Text(
+                        'My Flight Journey',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 18,
+                          color: Color(0xFF333333),
+                        ),
+                      ),
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Color(0xFF9CA3AF),
+                        size: 16,
+                      ),
+                      onTap: () {
+                        // TODO: Navigate to My Flight Journey screen
+                      },
+                    ),
+                    const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                    
+                    // Settings
+                    ListTile(
+                      leading: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Color(0x33008080),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.settings,
+                            color: Color(0xFF008080),
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                      title: const Text(
+                        'Settings',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 18,
+                          color: Color(0xFF333333),
+                        ),
+                      ),
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Color(0xFF9CA3AF),
+                        size: 16,
+                      ),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => SettingsScreen(
+                              username: widget.username,
+                              phoneNumber: widget.phoneNumber,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    
+                    // Debug Tools (only in debug mode)
+                    if (kDebugMode) ...[
+                      const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                      ListTile(
+                        leading: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Color(0x33008080),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.bug_report,
+                              color: Color(0xFF008080),
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        title: Row(
                           children: [
-                            const Icon(Icons.phone, size: 18, color: Color(0xFF6B7280)),
-                            const SizedBox(width: 6),
-                            Text(
-                              widget.phoneNumber,
-                              style: const TextStyle(
+                            const Text(
+                              'Debug Tools',
+                              style: TextStyle(
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w400,
-                                fontSize: 16,
-                                color: Color(0xFF6B7280),
+                                fontSize: 18,
+                                color: Color(0xFF333333),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFF6B35),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                'DEBUG',
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 8,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'To change your phone number, please log out and log in again.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 15,
-                              color: Color(0xFF6B7280),
-                            ),
-                          ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Color(0xFF9CA3AF),
+                          size: 16,
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Color(0x33008080),
-                              shape: BoxShape.circle,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const DebugToolsScreen(),
                             ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.groups,
-                                color: Color(0xFF008080),
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                          title: const Text(
-                            'My Circle',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFF333333),
-                            ),
-                          ),
-                          onTap: () {},
-                        ),
-                        const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
-                        ListTile(
-                          leading: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Color(0x33008080),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.flight_takeoff,
-                                color: Color(0xFF008080),
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                          title: const Text(
-                            'My Flight Journey',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFF333333),
-                            ),
-                          ),
-                          onTap: () {},
-                        ),
-                        // Debug-only options
-                        if (kDebugMode) ...[
-                          const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
-                          ListTile(
-                            leading: Container(
-                              width: 32,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: Color(0x33008080),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.psychology,
-                                  color: Color(0xFF008080),
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                            title: Row(
-                              children: [
-                                const Text(
-                                  'AI Demo',
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 18,
-                                    color: Color(0xFF333333),
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFF6B35),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: const Text(
-                                    'DEBUG',
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 8,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(builder: (context) => const AIDemoScreen()),
-                              );
-                            },
-                          ),
-                          const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
-                          ListTile(
-                            leading: Container(
-                              width: 32,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: Color(0x33008080),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.settings,
-                                  color: Color(0xFF008080),
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                            title: Row(
-                              children: [
-                                const Text(
-                                  'Remote Configs',
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 18,
-                                    color: Color(0xFF333333),
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFF6B35),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: const Text(
-                                    'DEBUG',
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 8,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            onTap: () {
-                              // Show remote config status in a dialog
-                              _showRemoteConfigStatus();
-                            },
-                          ),
-                          const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
-                          ListTile(
-                            leading: Container(
-                              width: 32,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: Color(0x33008080),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.notifications,
-                                  color: Color(0xFF008080),
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                            title: Row(
-                              children: [
-                                const Text(
-                                  'Push Notifications',
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 18,
-                                    color: Color(0xFF333333),
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFF6B35),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: const Text(
-                                    'DEBUG',
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 8,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(builder: (context) => const PushNotificationTestScreen()),
-                              );
-                            },
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFF7E6),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.logout, color: Color(0xFFFFA726)),
-                          ),
-                          title: const Text(
-                            'Sign Out',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFF111827),
-                            ),
-                          ),
-                          onTap: _isLoading ? null : _signOut,
-                        ),
-                        const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
-                        ListTile(
-                          leading: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFE6E6),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.delete, color: Color(0xFFEF4444)),
-                          ),
-                          title: const Text(
-                            'Delete Account',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFFEF4444),
-                            ),
-                          ),
-                          onTap: _isLoading ? null : _deleteAccount,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // Loading overlay
-          if (_isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.3),
-              child: const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1F2937)),
+                          );
+                        },
+                      ),
+                    ],
+                  ],
                 ),
               ),
-            ),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
