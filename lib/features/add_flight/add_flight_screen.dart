@@ -1065,24 +1065,31 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     try {
       print('Populating form with ticket data: $ticketData');
       
-      // Extract the first flight data
-      final List<dynamic> flights = ticketData['flights'] ?? [];
-      if (flights.isEmpty) {
-        print('No flights found in ticket data');
-        return;
+      // Handle both data structures: flat object and nested flights array
+      Map<String, dynamic> flightData;
+      
+      if (ticketData.containsKey('flights')) {
+        // Nested structure: {flights: [{...}]}
+        final List<dynamic> flights = ticketData['flights'] ?? [];
+        if (flights.isEmpty) {
+          print('No flights found in ticket data');
+          return;
+        }
+        flightData = flights.first;
+      } else {
+        // Flat structure: {flightNumber: ..., departureCity: ..., etc.}
+        flightData = ticketData;
       }
       
-      final Map<String, dynamic> firstFlight = flights.first;
-      
       // Populate flight number
-      final String? flightNumber = firstFlight['flightNumber'];
+      final String? flightNumber = flightData['flightNumber'];
       if (flightNumber != null && flightNumber.isNotEmpty) {
         _flightNumberController.text = flightNumber;
       }
       
       // Populate departure city and airport
-      final String? departureCity = firstFlight['departureCity'];
-      final String? departureAirport = firstFlight['departureAirport'];
+      final String? departureCity = flightData['departureCity'];
+      final String? departureAirport = flightData['departureAirport'];
       if (departureCity != null && departureCity.isNotEmpty) {
         _selectedDepartureCity = departureCity;
         _departureController.text = departureCity;
@@ -1100,8 +1107,8 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
       }
       
       // Populate arrival city and airport
-      final String? arrivalCity = firstFlight['arrivalCity'];
-      final String? arrivalAirport = firstFlight['arrivalAirport'];
+      final String? arrivalCity = flightData['arrivalCity'];
+      final String? arrivalAirport = flightData['arrivalAirport'];
       if (arrivalCity != null && arrivalCity.isNotEmpty) {
         _selectedArrivalCity = arrivalCity;
         _arrivalController.text = arrivalCity;
@@ -1119,7 +1126,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
       }
       
       // Populate departure date
-      final String? departureDateStr = firstFlight['departureDate'];
+      final String? departureDateStr = flightData['departureDate'];
       if (departureDateStr != null && departureDateStr.isNotEmpty) {
         try {
           final DateTime departureDate = DateTime.parse(departureDateStr);
