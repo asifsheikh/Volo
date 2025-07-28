@@ -1066,6 +1066,18 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     try {
       print('Populating form with ticket data: $ticketData');
       
+      // Clear previous validation state first
+      setState(() {
+        _selectedDepartureAirport = null;
+        _selectedArrivalAirport = null;
+        _selectedDepartureCity = null;
+        _selectedArrivalCity = null;
+        _departureController.clear();
+        _arrivalController.clear();
+        _flightNumberController.clear();
+        _selectedDate = null;
+      });
+      
       // Extract flight number
       final String? flightNumber = ticketData['flightNumber'];
       if (flightNumber != null && flightNumber.isNotEmpty) {
