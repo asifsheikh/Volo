@@ -541,7 +541,7 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF059393),
+                    backgroundColor: AppTheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

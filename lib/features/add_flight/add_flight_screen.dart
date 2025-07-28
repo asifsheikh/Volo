@@ -512,7 +512,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
             ),
             Container(
               width: double.infinity,
-              color: const Color(0xFFE5E7EB),
+              color: AppTheme.background,
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
               child: Consumer(
                 builder: (context, ref, child) {
