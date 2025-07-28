@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 
 import '../../../../theme/app_theme.dart';
+import '../../../../services/firebase_service.dart';
 import '../providers/auth_provider.dart';
-// TODO: Import actual onboarding screens when they're migrated
-// import '../../../onboarding/presentation/screens/onboarding_screen.dart';
-// import '../../../onboarding/presentation/screens/welcome_back_screen.dart';
+import '../../../../features/onboarding/presentation/screens/onboarding_screen.dart';
+import '../../../../features/onboarding/presentation/screens/welcome_back_screen.dart';
 
 /// OTP Verification Screen for Volo App using Riverpod + Clean Architecture
 /// 
@@ -108,30 +109,51 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     }
   }
 
-  /// Handle post-authentication routing based on user profile existence
+  /// Handles post-authentication navigation
+  /// 
+  /// This method:
+  /// 1. Checks if user profile exists in Firestore
+  /// 2. Navigates to appropriate screen based on profile status
+  /// 3. Handles errors gracefully
   Future<void> _handlePostAuthentication() async {
     try {
-      // For now, navigate to a placeholder
-      // TODO: Navigate to actual onboarding screen when migrated
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => Scaffold(
-              appBar: AppBar(title: const Text('Onboarding')),
-              body: const Center(child: Text('Onboarding Screen - To be migrated')),
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      
+      // Check if user profile exists in Firestore by phone number
+      final userProfile = await FirebaseService.getUserProfileByPhoneNumber(user.phoneNumber ?? '');
+      
+      if (userProfile != null) {
+        // Migrate profile to current UID if needed
+        await FirebaseService.migrateUserProfileToCurrentUid(user.phoneNumber ?? '');
+        
+        // User profile exists - show WelcomeBackScreen
+        if (mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => WelcomeBackScreen(
+                userName: userProfile['firstName'] ?? 'User',
+              ),
             ),
-          ),
-        );
+            (route) => false,
+          );
+        }
+      } else {
+        // No user profile - show onboarding screen
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => OnboardingScreen(phoneNumber: widget.phoneNumber),
+            ),
+          );
+        }
       }
     } catch (e) {
-      // If there's an error, default to placeholder
+      // If there's an error checking profile, default to onboarding
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => Scaffold(
-              appBar: AppBar(title: const Text('Onboarding')),
-              body: const Center(child: Text('Onboarding Screen - To be migrated')),
-            ),
+            builder: (context) => OnboardingScreen(phoneNumber: widget.phoneNumber),
           ),
         );
       }
