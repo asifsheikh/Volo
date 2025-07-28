@@ -340,12 +340,14 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                                                     color: const Color(0xFF059393),
                                                   ),
                                                   const SizedBox(width: 8),
-                                                  Text(
-                                                    'Real-time alerts will be sent via WhatsApp',
-                                                    style: AppTheme.bodyLarge.copyWith(
-                                                      fontWeight: FontWeight.w600,
-                                                      fontSize: 14,
-                                                      color: const Color(0xFF374151),
+                                                  Expanded(
+                                                    child: Text(
+                                                      'Real-time alerts will be sent via WhatsApp',
+                                                      style: AppTheme.bodyLarge.copyWith(
+                                                        fontWeight: FontWeight.w600,
+                                                        fontSize: 14,
+                                                        color: const Color(0xFF374151),
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
