@@ -49,6 +49,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     _authRepository.authStateChanges.listen((user) {
       print('AuthNotifier: Auth state changed - user: ${user?.id}');
       try {
+        print('AuthNotifier: About to update auth state');
         state = state.copyWith(
           user: user,
           isAuthenticated: user != null,
@@ -57,6 +58,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         print('AuthNotifier: Auth state updated successfully');
       } catch (e) {
         print('AuthNotifier: Error in auth state change listener: $e');
+        print('AuthNotifier: Error stack trace: ${StackTrace.current}');
         state = state.copyWith(
           error: 'Auth state change error: $e',
         );
@@ -101,6 +103,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
     } catch (e) {
       print('AuthNotifier: Exception in signInWithPhone: $e');
+      print('AuthNotifier: Exception stack trace: ${StackTrace.current}');
       state = state.copyWith(
         isLoading: false,
         error: 'Sign in failed: $e',
@@ -110,15 +113,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<String?> sendOTP({required String phoneNumber}) async {
     developer.log('AuthNotifier: Starting sendOTP for phone: $phoneNumber', name: 'VoloAuth');
+    print('AuthNotifier: Starting sendOTP for phone: $phoneNumber');
     state = state.copyWith(isLoading: true, error: null);
 
     try {
       final result = await _authRepository.sendOTP(phoneNumber: phoneNumber);
       developer.log('AuthNotifier: Repository result received', name: 'VoloAuth');
+      print('AuthNotifier: Repository result received for sendOTP');
 
       return result.fold(
         (failure) {
           developer.log('AuthNotifier: SendOTP failed - ${failure.message}', name: 'VoloAuth');
+          print('AuthNotifier: SendOTP failed - ${failure.message}');
           state = state.copyWith(
             isLoading: false,
             error: failure.message ?? 'An error occurred',
@@ -127,6 +133,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         },
         (verificationId) {
           developer.log('AuthNotifier: SendOTP successful - verificationId: $verificationId', name: 'VoloAuth');
+          print('AuthNotifier: SendOTP successful - verificationId: $verificationId');
           state = state.copyWith(
             isLoading: false,
             error: null,
@@ -136,6 +143,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
     } catch (e) {
       developer.log('AuthNotifier: SendOTP exception - $e', name: 'VoloAuth');
+      print('AuthNotifier: SendOTP exception - $e');
+      print('AuthNotifier: SendOTP exception stack trace: ${StackTrace.current}');
       state = state.copyWith(
         isLoading: false,
         error: 'Failed to send OTP: $e',
@@ -196,6 +205,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   void clearError() {
+    print('AuthNotifier: Clearing error');
     state = state.copyWith(error: null);
   }
 }
