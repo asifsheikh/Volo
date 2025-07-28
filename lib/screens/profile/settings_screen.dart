@@ -363,70 +363,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Account Actions
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFF7E6),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.logout, color: Color(0xFFFFA726)),
-                          ),
-                          title: const Text(
-                            'Sign Out',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFF111827),
-                            ),
-                          ),
-                          trailing: const Icon(
-                            Icons.arrow_forward_ios,
-                            color: Color(0xFF9CA3AF),
-                            size: 16,
-                          ),
-                          onTap: _isLoading ? null : _signOut,
-                        ),
-                        const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
-                        ListTile(
-                          leading: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFE6E6),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.delete, color: Color(0xFFEF4444)),
-                          ),
-                          title: const Text(
-                            'Delete Account',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFFEF4444),
-                            ),
-                          ),
-                          trailing: const Icon(
-                            Icons.arrow_forward_ios,
-                            color: Color(0xFF9CA3AF),
-                            size: 16,
-                          ),
-                          onTap: _isLoading ? null : _deleteAccount,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  
                   // Support & Legal
                   Container(
                     decoration: BoxDecoration(
@@ -532,6 +468,70 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             size: 16,
                           ),
                           onTap: _showTermsAndServices,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Account Actions (moved to end)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          leading: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFF7E6),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.all(8),
+                            child: const Icon(Icons.logout, color: Color(0xFFFFA726)),
+                          ),
+                          title: const Text(
+                            'Sign Out',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 18,
+                              color: Color(0xFF111827),
+                            ),
+                          ),
+                          trailing: const Icon(
+                            Icons.arrow_forward_ios,
+                            color: Color(0xFF9CA3AF),
+                            size: 16,
+                          ),
+                          onTap: _isLoading ? null : _signOut,
+                        ),
+                        const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                        ListTile(
+                          leading: Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFE6E6),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.all(8),
+                            child: const Icon(Icons.delete, color: Color(0xFFEF4444)),
+                          ),
+                          title: const Text(
+                            'Delete Account',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 18,
+                              color: Color(0xFFEF4444),
+                            ),
+                          ),
+                          trailing: const Icon(
+                            Icons.arrow_forward_ios,
+                            color: Color(0xFF9CA3AF),
+                            size: 16,
+                          ),
+                          onTap: _isLoading ? null : _deleteAccount,
                         ),
                       ],
                     ),
