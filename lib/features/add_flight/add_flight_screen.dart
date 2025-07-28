@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'dart:io';
 import 'dart:developer';
 import 'dart:convert';
@@ -22,6 +24,7 @@ import 'controller/add_flight_controller.dart';
 import 'flight_selection_dialog.dart';
 import 'flight_ticket_extraction_service.dart';
 import 'upload_ticket_service.dart';
+import 'presentation/providers/add_flight_provider.dart';
 
 class Airport {
   final String city;
@@ -257,15 +260,10 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => FlightSelectScreen(
-          searchFuture: FlightApiService.searchFlights(
-            departureIata: departureIata,
-            arrivalIata: arrivalIata,
-            date: DateFormat('yyyy-MM-dd').format(_selectedDate!),
-            flightNumber: '', // TODO: Add flight number field
-          ),
           departureCity: _selectedDepartureCity ?? '',
           arrivalCity: _selectedArrivalCity ?? '',
           date: DateFormat('yyyy-MM-dd').format(_selectedDate!),
+          flightNumber: _flightNumberController.text.isNotEmpty ? _flightNumberController.text : null,
         ),
       ),
     );

@@ -136,6 +136,6 @@ class FlightSelectRemoteDataSource extends _$FlightSelectRemoteDataSource {
   /// Check network connectivity
   Future<bool> hasInternetConnection() async {
     final networkService = NetworkService();
-    return await networkService.isConnected();
+    return await networkService.hasInternetConnection();
   }
 } 
