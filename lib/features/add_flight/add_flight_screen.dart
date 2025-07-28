@@ -1066,65 +1066,30 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     try {
       print('Populating form with ticket data: $ticketData');
       
-      // Handle both data structures: flat object and nested flights array
-      Map<String, dynamic> flightData;
-      
-      if (ticketData.containsKey('flights')) {
-        // Nested structure: {flights: [{...}]}
-        final List<dynamic> flights = ticketData['flights'] ?? [];
-        if (flights.isEmpty) {
-          print('No flights found in ticket data');
-          return;
-        }
-        flightData = flights.first;
-      } else {
-        // Flat structure: {flightNumber: ..., departureCity: ..., etc.}
-        flightData = ticketData;
-      }
-      
-      // Get airports list from provider
-      final airports = ref.read(airportsProvider);
-      
-      // Populate flight number
-      final String? flightNumber = flightData['flightNumber'];
+      // Extract flight number
+      final String? flightNumber = ticketData['flightNumber'];
       if (flightNumber != null && flightNumber.isNotEmpty) {
         _flightNumberController.text = flightNumber;
       }
       
-      // Populate departure airport by searching for IATA code
-      final String? departureAirportCode = flightData['departureAirport'];
-      if (departureAirportCode != null && departureAirportCode.isNotEmpty) {
-        final departureAirport = airports.firstWhere(
-          (airport) => airport.iata.toUpperCase() == departureAirportCode.toUpperCase(),
-          orElse: () => AirportModel(
-            city: flightData['departureCity'] ?? '',
-            airport: flightData['departureCity'] ?? '',
-            iata: departureAirportCode,
-            countryCode: '',
-            countryName: '',
-          ),
-        );
-        _onDepartureAirportSelected(departureAirport);
+      // Extract departure information
+      final String? departureCity = ticketData['departureCity'];
+      final String? departureAirport = ticketData['departureAirport'];
+      if (departureCity != null && departureCity.isNotEmpty) {
+        _departureController.text = departureCity;
+        _selectedDepartureCity = departureCity;
       }
       
-      // Populate arrival airport by searching for IATA code
-      final String? arrivalAirportCode = flightData['arrivalAirport'];
-      if (arrivalAirportCode != null && arrivalAirportCode.isNotEmpty) {
-        final arrivalAirport = airports.firstWhere(
-          (airport) => airport.iata.toUpperCase() == arrivalAirportCode.toUpperCase(),
-          orElse: () => AirportModel(
-            city: flightData['arrivalCity'] ?? '',
-            airport: flightData['arrivalCity'] ?? '',
-            iata: arrivalAirportCode,
-            countryCode: '',
-            countryName: '',
-          ),
-        );
-        _onArrivalAirportSelected(arrivalAirport);
+      // Extract arrival information
+      final String? arrivalCity = ticketData['arrivalCity'];
+      final String? arrivalAirport = ticketData['arrivalAirport'];
+      if (arrivalCity != null && arrivalCity.isNotEmpty) {
+        _arrivalController.text = arrivalCity;
+        _selectedArrivalCity = arrivalCity;
       }
       
-      // Populate departure date
-      final String? departureDateStr = flightData['departureDate'];
+      // Extract departure date
+      final String? departureDateStr = ticketData['departureDate'];
       if (departureDateStr != null && departureDateStr.isNotEmpty) {
         try {
           final DateTime departureDate = DateTime.parse(departureDateStr);
@@ -1141,13 +1106,6 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
       
     } catch (e) {
       print('Error populating form from ticket data: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error filling form: ${e.toString()}'),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 4),
-        ),
-      );
     }
   }
 }
