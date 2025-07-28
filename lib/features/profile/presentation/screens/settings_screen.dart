@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:developer' as developer;
-import '../../services/firebase_service.dart';
-import '../../theme/app_theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../services/firebase_service.dart';
+import '../../../../theme/app_theme.dart';
 
 class SettingsScreen extends StatefulWidget {
   final String username;
@@ -80,34 +80,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
 
     try {
-      developer.log('SettingsScreen: Signing out user', name: 'VoloAuth');
-      
       // Sign out from Firebase
       await FirebaseService.signOut();
-      
-      developer.log('SettingsScreen: Sign out successful', name: 'VoloAuth');
       
       // Navigate back to welcome screen (AuthWrapper will handle routing)
       if (mounted) {
         Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
       }
     } catch (e) {
-      developer.log('SettingsScreen: Error signing out: $e', name: 'VoloAuth');
-      
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-
-        // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Unable to sign out. Please try again.'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Unable to sign out. Please try again.'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
+        ),
+      );
     }
   }
 
@@ -172,34 +160,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
 
     try {
-      developer.log('SettingsScreen: Deleting user account', name: 'VoloAuth');
-      
       // Delete user account and data
       await FirebaseService.deleteUserAccount();
-      
-      developer.log('SettingsScreen: Account deletion successful', name: 'VoloAuth');
       
       // Navigate back to welcome screen (AuthWrapper will handle routing)
       if (mounted) {
         Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
       }
     } catch (e) {
-      developer.log('SettingsScreen: Error deleting account: $e', name: 'VoloAuth');
-      
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-
-        // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Unable to delete account. Please try again.'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Unable to delete account. Please try again.'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
+        ),
+      );
     }
   }
 
