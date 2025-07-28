@@ -1,91 +1,36 @@
 
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../models/trip/trip_model.dart';
 import '../../../../services/trip_service.dart';
 import '../../../add_flight/add_flight_screen.dart';
 import '../../../../theme/app_theme.dart';
+import '../providers/flights_provider.dart';
 
-class FlightsScreen extends StatefulWidget {
+class FlightsScreen extends ConsumerStatefulWidget {
   final String username;
   
   const FlightsScreen({Key? key, required this.username}) : super(key: key);
 
   @override
-  State<FlightsScreen> createState() => _FlightsScreenState();
+  ConsumerState<FlightsScreen> createState() => _FlightsScreenState();
 }
 
-class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProviderStateMixin {
+class _FlightsScreenState extends ConsumerState<FlightsScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  List<Trip> _upcomingTrips = [];
-  List<Trip> _pastTrips = [];
-  bool _isLoading = true;
-  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _loadTrips();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  Future<void> _loadTrips() async {
-    try {
-      setState(() {
-        _isLoading = true;
-        _errorMessage = null;
-      });
-
-      final userId = TripService.getCurrentUserId();
-      if (userId == null) {
-        throw Exception('User not authenticated');
-      }
-
-      final allTrips = await TripService.getUserTrips(userId);
-      final now = DateTime.now();
-
-      // Separate trips into upcoming and past
-      final upcoming = <Trip>[];
-      final past = <Trip>[];
-
-      for (final trip in allTrips) {
-        final departureTime = trip.tripData.departureTime;
-        if (departureTime.isAfter(now)) {
-          upcoming.add(trip);
-        } else {
-          past.add(trip);
-        }
-      }
-
-      // Sort upcoming trips by departure time (earliest first)
-      upcoming.sort((a, b) => a.tripData.departureTime.compareTo(b.tripData.departureTime));
-      
-      // Sort past trips by departure time (most recent first)
-      past.sort((a, b) => b.tripData.departureTime.compareTo(a.tripData.departureTime));
-
-      if (mounted) {
-        setState(() {
-          _upcomingTrips = upcoming;
-          _pastTrips = past;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _errorMessage = 'Failed to load trips: ${e.toString()}';
-          _isLoading = false;
-        });
-      }
-    }
   }
 
   void _navigateToAddFlight() {
@@ -95,170 +40,180 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
       ),
     ).then((_) {
       // Refresh trips when returning from add flight
-      _loadTrips();
+      ref.read(flightsNotifierProvider.notifier).refreshTrips();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final tripsAsync = ref.watch(flightsNotifierProvider);
+    
     return Scaffold(
-              backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Flights',
-                          style: AppTheme.headlineMedium,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Manage your upcoming trips',
-                          style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
-                        ),
-                      ],
-                    ),
-                  ),
-                                     // Add Flight Button
-                   GestureDetector(
-                     onTap: _navigateToAddFlight,
-                     child: Container(
-                       width: 40,
-                       height: 40,
-                       decoration: BoxDecoration(
-                         color: AppTheme.primary,
-                         borderRadius: BorderRadius.circular(9999),
-                         boxShadow: [
-                           BoxShadow(
-                             color: Colors.black.withOpacity(0.1),
-                             blurRadius: 4,
-                             offset: const Offset(0, 4),
-                           ),
-                           BoxShadow(
-                             color: Colors.black.withOpacity(0.1),
-                             blurRadius: 10,
-                             offset: const Offset(0, 10),
-                           ),
-                         ],
-                       ),
-                       child: const Icon(
-                         Icons.add,
-                         color: AppTheme.textOnPrimary,
-                         size: 20,
-                         weight: 900,
-                       ),
-                     ),
-                   ),
-                ],
-              ),
-            ),
-
-            // Tab Bar
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              height: 52,
-              decoration: BoxDecoration(
-                color: AppTheme.cardBackground,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: TabBar(
-                controller: _tabController,
-                indicator: BoxDecoration(
-                  color: AppTheme.primary,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                indicatorSize: TabBarIndicatorSize.tab,
-                labelColor: AppTheme.textOnPrimary,
-                unselectedLabelColor: AppTheme.textSecondary,
-                labelStyle: AppTheme.labelLarge,
-                unselectedLabelStyle: AppTheme.labelLarge,
-                dividerColor: Colors.transparent,
-                tabs: const [
-                  Tab(text: 'Upcoming'),
-                  Tab(text: 'Past'),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Tab Content
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildUpcomingTab(),
-                  _buildPastTab(),
-                ],
-              ),
-            ),
-          ],
+        child: tripsAsync.when(
+          data: (tripsState) => _buildContent(tripsState),
+          loading: () => _buildLoadingContent(),
+          error: (error, stackTrace) => _buildErrorContent(error.toString()),
         ),
       ),
     );
   }
 
-  Widget _buildUpcomingTab() {
-    if (_isLoading) {
-      return Center(
-        child: CircularProgressIndicator(
-          color: AppTheme.primary,
-        ),
-      );
-    }
-
-    if (_errorMessage != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _errorMessage!,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _loadTrips,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF047C7C),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+  Widget _buildContent(FlightsState tripsState) {
+    return Column(
+      children: [
+        // Header
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Flights',
+                      style: AppTheme.headlineMedium,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Manage your upcoming trips',
+                      style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
+                    ),
+                  ],
                 ),
               ),
-              child: const Text('Retry'),
-            ),
-          ],
+              // Add Flight Button
+              GestureDetector(
+                onTap: _navigateToAddFlight,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary,
+                    borderRadius: BorderRadius.circular(9999),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 4),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.add,
+                    color: AppTheme.textOnPrimary,
+                    size: 20,
+                    weight: 900,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      );
-    }
 
-    if (_upcomingTrips.isEmpty) {
+        // Tab Bar
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          height: 52,
+          decoration: BoxDecoration(
+            color: AppTheme.cardBackground,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: TabBar(
+            controller: _tabController,
+            indicator: BoxDecoration(
+              color: AppTheme.primary,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            indicatorSize: TabBarIndicatorSize.tab,
+            labelColor: AppTheme.textOnPrimary,
+            unselectedLabelColor: AppTheme.textSecondary,
+            labelStyle: AppTheme.labelLarge,
+            unselectedLabelStyle: AppTheme.labelLarge,
+            dividerColor: Colors.transparent,
+            tabs: const [
+              Tab(text: 'Upcoming'),
+              Tab(text: 'Past'),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Tab Content
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _buildUpcomingTab(tripsState),
+              _buildPastTab(tripsState),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoadingContent() {
+    return Center(
+      child: CircularProgressIndicator(
+        color: AppTheme.primary,
+      ),
+    );
+  }
+
+  Widget _buildErrorContent(String error) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 64,
+            color: Colors.grey[400],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            error,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.grey,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => ref.read(flightsNotifierProvider.notifier).refreshTrips(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF047C7C),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUpcomingTab(FlightsState tripsState) {
+    if (tripsState.upcomingTrips.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -293,63 +248,20 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
     }
 
     return RefreshIndicator(
-      onRefresh: _loadTrips,
+      onRefresh: () => ref.read(flightsNotifierProvider.notifier).refreshTrips(),
       color: const Color(0xFF047C7C),
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: _upcomingTrips.length,
+        itemCount: tripsState.upcomingTrips.length,
         itemBuilder: (context, index) {
-          return _buildTripCard(_upcomingTrips[index]);
+          return _buildTripCard(tripsState.upcomingTrips[index]);
         },
       ),
     );
   }
 
-  Widget _buildPastTab() {
-    if (_isLoading) {
-      return Center(
-        child: CircularProgressIndicator(
-          color: AppTheme.primary,
-        ),
-      );
-    }
-
-    if (_errorMessage != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.grey[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _errorMessage!,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _loadTrips,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF047C7C),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (_pastTrips.isEmpty) {
+  Widget _buildPastTab(FlightsState tripsState) {
+    if (tripsState.pastTrips.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -384,13 +296,13 @@ class _FlightsScreenState extends State<FlightsScreen> with SingleTickerProvider
     }
 
     return RefreshIndicator(
-      onRefresh: _loadTrips,
+      onRefresh: () => ref.read(flightsNotifierProvider.notifier).refreshTrips(),
       color: const Color(0xFF047C7C),
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: _pastTrips.length,
+        itemCount: tripsState.pastTrips.length,
         itemBuilder: (context, index) {
-          return _buildTripCard(_pastTrips[index]);
+          return _buildTripCard(tripsState.pastTrips[index]);
         },
       ),
     );

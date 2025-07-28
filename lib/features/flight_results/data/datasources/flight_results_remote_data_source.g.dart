@@ -7,7 +7,7 @@ part of 'flight_results_remote_data_source.dart';
 // **************************************************************************
 
 String _$flightResultsRemoteDataSourceHash() =>
-    r'5deee30b9274630f81ebd49b90e22b12bfaad7d7';
+    r'36fe6cffcaf521a94661bcee21febdfa0c46bd17';
 
 /// Remote data source for flight results
 ///
