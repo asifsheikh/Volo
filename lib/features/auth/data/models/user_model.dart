@@ -14,26 +14,16 @@ class UserModel extends UserEntity {
   });
 
   factory UserModel.fromFirebaseUser(dynamic user) {
-    try {
-      print('UserModel.fromFirebaseUser: Starting conversion for user: ${user.uid}');
-      print('UserModel.fromFirebaseUser: creationTime type: ${user.metadata.creationTime.runtimeType}');
-      print('UserModel.fromFirebaseUser: lastSignInTime type: ${user.metadata.lastSignInTime.runtimeType}');
-      
-      return UserModel(
-        id: user.uid,
-        phoneNumber: user.phoneNumber,
-        displayName: user.displayName,
-        email: user.email,
-        photoURL: user.photoURL,
-        isEmailVerified: user.emailVerified,
-        createdAt: user.metadata.creationTime,
-        lastSignInAt: user.metadata.lastSignInTime,
-      );
-    } catch (e) {
-      print('UserModel.fromFirebaseUser: Error converting user: $e');
-      print('UserModel.fromFirebaseUser: Error stack trace: ${StackTrace.current}');
-      rethrow;
-    }
+    return UserModel(
+      id: user.uid,
+      phoneNumber: user.phoneNumber,
+      displayName: user.displayName,
+      email: user.email,
+      photoURL: user.photoURL,
+      isEmailVerified: user.emailVerified,
+      createdAt: user.metadata.creationTime,
+      lastSignInAt: user.metadata.lastSignInTime,
+    );
   }
 
   factory UserModel.fromJson(Map<String, dynamic> json) {

@@ -77,34 +77,28 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<String> sendOTP({
     required String phoneNumber,
   }) async {
-    developer.log('AuthRemoteDataSourceImpl: Starting sendOTP for phone: $phoneNumber', name: 'VoloAuth');
     try {
       final completer = Completer<String>();
       Exception? verificationError;
       
-      developer.log('AuthRemoteDataSourceImpl: Calling Firebase verifyPhoneNumber', name: 'VoloAuth');
       await _firebaseAuth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) async {
-          developer.log('AuthRemoteDataSourceImpl: Auto-verification completed', name: 'VoloAuth');
           // Auto-verification if possible
           await _firebaseAuth.signInWithCredential(credential);
         },
         verificationFailed: (FirebaseAuthException e) {
-          developer.log('AuthRemoteDataSourceImpl: Verification failed - Code: ${e.code}, Message: ${e.message}', name: 'VoloAuth');
           verificationError = Exception('Verification failed: ${e.message}');
           if (!completer.isCompleted) {
             completer.completeError(verificationError!);
           }
         },
         codeSent: (String vid, int? resendToken) {
-          developer.log('AuthRemoteDataSourceImpl: Code sent successfully - verificationId: $vid', name: 'VoloAuth');
           if (!completer.isCompleted) {
             completer.complete(vid);
           }
         },
         codeAutoRetrievalTimeout: (String vid) {
-          developer.log('AuthRemoteDataSourceImpl: Auto-retrieval timeout - verificationId: $vid', name: 'VoloAuth');
           if (!completer.isCompleted) {
             completer.complete(vid);
           }
@@ -112,46 +106,27 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         timeout: const Duration(seconds: 60),
       );
       
-      developer.log('AuthRemoteDataSourceImpl: Waiting for completer result', name: 'VoloAuth');
       // Wait for the result from the callbacks
       final result = await completer.future;
       
       if (verificationError != null) {
-        developer.log('AuthRemoteDataSourceImpl: Throwing verification error', name: 'VoloAuth');
         throw verificationError!;
       }
       
       if (result == null || result.isEmpty) {
-        developer.log('AuthRemoteDataSourceImpl: No verification ID received', name: 'VoloAuth');
         throw Exception('Failed to get verification ID');
       }
-      
-      developer.log('AuthRemoteDataSourceImpl: Successfully returning verificationId: $result', name: 'VoloAuth');
       return result;
     } catch (e) {
-      developer.log('AuthRemoteDataSourceImpl: Exception in sendOTP: $e', name: 'VoloAuth');
       throw Exception('Failed to send OTP: ${e.toString()}');
     }
   }
 
   @override
   Future<UserModel?> getCurrentUser() async {
-    print('AuthRemoteDataSource: getCurrentUser called');
     final user = _firebaseAuth.currentUser;
-    if (user == null) {
-      print('AuthRemoteDataSource: No current user, returning null');
-      return null;
-    }
-    try {
-      print('AuthRemoteDataSource: Converting current user to UserModel');
-      final userModel = UserModel.fromFirebaseUser(user);
-      print('AuthRemoteDataSource: Successfully converted current user to UserModel');
-      return userModel;
-    } catch (e) {
-      print('AuthRemoteDataSource: Error converting current user to UserModel: $e');
-      print('AuthRemoteDataSource: Error stack trace: ${StackTrace.current}');
-      rethrow;
-    }
+    if (user == null) return null;
+    return UserModel.fromFirebaseUser(user);
   }
 
   @override
@@ -191,19 +166,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Stream<UserModel?> get authStateChanges {
     return _firebaseAuth.authStateChanges().map((user) {
-      print('AuthRemoteDataSource: Auth state change - user: ${user?.uid}');
       if (user == null) {
-        print('AuthRemoteDataSource: User is null, returning null');
         return null;
       }
       try {
-        print('AuthRemoteDataSource: Converting user to UserModel');
-        final userModel = UserModel.fromFirebaseUser(user);
-        print('AuthRemoteDataSource: Successfully converted user to UserModel');
-        return userModel;
+        return UserModel.fromFirebaseUser(user);
       } catch (e) {
-        print('AuthRemoteDataSource: Error converting user to UserModel: $e');
-        print('AuthRemoteDataSource: Error stack trace: ${StackTrace.current}');
         rethrow;
       }
     });
