@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../features/home/presentation/screens/home_screen.dart';
+import '../features/flights/presentation/screens/flights_screen.dart';
 import '../theme/app_theme.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -56,34 +57,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         },
         children: [
           HomeScreen(username: widget.username),
-          // TODO: Replace with Riverpod flights screen when migrated
-          Scaffold(
-            backgroundColor: AppTheme.background,
-            body: SafeArea(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.flight,
-                      size: 64,
-                      color: AppTheme.textSecondary,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Flights',
-                      style: AppTheme.headlineLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Coming Soon!',
-                      style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          FlightsScreen(username: widget.username),
         ],
       ),
       bottomNavigationBar: Container(
