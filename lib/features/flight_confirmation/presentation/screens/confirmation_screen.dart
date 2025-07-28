@@ -346,53 +346,51 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                                       const SizedBox(height: 16),
                                       
                                       // Enhanced Alert Information
-                                      if (widget.args.contactNames.isNotEmpty) ...[
-                                        Container(
-                                          padding: const EdgeInsets.all(16),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFF9FAFB),
-                                            borderRadius: BorderRadius.circular(12),
-                                            border: Border.all(
-                                              color: const Color(0xFFE5E7EB),
-                                              width: 1,
-                                            ),
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.notifications_active,
-                                                    size: 18,
-                                                    color: const Color(0xFF059393),
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Expanded(
-                                                    child: Text(
-                                                      'Real-time alerts will be sent via WhatsApp',
-                                                      style: AppTheme.bodyLarge.copyWith(
-                                                        fontWeight: FontWeight.w600,
-                                                        fontSize: 14,
-                                                        color: const Color(0xFF374151),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 12),
-                                              _buildConfirmationAlertItem('✈️ Flight plan confirmation'),
-                                              _buildConfirmationAlertItem('🛫 Departure (boarding & takeoff)'),
-                                              _buildConfirmationAlertItem('🛬 Arrival and landing'),
-                                              _buildConfirmationAlertItem('⏰ Delays with updated times'),
-                                              _buildConfirmationAlertItem('❌ Cancellations'),
-                                              _buildConfirmationAlertItem('🔄 Diversions'),
-                                              _buildConfirmationAlertItem('🚪 Gate changes'),
-                                              _buildConfirmationAlertItem('📋 Schedule updates'),
-                                            ],
+                                      Container(
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF9FAFB),
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(
+                                            color: const Color(0xFFE5E7EB),
+                                            width: 1,
                                           ),
                                         ),
-                                      ],
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.notifications_active,
+                                                  size: 18,
+                                                  color: const Color(0xFF059393),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(
+                                                    'Real-time alerts will be sent via WhatsApp',
+                                                    style: AppTheme.bodyLarge.copyWith(
+                                                      fontWeight: FontWeight.w600,
+                                                      fontSize: 14,
+                                                      color: const Color(0xFF374151),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 12),
+                                            _buildConfirmationAlertItem('✈️ Flight plan confirmation'),
+                                            _buildConfirmationAlertItem('🛫 Departure (boarding & takeoff)'),
+                                            _buildConfirmationAlertItem('🛬 Arrival and landing'),
+                                            _buildConfirmationAlertItem('⏰ Delays with updated times'),
+                                            _buildConfirmationAlertItem('❌ Cancellations'),
+                                            _buildConfirmationAlertItem('🔄 Diversions'),
+                                            _buildConfirmationAlertItem('🚪 Gate changes'),
+                                            _buildConfirmationAlertItem('📋 Schedule updates'),
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                   ),
                                   const SizedBox(height: 32),
