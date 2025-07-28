@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
+import 'dart:developer';
 import 'dart:convert';
-import 'dart:async';
-import 'dart:developer' as developer;
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 
-import '../../services/flight_api_service.dart';
-import 'upload_ticket_service.dart';
-import '../../screens/home/flight_results_screen.dart';
-import '../../screens/home/flight_select_screen.dart';
-import '../../features/flight_confirmation/screens/confirmation_screen.dart' show resetConfettiForNewJourney;
-import 'presentation/providers/add_flight_provider.dart';
-import 'domain/entities/airport_entity.dart';
+import '../../theme/app_theme.dart';
+import '../../features/flight_results/presentation/screens/flight_results_screen.dart';
+import '../../features/flight_select/presentation/screens/flight_select_screen.dart';
+import '../../features/flight_confirmation/presentation/screens/confirmation_screen.dart';
+import '../../features/flight_confirmation/models/confirmation_args.dart';
+import '../../features/flight_confirmation/domain/usecases/get_confirmation_data.dart';
+import '../../services/firebase_service.dart';
+import '../../services/network_service.dart';
+import '../../widgets/loading_dialog.dart';
+import '../../widgets/network_error_widget.dart';
 import 'domain/entities/flight_entity.dart';
+import 'controller/add_flight_controller.dart';
+import 'flight_selection_dialog.dart';
+import 'flight_ticket_extraction_service.dart';
+import 'upload_ticket_service.dart';
 
 class Airport {
   final String city;
@@ -109,11 +116,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
       CurvedAnimation(parent: _scanButtonController, curve: Curves.easeInOut),
     );
     
-    // Reset confetti flag for new journey
-    resetConfettiForNewJourney();
-    
-    // Reset confetti flag for new journey
-    resetConfettiForNewJourney();
+    // Reset confetti flag for new journey (will be handled when navigating to confirmation screen)
   }
 
   @override

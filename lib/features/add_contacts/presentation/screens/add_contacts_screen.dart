@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import '../../../../features/flight_confirmation/screens/confirmation_screen.dart';
+import '../../../../features/flight_confirmation/presentation/screens/confirmation_screen.dart';
 import '../../../../features/flight_confirmation/models/confirmation_args.dart';
 import '../../widgets/contact_picker_dialog.dart';
 import '../providers/add_contacts_provider.dart';

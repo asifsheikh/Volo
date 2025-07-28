@@ -11,6 +11,7 @@ import '../../domain/usecases/get_confirmation_data.dart';
 import '../../models/confirmation_args.dart';
 import '../../../../features/weather/presentation/providers/weather_provider.dart';
 import '../../../../features/weather/presentation/widgets/weather_city_card.dart';
+import '../../../../features/weather/domain/entities/weather_state.dart' as weather_domain;
 
 /// Flight Confirmation Screen using Riverpod + Clean Architecture
 class ConfirmationScreen extends ConsumerStatefulWidget {
@@ -723,7 +724,7 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
 
     return Consumer(
       builder: (context, ref, child) {
-        final weatherAsync = ref.watch(weatherProviderProvider(iataCodes));
+        final weatherState = ref.watch(globalWeatherNotifierProvider);
         
         return Container(
           padding: const EdgeInsets.all(20),
@@ -750,98 +751,41 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              weatherAsync.when(
-                data: (weatherData) {
-                  if (weatherData.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-
-                  // Find departure and arrival weather
-                  final departureWeather = weatherData.firstWhere(
-                    (w) => w.iataCode == widget.args.departureAirportCode,
-                    orElse: () => weatherData.first,
-                  );
-                  final arrivalWeather = weatherData.firstWhere(
-                    (w) => w.iataCode == widget.args.arrivalAirportCode,
-                    orElse: () => weatherData.last,
-                  );
-
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: WeatherCityCard(
-                          weather: departureWeather,
-                          isDeparture: true,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: WeatherCityCard(
-                          weather: arrivalWeather,
-                          isDeparture: false,
-                        ),
-                      ),
-                    ],
-                  );
-                },
-                loading: () => Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        height: 120,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey[200],
-                        ),
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Container(
-                        height: 120,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey[200],
-                        ),
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                error: (error, stackTrace) => Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: Colors.red[50],
-                    border: Border.all(color: Colors.red[200]!),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.error_outline, color: Colors.red[400], size: 20),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Unable to load weather data',
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                            color: Colors.red[700],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              _buildWeatherContent(weatherState),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _buildWeatherContent(Map<String, weather_domain.WeatherState> weatherState) {
+    final departureWeather = weatherState[widget.args.departureAirportCode];
+    final arrivalWeather = weatherState[widget.args.arrivalAirportCode];
+
+    if (departureWeather == null && arrivalWeather == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(
+      children: [
+        if (departureWeather != null)
+          Expanded(
+            child: WeatherCityCard(
+              weather: departureWeather,
+              isDeparture: true,
+            ),
+          ),
+        if (departureWeather != null && arrivalWeather != null)
+          const SizedBox(width: 12),
+        if (arrivalWeather != null)
+          Expanded(
+            child: WeatherCityCard(
+              weather: arrivalWeather,
+              isDeparture: false,
+            ),
+          ),
+      ],
     );
   }
 } 
