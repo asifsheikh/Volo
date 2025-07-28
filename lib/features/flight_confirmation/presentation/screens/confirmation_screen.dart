@@ -32,11 +32,16 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
   ConfettiController? _confettiController;
   ConfettiController? _leftConfettiController;
   ConfettiController? _rightConfettiController;
+  bool _weatherLoaded = false;
   
   @override
   void initState() {
     super.initState();
     _initializeControllers();
+    // Load weather data automatically after the widget is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadWeatherData();
+    });
   }
 
   void _initializeControllers() {
@@ -53,6 +58,22 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
         Future.delayed(const Duration(milliseconds: 100), () {
           _playConfetti(includeCenter: false);
         });
+      });
+    }
+  }
+
+  void _loadWeatherData() {
+    if (!_weatherLoaded) {
+      final args = widget.args;
+      final iataCodes = [args.departureAirportCode, args.arrivalAirportCode];
+      
+      print('Confirmation Debug: Auto-loading weather for IATA codes: $iataCodes');
+      
+      final globalWeatherNotifier = ref.read(globalWeatherNotifierProvider.notifier);
+      globalWeatherNotifier.loadWeatherData(iataCodes);
+      
+      setState(() {
+        _weatherLoaded = true;
       });
     }
   }
@@ -790,20 +811,26 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
         final globalWeather = ref.watch(globalWeatherNotifierProvider);
         final weather = globalWeather[airportCode];
         
+        print('Confirmation Weather Debug: Building weather for $airportCode, weather data: ${weather != null ? 'available' : 'null'}');
+        
         if (weather != null) {
           // Just show temperature with simple formatting
-          return Text(
-            '${weather.current.temperature.round()}°C',
-            style: const TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w800, // Slightly bolder
-              fontSize: 20, // Larger font size
-              color: Colors.white,
-              letterSpacing: 0.5,
+          return Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              '${weather.current.temperature.round()}°C',
+              style: const TextStyle(
+                fontFamily: 'Inter',
+                fontWeight: FontWeight.w800,
+                fontSize: 20,
+                color: Colors.white,
+                letterSpacing: 0.5,
+              ),
             ),
           );
         } else {
           // Show nothing when weather data is not available
+          print('Confirmation Weather Debug: No weather data for $airportCode, showing SizedBox.shrink()');
           return const SizedBox.shrink();
         }
       },
