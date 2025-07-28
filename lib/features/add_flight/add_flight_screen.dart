@@ -17,7 +17,7 @@ import '../../services/firebase_service.dart';
 import '../../services/network_service.dart';
 import '../../widgets/loading_dialog.dart';
 import '../../widgets/network_error_widget.dart';
-import 'domain/entities/flight_entity.dart';
+import 'domain/entities/airport_entity.dart';
 import 'controller/add_flight_controller.dart';
 import 'flight_selection_dialog.dart';
 import 'flight_ticket_extraction_service.dart';
