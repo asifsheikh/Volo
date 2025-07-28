@@ -12,6 +12,8 @@ import '../../../../services/remote_config_service.dart';
 import '../../../../features/ai_demo/ai_demo_screen.dart';
 import '../../../../theme/app_theme.dart';
 import '../screens/push_notification_test_screen.dart';
+import '../../../../screens/profile/settings_screen.dart';
+import '../../../../screens/profile/debug_tools_screen.dart';
 
 /// Profile Screen using Riverpod + Clean Architecture
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -71,569 +73,372 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
-  /// Handle sign out
-  Future<void> _signOut() async {
-    // Show confirmation dialog
-    final shouldSignOut = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Sign Out',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-            ),
-          ),
-          content: const Text(
-            'Are you sure you want to sign out of your account?',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w400,
-              fontSize: 16,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF6B7280),
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text(
-                'Sign Out',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFFEF4444),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (shouldSignOut != true) {
-      return;
-    }
-
-    try {
-      developer.log('ProfileScreen: Signing out user', name: 'VoloAuth');
-      
-      // Sign out using the use case
-      await ref.read(getProfileDataProvider(widget.username, widget.phoneNumber).notifier).signOut();
-      
-      developer.log('ProfileScreen: Sign out successful', name: 'VoloAuth');
-      
-      // Navigate back to welcome screen (AuthWrapper will handle routing)
-      if (mounted) {
-        Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
-      }
-    } catch (e) {
-      developer.log('ProfileScreen: Error signing out: $e', name: 'VoloAuth');
-      
-      if (mounted) {
-        // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Unable to sign out. Please try again.'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
-    }
-  }
-
-  /// Handle delete account
-  Future<void> _deleteAccount() async {
-    // Show confirmation dialog
-    final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            'Delete Account',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-              color: Color(0xFFEF4444),
-            ),
-          ),
-          content: const Text(
-            'This action cannot be undone. All your flight data and contacts will be permanently deleted.',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w400,
-              fontSize: 16,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF6B7280),
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text(
-                'Delete',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFFEF4444),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (shouldDelete != true) {
-      return;
-    }
-
-    try {
-      developer.log('ProfileScreen: Deleting user account', name: 'VoloAuth');
-      
-      // Delete account using the use case
-      await ref.read(getProfileDataProvider(widget.username, widget.phoneNumber).notifier).deleteAccount();
-      
-      developer.log('ProfileScreen: Account deletion successful', name: 'VoloAuth');
-      
-      // Navigate back to welcome screen
-      if (mounted) {
-        Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
-      }
-    } catch (e) {
-      developer.log('ProfileScreen: Error deleting account: $e', name: 'VoloAuth');
-      
-      if (mounted) {
-        // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Unable to delete account. Please try again.'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final profileAsync = ref.watch(profileProviderProvider(widget.username, widget.phoneNumber));
-    
-    return profileAsync.when(
-      data: (profileState) => _buildProfileContent(profileState),
-      loading: () => _buildLoadingContent(),
-      error: (error, stackTrace) => _buildErrorContent(error.toString()),
-    );
-  }
+    final profileState = ref.watch(getProfileDataProvider(widget.username, widget.phoneNumber));
 
-  Widget _buildLoadingContent() {
     return Scaffold(
       backgroundColor: AppTheme.background,
-      body: const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-  }
-
-  Widget _buildErrorContent(String error) {
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red[300],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Error Loading Profile',
-              style: AppTheme.headlineMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error,
-              style: AppTheme.bodyMedium.copyWith(color: Colors.grey[600]),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                ref.invalidate(profileProviderProvider(widget.username, widget.phoneNumber));
-              },
-              child: const Text('Retry'),
-            ),
-          ],
+      appBar: AppBar(
+        backgroundColor: AppTheme.background,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
+          onPressed: () => Navigator.of(context).pop(),
         ),
+        title: Text(
+          'Profile',
+          style: AppTheme.headlineMedium,
+        ),
+        centerTitle: false,
       ),
-    );
-  }
-
-  Widget _buildProfileContent(domain.ProfileState profileState) {
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header with back button
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                        color: AppTheme.textPrimary,
-                        splashRadius: 24,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Profile',
-                        style: AppTheme.headlineLarge.copyWith(fontSize: 28),
+      body: profileState.when(
+        data: (profileData) => SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Profile Picture Section
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 32),
-                  
-                  // Profile Picture Section
-                  Center(
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                          onTap: _updateProfilePicture,
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: const Color(0xFF059393),
-                                    width: 3,
+                  child: Column(
+                    children: [
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Profile picture with teal border
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: const Color(0xFF008080), // Teal border
+                                width: 3,
+                              ),
+                            ),
+                            child: CircleAvatar(
+                              radius: 48,
+                              backgroundColor: Colors.white,
+                              backgroundImage: profileData.profilePictureUrl != null
+                                  ? NetworkImage(profileData.profilePictureUrl!)
+                                  : null,
+                              child: profileData.profilePictureUrl == null
+                                  ? Icon(
+                                      Icons.person,
+                                      size: 48,
+                                      color: Color(0xFF9CA3AF),
+                                    )
+                                  : null,
+                            ),
+                          ),
+                          // Camera button
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: _isUpdatingProfilePicture ? null : _updateProfilePicture,
+                                child: Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: _isUpdatingProfilePicture 
+                                        ? Color(0xFF9CA3AF)
+                                        : Color(0xFF008080),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 6,
+                                        offset: Offset(0, 4),
+                                      ),
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 4,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                child: ClipOval(
                                   child: _isUpdatingProfilePicture
-                                      ? Container(
-                                          color: Colors.grey[200],
-                                          child: const Center(
-                                            child: CircularProgressIndicator(),
+                                      ? const SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                           ),
                                         )
-                                      : profileState.profilePictureUrl != null
-                                          ? Image.network(
-                                              profileState.profilePictureUrl!,
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (context, error, stackTrace) {
-                                                return Container(
-                                                  color: Colors.grey[200],
-                                                  child: Icon(
-                                                    Icons.person,
-                                                    size: 60,
-                                                    color: Colors.grey[400],
-                                                  ),
-                                                );
-                                              },
-                                            )
-                                          : Container(
-                                              color: Colors.grey[200],
-                                              child: Icon(
-                                                Icons.person,
-                                                size: 60,
-                                                color: Colors.grey[400],
-                                              ),
-                                            ),
+                                      : const Icon(
+                                          Icons.camera_alt,
+                                          color: Colors.white,
+                                          size: 18,
+                                        ),
                                 ),
                               ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  width: 36,
-                                  height: 36,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF059393),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white, width: 3),
-                                  ),
-                                  child: const Icon(
-                                    Icons.camera_alt,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        profileData.username,
+                        style: const TextStyle(
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          fontSize: 24,
+                          color: Color(0xFF111827),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.phone, size: 18, color: Color(0xFF6B7280)),
+                          const SizedBox(width: 6),
+                          Text(
+                            profileData.phoneNumber,
+                            style: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 16,
+                              color: Color(0xFF6B7280),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          'To change your phone number, please log out and log in again.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 15,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                
+                // Main Sections
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Column(
+                    children: [
+                      // My Circle
+                      ListTile(
+                        leading: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Color(0x33008080),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.groups,
+                              color: Color(0xFF008080),
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        title: const Text(
+                          'My Circle',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Color(0xFF9CA3AF),
+                          size: 16,
+                        ),
+                        onTap: () {
+                          // TODO: Navigate to My Circle screen
+                        },
+                      ),
+                      const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                      
+                      // My Flight Journey
+                      ListTile(
+                        leading: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Color(0x33008080),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.flight_takeoff,
+                              color: Color(0xFF008080),
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        title: const Text(
+                          'My Flight Journey',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Color(0xFF9CA3AF),
+                          size: 16,
+                        ),
+                        onTap: () {
+                          // TODO: Navigate to My Flight Journey screen
+                        },
+                      ),
+                      const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                      
+                      // Settings
+                      ListTile(
+                        leading: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Color(0x33008080),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.settings,
+                              color: Color(0xFF008080),
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        title: const Text(
+                          'Settings',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Color(0xFF9CA3AF),
+                          size: 16,
+                        ),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => SettingsScreen(
+                                username: profileData.username,
+                                phoneNumber: profileData.phoneNumber,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      
+                      // Debug Tools (only in debug mode)
+                      if (kDebugMode) ...[
+                        const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                        ListTile(
+                          leading: Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: Color(0x33008080),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.bug_report,
+                                color: Color(0xFF008080),
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                          title: Row(
+                            children: [
+                              const Text(
+                                'Debug Tools',
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 18,
+                                  color: Color(0xFF333333),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFF6B35),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  'DEBUG',
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 8,
                                     color: Colors.white,
-                                    size: 18,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          profileState.username,
-                          style: AppTheme.headlineMedium.copyWith(fontSize: 24),
-                        ),
-                        Text(
-                          profileState.phoneNumber,
-                          style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  
-                  // Settings Section
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE6F3FF),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.settings, color: Color(0xFF059393)),
+                          trailing: const Icon(
+                            Icons.arrow_forward_ios,
+                            color: Color(0xFF9CA3AF),
+                            size: 16,
                           ),
-                          title: const Text(
-                            'Settings',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFF111827),
-                            ),
-                          ),
-                          trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF9CA3AF)),
                           onTap: () {
-                            // Navigate to settings
-                          },
-                        ),
-                        const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
-                        ListTile(
-                          leading: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE6F3FF),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.help_outline, color: Color(0xFF059393)),
-                          ),
-                          title: const Text(
-                            'Help & Support',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFF111827),
-                            ),
-                          ),
-                          trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF9CA3AF)),
-                          onTap: () {
-                            // Navigate to help & support
-                          },
-                        ),
-                        const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
-                        ListTile(
-                          leading: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE6F3FF),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.privacy_tip, color: Color(0xFF059393)),
-                          ),
-                          title: const Text(
-                            'Privacy Policy',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFF111827),
-                            ),
-                          ),
-                          trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF9CA3AF)),
-                          onTap: () {
-                            // Navigate to privacy policy
-                          },
-                        ),
-                        const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
-                        ListTile(
-                          leading: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE6F3FF),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.description, color: Color(0xFF059393)),
-                          ),
-                          title: const Text(
-                            'Terms of Service',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFF111827),
-                            ),
-                          ),
-                          trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF9CA3AF)),
-                          onTap: () {
-                            // Navigate to terms of service
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  
-                  // Debug Section (if in debug mode)
-                  if (kDebugMode) ...[
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      child: Column(
-                        children: [
-                          ListTile(
-                            leading: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFFF7E6),
-                                borderRadius: BorderRadius.circular(12),
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const DebugToolsScreen(),
                               ),
-                              padding: const EdgeInsets.all(8),
-                              child: const Icon(Icons.bug_report, color: Color(0xFFFFA726)),
-                            ),
-                            title: Row(
-                              children: [
-                                const Text(
-                                  'Debug Tools',
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 18,
-                                    color: Color(0xFF111827),
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFF6B35),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: const Text(
-                                    'DEBUG',
-                                    style: TextStyle(
-                                      fontFamily: 'Inter',
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 8,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(builder: (context) => const PushNotificationTestScreen()),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
-                  
-                  // Account Actions Section
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFF7E6),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.logout, color: Color(0xFFFFA726)),
-                          ),
-                          title: const Text(
-                            'Sign Out',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFF111827),
-                            ),
-                          ),
-                          onTap: _signOut,
-                        ),
-                        const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
-                        ListTile(
-                          leading: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFE6E6),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.delete, color: Color(0xFFEF4444)),
-                          ),
-                          title: const Text(
-                            'Delete Account',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFFEF4444),
-                            ),
-                          ),
-                          onTap: _deleteAccount,
+                            );
+                          },
                         ),
                       ],
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        error: (error, stackTrace) => Center(
+          child: Text('Error: $error'),
+        ),
       ),
     );
   }
