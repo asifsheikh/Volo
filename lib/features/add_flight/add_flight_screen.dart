@@ -17,6 +17,7 @@ import '../../features/flight_confirmation/models/confirmation_args.dart';
 import '../../features/flight_confirmation/domain/usecases/get_confirmation_data.dart';
 import '../../services/firebase_service.dart';
 import '../../services/network_service.dart';
+import '../../services/flight_api_service.dart';
 import '../../widgets/loading_dialog.dart';
 import '../../widgets/network_error_widget.dart';
 import 'domain/entities/airport_entity.dart';
@@ -260,10 +261,15 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => FlightSelectScreen(
+          searchFuture: FlightApiService.searchFlights(
+            departureIata: departureIata,
+            arrivalIata: arrivalIata,
+            date: DateFormat('yyyy-MM-dd').format(_selectedDate!),
+            flightNumber: _flightNumberController.text.isNotEmpty ? _flightNumberController.text : null,
+          ),
           departureCity: _selectedDepartureCity ?? '',
           arrivalCity: _selectedArrivalCity ?? '',
           date: DateFormat('yyyy-MM-dd').format(_selectedDate!),
-          flightNumber: _flightNumberController.text.isNotEmpty ? _flightNumberController.text : null,
         ),
       ),
     );

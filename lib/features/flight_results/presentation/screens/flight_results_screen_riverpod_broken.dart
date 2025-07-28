@@ -1,26 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../../../services/flight_api_service.dart';
 import '../../../../theme/app_theme.dart';
+import '../providers/flight_results_provider.dart';
+import '../../domain/entities/flight_results_state.dart' as domain;
 
-class FlightResultsScreen extends StatelessWidget {
-  final FlightSearchResponse searchResponse;
+/// Flight Results Screen using Riverpod + Clean Architecture
+class FlightResultsScreen extends ConsumerStatefulWidget {
   final String departureCity;
   final String arrivalCity;
   final String date;
+  final String? flightNumber;
 
   const FlightResultsScreen({
     Key? key,
-    required this.searchResponse,
     required this.departureCity,
     required this.arrivalCity,
     required this.date,
+    this.flightNumber,
   }) : super(key: key);
 
   @override
+  ConsumerState<FlightResultsScreen> createState() => _FlightResultsScreenState();
+}
+
+class _FlightResultsScreenState extends ConsumerState<FlightResultsScreen> {
+  @override
   Widget build(BuildContext context) {
-    final allFlights = [...searchResponse.bestFlights, ...searchResponse.otherFlights];
-    
+    final flightResultsAsync = ref.watch(flightResultsProviderProvider(
+      departureCity: widget.departureCity,
+      arrivalCity: widget.arrivalCity,
+      date: widget.date,
+      flightNumber: widget.flightNumber,
+    ));
+
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
@@ -38,130 +51,191 @@ class FlightResultsScreen extends StatelessWidget {
         centerTitle: false,
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            // Route summary
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppTheme.cardBackground,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          departureCity,
-                          style: AppTheme.bodyLarge.copyWith(fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Departure',
-                          style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: AppTheme.textPrimary,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Icon(
-                      Icons.flight_takeoff,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          arrivalCity,
-                          style: AppTheme.bodyLarge.copyWith(fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Arrival',
-                          style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            // Results count and price info
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppTheme.cardBackground,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '${allFlights.length} flights found',
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: Color(0xFF374151),
-                    ),
-                  ),
-                  Text(
-                    'From \$${_getLowestPrice(allFlights)}',
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      color: Color(0xFF059669),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            const SizedBox(height: 8),
-            
-            // Flight list
-            Expanded(
-              child: allFlights.isEmpty
-                  ? _buildNoResultsWidget()
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: allFlights.length,
-                      itemBuilder: (context, index) {
-                        final flight = allFlights[index];
-                        return _buildFlightCard(flight, index == 0);
-                      },
-                    ),
-            ),
-          ],
+        child: flightResultsAsync.when(
+          data: (flightResults) => _buildFlightResultsContent(flightResults),
+          loading: () => _buildLoadingContent(),
+          error: (error, stackTrace) => _buildErrorContent(error.toString()),
         ),
+      ),
+    );
+  }
+
+  Widget _buildFlightResultsContent(domain.FlightResultsState flightResults) {
+    final allFlights = [...flightResults.bestFlights, ...flightResults.otherFlights];
+    
+    return Column(
+      children: [
+        // Route summary
+        Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppTheme.cardBackground,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      flightResults.departureCity,
+                      style: AppTheme.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Departure',
+                      style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppTheme.textPrimary,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(
+                  Icons.flight_takeoff,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      flightResults.arrivalCity,
+                      style: AppTheme.bodyLarge.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Arrival',
+                      style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        
+        // Results count and price info
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppTheme.cardBackground,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${allFlights.length} flights found',
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  color: Color(0xFF374151),
+                ),
+              ),
+              Text(
+                'From \$${_getLowestPrice(allFlights)}',
+                style: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: Color(0xFF059669),
+                ),
+              ),
+            ],
+          ),
+        ),
+        
+        const SizedBox(height: 8),
+        
+        // Flight list
+        Expanded(
+          child: allFlights.isEmpty
+              ? _buildNoResultsWidget()
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: allFlights.length,
+                  itemBuilder: (context, index) {
+                    final flight = allFlights[index];
+                    return _buildFlightCard(flight, index == 0);
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoadingContent() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 16),
+          Text('Searching for flights...'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorContent(String error) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 64,
+            color: AppTheme.textSecondary,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Error loading flights',
+            style: AppTheme.headlineMedium,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            error,
+            style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              ref.invalidate(flightResultsProviderProvider(
+                departureCity: widget.departureCity,
+                arrivalCity: widget.arrivalCity,
+                date: widget.date,
+                flightNumber: widget.flightNumber,
+              ));
+            },
+            child: const Text('Retry'),
+          ),
+        ],
       ),
     );
   }
@@ -201,7 +275,7 @@ class FlightResultsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFlightCard(FlightOption flight, bool isBest) {
+  Widget _buildFlightCard(domain.FlightOption flight, bool isBest) {
     final mainFlight = flight.flights.first;
     final isDirect = flight.flights.length == 1;
     
@@ -233,14 +307,14 @@ class FlightResultsScreen extends StatelessWidget {
             child: Row(
               children: [
                 // Airline logo
-                if (mainFlight.airlineLogo != null)
+                if (flight.airlineLogo != null)
                   Container(
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                       image: DecorationImage(
-                        image: NetworkImage(mainFlight.airlineLogo!),
+                        image: NetworkImage(flight.airlineLogo!),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -302,23 +376,15 @@ class FlightResultsScreen extends StatelessWidget {
                         color: Color(0xFF111827),
                       ),
                     ),
-                    if (isBest)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF059669),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Text(
-                          'Best',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 10,
-                            color: Colors.white,
-                          ),
-                        ),
+                    Text(
+                      isDirect ? 'Direct' : '${flight.flights.length} stops',
+                      style: const TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                        color: Color(0xFF6B7280),
                       ),
+                    ),
                   ],
                 ),
               ],
@@ -326,7 +392,7 @@ class FlightResultsScreen extends StatelessWidget {
           ),
           
           // Flight details
-          Padding(
+          Container(
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
@@ -361,33 +427,22 @@ class FlightResultsScreen extends StatelessWidget {
                       ),
                     ),
                     
-                    // Duration and stops
+                    // Duration
                     Column(
                       children: [
+                        Container(
+                          width: 60,
+                          height: 1,
+                          color: const Color(0xFFE5E7EB),
+                        ),
+                        const SizedBox(height: 4),
                         Text(
                           _formatDuration(flight.totalDuration),
                           style: const TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w500,
-                            fontSize: 14,
+                            fontSize: 12,
                             color: Color(0xFF6B7280),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: isDirect ? const Color(0xFF059669).withOpacity(0.1) : const Color(0xFFF59E0B).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            isDirect ? 'Direct' : '${flight.flights.length - 1} stop${flight.flights.length > 2 ? 's' : ''}',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 10,
-                              color: isDirect ? const Color(0xFF059669) : const Color(0xFFF59E0B),
-                            ),
                           ),
                         ),
                       ],
@@ -424,7 +479,7 @@ class FlightResultsScreen extends StatelessWidget {
                 ),
                 
                 // Additional info
-                if (mainFlight.airplane != null || mainFlight.extensions.isNotEmpty)
+                if (mainFlight.airplane != null || (mainFlight.extensions?.isNotEmpty ?? false))
                   Container(
                     margin: const EdgeInsets.only(top: 12),
                     padding: const EdgeInsets.all(12),
@@ -445,9 +500,9 @@ class FlightResultsScreen extends StatelessWidget {
                               color: Color(0xFF374151),
                             ),
                           ),
-                        if (mainFlight.extensions.isNotEmpty)
+                        if (mainFlight.extensions?.isNotEmpty ?? false)
                           Text(
-                            mainFlight.extensions.first,
+                            mainFlight.extensions!.first,
                             style: const TextStyle(
                               fontFamily: 'Inter',
                               fontWeight: FontWeight.w400,
@@ -487,7 +542,7 @@ class FlightResultsScreen extends StatelessWidget {
     }
   }
 
-  int _getLowestPrice(List<FlightOption> flights) {
+  int _getLowestPrice(List<domain.FlightOption> flights) {
     if (flights.isEmpty) return 0;
     return flights.map((flight) => flight.price).reduce((a, b) => a < b ? a : b);
   }
