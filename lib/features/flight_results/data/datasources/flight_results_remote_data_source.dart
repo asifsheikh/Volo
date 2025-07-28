@@ -1,5 +1,4 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/flight_results_state.dart' as domain;
 import '../../../../services/flight_api_service.dart';
 import '../../../../services/network_service.dart';
@@ -128,6 +127,20 @@ class FlightResultsRemoteDataSource extends _$FlightResultsRemoteDataSource {
         otherFlights: otherFlights,
         airports: airports,
       );
+    } on NetworkError catch (e) {
+      // Handle the case where no flights are found
+      if (e.type == NetworkErrorType.notFound) {
+        return domain.FlightResultsState(
+          departureCity: departureCity,
+          arrivalCity: arrivalCity,
+          date: date,
+          bestFlights: [],
+          otherFlights: [],
+          airports: [],
+          errorMessage: e.message,
+        );
+      }
+      throw Exception('Failed to get flight results: $e');
     } catch (e) {
       throw Exception('Failed to get flight results: $e');
     }
