@@ -72,6 +72,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     try {
+      // Clear any existing errors before starting
+      ref.read(authNotifierProvider).clearError();
+
       // Format phone number and country code
       String formattedCountryCode = _countryCode.trim();
       String formattedNumber = _phoneController.text.trim();
@@ -93,13 +96,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       String fullPhoneNumber = '+$formattedCountryCode$formattedNumber';
 
+      print('LoginScreen: Sending OTP for phone: $fullPhoneNumber');
+
       // Send OTP via Riverpod
       final verificationId = await ref.read(authNotifierProvider).sendOTP(
         phoneNumber: fullPhoneNumber,
       );
 
+      print('LoginScreen: OTP result - verificationId: $verificationId');
+
       // If successful, navigate to OTP screen
       if (mounted && verificationId != null) {
+        print('LoginScreen: Navigating to OTP screen');
+        // Clear any errors before navigation since we're successful
+        ref.read(authNotifierProvider).clearError();
+        
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => OtpScreen(
@@ -108,6 +119,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         );
+      } else {
+        print('LoginScreen: OTP sending failed - verificationId is null');
       }
     } catch (e) {
       // Error handling is done via Riverpod state
@@ -189,10 +202,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide(
-                                    color: (error != null && _hasAttemptedSubmission) ? Colors.red : Colors.transparent,
+                                    color: (error != null && _hasAttemptedSubmission && !isLoading) ? Colors.red : Colors.transparent,
                                   ),
                                 ),
-                                errorText: (error != null && _hasAttemptedSubmission) ? error : null,
+                                errorText: (error != null && _hasAttemptedSubmission && !isLoading) ? error : null,
                                 errorStyle: const TextStyle(color: Colors.red),
                               ),
                               onChanged: (phone) {
