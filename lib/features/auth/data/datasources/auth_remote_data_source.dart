@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:async';
+import 'dart:developer' as developer;
 
 import '../models/user_model.dart';
 import '../../../../core/di/providers.dart';
@@ -75,36 +77,59 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<String> sendOTP({
     required String phoneNumber,
   }) async {
+    developer.log('AuthRemoteDataSourceImpl: Starting sendOTP for phone: $phoneNumber', name: 'VoloAuth');
     try {
-      String? verificationId;
+      final completer = Completer<String>();
+      Exception? verificationError;
       
+      developer.log('AuthRemoteDataSourceImpl: Calling Firebase verifyPhoneNumber', name: 'VoloAuth');
       await _firebaseAuth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) async {
+          developer.log('AuthRemoteDataSourceImpl: Auto-verification completed', name: 'VoloAuth');
           // Auto-verification if possible
           await _firebaseAuth.signInWithCredential(credential);
         },
         verificationFailed: (FirebaseAuthException e) {
-          throw Exception('Verification failed: ${e.message}');
+          developer.log('AuthRemoteDataSourceImpl: Verification failed - Code: ${e.code}, Message: ${e.message}', name: 'VoloAuth');
+          verificationError = Exception('Verification failed: ${e.message}');
+          if (!completer.isCompleted) {
+            completer.completeError(verificationError!);
+          }
         },
         codeSent: (String vid, int? resendToken) {
-          verificationId = vid;
+          developer.log('AuthRemoteDataSourceImpl: Code sent successfully - verificationId: $vid', name: 'VoloAuth');
+          if (!completer.isCompleted) {
+            completer.complete(vid);
+          }
         },
         codeAutoRetrievalTimeout: (String vid) {
-          verificationId = vid;
+          developer.log('AuthRemoteDataSourceImpl: Auto-retrieval timeout - verificationId: $vid', name: 'VoloAuth');
+          if (!completer.isCompleted) {
+            completer.complete(vid);
+          }
         },
         timeout: const Duration(seconds: 60),
       );
       
-      // Wait a bit for the verification ID to be set
-      await Future.delayed(const Duration(milliseconds: 100));
+      developer.log('AuthRemoteDataSourceImpl: Waiting for completer result', name: 'VoloAuth');
+      // Wait for the result from the callbacks
+      final result = await completer.future;
       
-      if (verificationId == null) {
+      if (verificationError != null) {
+        developer.log('AuthRemoteDataSourceImpl: Throwing verification error', name: 'VoloAuth');
+        throw verificationError!;
+      }
+      
+      if (result == null || result.isEmpty) {
+        developer.log('AuthRemoteDataSourceImpl: No verification ID received', name: 'VoloAuth');
         throw Exception('Failed to get verification ID');
       }
       
-      return verificationId!;
+      developer.log('AuthRemoteDataSourceImpl: Successfully returning verificationId: $result', name: 'VoloAuth');
+      return result;
     } catch (e) {
+      developer.log('AuthRemoteDataSourceImpl: Exception in sendOTP: $e', name: 'VoloAuth');
       throw Exception('Failed to send OTP: ${e.toString()}');
     }
   }
