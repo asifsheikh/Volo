@@ -1072,20 +1072,61 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
         _flightNumberController.text = flightNumber;
       }
       
-      // Extract departure information
+      // Get airports list from provider
+      final airports = ref.read(airportsProvider);
+      
+      // Handle departure airport
       final String? departureCity = ticketData['departureCity'];
-      final String? departureAirport = ticketData['departureAirport'];
+      final String? departureAirportCode = ticketData['departureAirport'];
+      
       if (departureCity != null && departureCity.isNotEmpty) {
-        _departureController.text = departureCity;
-        _selectedDepartureCity = departureCity;
+        if (departureAirportCode != null && departureAirportCode.isNotEmpty) {
+          // Try to find exact airport by IATA code
+          try {
+            final exactAirport = airports.firstWhere(
+              (airport) => airport.iata.toUpperCase() == departureAirportCode.toUpperCase(),
+            );
+            // Found exact airport - pre-select it
+            _onDepartureAirportSelected(exactAirport);
+            print('Found exact departure airport: ${exactAirport.displayName}');
+          } catch (e) {
+            // Airport not found - just populate city name
+            _departureController.text = departureCity;
+            _selectedDepartureCity = departureCity;
+            print('Departure airport $departureAirportCode not found, using city: $departureCity');
+          }
+        } else {
+          // No airport code - just populate city name
+          _departureController.text = departureCity;
+          _selectedDepartureCity = departureCity;
+        }
       }
       
-      // Extract arrival information
+      // Handle arrival airport
       final String? arrivalCity = ticketData['arrivalCity'];
-      final String? arrivalAirport = ticketData['arrivalAirport'];
+      final String? arrivalAirportCode = ticketData['arrivalAirport'];
+      
       if (arrivalCity != null && arrivalCity.isNotEmpty) {
-        _arrivalController.text = arrivalCity;
-        _selectedArrivalCity = arrivalCity;
+        if (arrivalAirportCode != null && arrivalAirportCode.isNotEmpty) {
+          // Try to find exact airport by IATA code
+          try {
+            final exactAirport = airports.firstWhere(
+              (airport) => airport.iata.toUpperCase() == arrivalAirportCode.toUpperCase(),
+            );
+            // Found exact airport - pre-select it
+            _onArrivalAirportSelected(exactAirport);
+            print('Found exact arrival airport: ${exactAirport.displayName}');
+          } catch (e) {
+            // Airport not found - just populate city name
+            _arrivalController.text = arrivalCity;
+            _selectedArrivalCity = arrivalCity;
+            print('Arrival airport $arrivalAirportCode not found, using city: $arrivalCity');
+          }
+        } else {
+          // No airport code - just populate city name
+          _arrivalController.text = arrivalCity;
+          _selectedArrivalCity = arrivalCity;
+        }
       }
       
       // Extract departure date
