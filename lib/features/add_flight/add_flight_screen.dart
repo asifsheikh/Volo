@@ -1062,7 +1062,96 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
 
   /// Populate form fields from extracted ticket data
   void _populateFormFromTicket(Map<String, dynamic> ticketData) {
-    // TODO: Implement ticket data population
-    // This would populate the form fields with extracted data
+    try {
+      print('Populating form with ticket data: $ticketData');
+      
+      // Extract the first flight data
+      final List<dynamic> flights = ticketData['flights'] ?? [];
+      if (flights.isEmpty) {
+        print('No flights found in ticket data');
+        return;
+      }
+      
+      final Map<String, dynamic> firstFlight = flights.first;
+      
+      // Populate flight number
+      final String? flightNumber = firstFlight['flightNumber'];
+      if (flightNumber != null && flightNumber.isNotEmpty) {
+        _flightNumberController.text = flightNumber;
+      }
+      
+      // Populate departure city and airport
+      final String? departureCity = firstFlight['departureCity'];
+      final String? departureAirport = firstFlight['departureAirport'];
+      if (departureCity != null && departureCity.isNotEmpty) {
+        _selectedDepartureCity = departureCity;
+        _departureController.text = departureCity;
+        
+        // Create AirportEntity for departure
+        if (departureAirport != null && departureAirport.isNotEmpty) {
+          _selectedDepartureAirport = AirportEntity(
+            city: departureCity,
+            airport: departureCity, // Use city as airport name if not specified
+            iata: departureAirport,
+            countryCode: '',
+            countryName: '',
+          );
+        }
+      }
+      
+      // Populate arrival city and airport
+      final String? arrivalCity = firstFlight['arrivalCity'];
+      final String? arrivalAirport = firstFlight['arrivalAirport'];
+      if (arrivalCity != null && arrivalCity.isNotEmpty) {
+        _selectedArrivalCity = arrivalCity;
+        _arrivalController.text = arrivalCity;
+        
+        // Create AirportEntity for arrival
+        if (arrivalAirport != null && arrivalAirport.isNotEmpty) {
+          _selectedArrivalAirport = AirportEntity(
+            city: arrivalCity,
+            airport: arrivalCity, // Use city as airport name if not specified
+            iata: arrivalAirport,
+            countryCode: '',
+            countryName: '',
+          );
+        }
+      }
+      
+      // Populate departure date
+      final String? departureDateStr = firstFlight['departureDate'];
+      if (departureDateStr != null && departureDateStr.isNotEmpty) {
+        try {
+          final DateTime departureDate = DateTime.parse(departureDateStr);
+          _selectedDate = departureDate;
+        } catch (e) {
+          print('Error parsing departure date: $e');
+        }
+      }
+      
+      // Trigger UI update
+      setState(() {});
+      
+      print('Form populated successfully');
+      
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Flight details extracted and form filled automatically!'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      
+    } catch (e) {
+      print('Error populating form from ticket data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error filling form: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    }
   }
 }
