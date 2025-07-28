@@ -10,72 +10,12 @@ import 'dart:developer';
 import 'dart:convert';
 
 import '../../theme/app_theme.dart';
-import '../../features/flight_results/presentation/screens/flight_results_screen.dart';
 import '../../features/flight_select/presentation/screens/flight_select_screen.dart';
-import '../../features/flight_confirmation/presentation/screens/confirmation_screen.dart';
-import '../../features/flight_confirmation/models/confirmation_args.dart';
-import '../../features/flight_confirmation/domain/usecases/get_confirmation_data.dart';
-import '../../services/firebase_service.dart';
-import '../../services/network_service.dart';
 import '../../services/flight_api_service.dart';
-import '../../widgets/loading_dialog.dart';
-import '../../widgets/network_error_widget.dart';
 import 'domain/entities/airport_entity.dart';
 import 'data/models/airport_model.dart';
-import 'controller/add_flight_controller.dart';
-import 'flight_selection_dialog.dart';
-import 'flight_ticket_extraction_service.dart';
 import 'upload_ticket_service.dart';
 import 'presentation/providers/add_flight_provider.dart';
-
-class Airport {
-  final String city;
-  final String airport;
-  final String iata;
-  final String countryCode;
-  final String countryName;
-
-  Airport({
-    required this.city,
-    required this.airport,
-    required this.iata,
-    this.countryCode = '',
-    this.countryName = '',
-  });
-
-  factory Airport.fromJson(Map<String, dynamic> json) {
-    return Airport(
-      city: json['city'] ?? '',
-      airport: json['airport'] ?? '',
-      iata: json['iata'] ?? '',
-    );
-  }
-
-  factory Airport.fromApiJson(Map<String, dynamic> json) {
-    return Airport(
-      city: json['city'] ?? '',
-      airport: json['airport'] ?? '',
-      iata: json['iata_code'] ?? '',
-      countryCode: json['country_code'] ?? '',
-      countryName: json['country_name'] ?? '',
-    );
-  }
-
-  String get displayName {
-    // If airport name is the same as city, just show city with IATA
-    if (airport.toLowerCase() == city.toLowerCase()) {
-      return '$city ($iata)';
-    }
-    
-    // If airport name contains city name, show the full airport name
-    if (airport.toLowerCase().contains(city.toLowerCase())) {
-      return '$city ($iata) – $airport';
-    }
-    
-    // Otherwise show city and airport separately
-    return '$city ($iata) – $airport';
-  }
-}
 
 class AddFlightScreen extends ConsumerStatefulWidget {
   const AddFlightScreen({Key? key}) : super(key: key);
