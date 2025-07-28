@@ -87,37 +87,19 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       _authStateSubscription = FirebaseAuth.instance.authStateChanges().listen((User? user) async {
         developer.log('AuthWrapper: Auth state changed: ${user == null ? "Logged out" : "Logged in"}', name: 'VoloAuth');
         if (user != null) {
-          // User is authenticated, check onboarding status
-          try {
-            final isOnboarded = await FirebaseService.isUserOnboarded();
-
-            // Double-check: if user profile doesn't exist, they're not onboarded
-            final userProfile = await FirebaseService.getUserProfile();
-            final hasProfile = userProfile != null;
-
-            if (mounted) {
-              setState(() {
-                _currentUser = user;
-                _isOnboarded = isOnboarded && hasProfile;
-                _isOffline = false;
-                _isLoading = false;
-              });
-            }
-          } catch (e) {
-            developer.log('AuthWrapper: Error checking onboarding status: $e', name: 'VoloAuth');
-            // If there's an error checking onboarding (e.g., network issue), 
-            // assume user is onboarded if they're authenticated
-            if (mounted) {
-              setState(() {
-                _currentUser = user;
-                _isOnboarded = true; // Assume onboarded if authenticated
-                _isOffline = true;
-                _isLoading = false;
-              });
-            }
+          // User is authenticated - go directly to home screen (skip onboarding check)
+          developer.log('AuthWrapper: User authenticated, going to home screen', name: 'VoloAuth');
+          if (mounted) {
+            setState(() {
+              _currentUser = user;
+              _isOnboarded = true; // Assume onboarded for authenticated users
+              _isOffline = false;
+              _isLoading = false;
+            });
           }
         } else {
           // User is not authenticated
+          developer.log('AuthWrapper: User not authenticated, going to welcome screen', name: 'VoloAuth');
           if (mounted) {
             setState(() {
               _currentUser = null;
@@ -150,15 +132,14 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       return _buildLoadingScreen();
     }
 
-    // User is not authenticated OR user is authenticated but not onboarded
-    if (_currentUser == null || !_isOnboarded) {
-      developer.log('AuthWrapper: Routing to WelcomeScreen', name: 'VoloAuth');
-      developer.log('  - Reason: ${_currentUser == null ? "Not authenticated" : "Not onboarded"}', name: 'VoloAuth');
+    // User is not authenticated
+    if (_currentUser == null) {
+      developer.log('AuthWrapper: Routing to WelcomeScreen - User not authenticated', name: 'VoloAuth');
       return const WelcomeScreen();
     }
 
-    // User is authenticated and onboarded
-    developer.log('AuthWrapper: Routing to HomeScreen', name: 'VoloAuth');
+    // User is authenticated - go directly to home screen (skip onboarding check)
+    developer.log('AuthWrapper: Routing to HomeScreen - User authenticated', name: 'VoloAuth');
     if (_isOffline) {
       developer.log('AuthWrapper: User is in offline mode', name: 'VoloAuth');
     }
