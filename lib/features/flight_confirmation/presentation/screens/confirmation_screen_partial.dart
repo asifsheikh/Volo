@@ -10,8 +10,8 @@ import '../../domain/entities/flight_confirmation_state.dart' as domain;
 import '../../domain/usecases/get_confirmation_data.dart';
 import '../../models/confirmation_args.dart';
 import '../../../../features/weather/presentation/providers/weather_provider.dart';
-import '../../../../features/weather/domain/entities/weather_state.dart' as weather_domain;
 import '../../../../features/weather/presentation/widgets/weather_city_card.dart';
+import '../../../../features/weather/domain/entities/weather_state.dart' as weather_domain;
 
 /// Flight Confirmation Screen using Riverpod + Clean Architecture
 class ConfirmationScreen extends ConsumerStatefulWidget {
@@ -220,27 +220,58 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                                                 ],
                                               ),
                                             ),
-                                            child: Center(
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  const Icon(
-                                                    Icons.flight_takeoff,
-                                                    color: Colors.white,
-                                                    size: 48,
+                                            child: Stack(
+                                              children: [
+                                                // Main content (icon, IATA, temperature) - centered
+                                                Center(
+                                                  child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      // Flight icon
+                                                      const Icon(
+                                                        Icons.flight_takeoff,
+                                                        color: Colors.white,
+                                                        size: 48,
+                                                      ),
+                                                      const SizedBox(height: 12), // Reduced margin
+                                                      
+                                                      // IATA code
+                                                      Text(
+                                                        confirmationState.departureAirportCode.toUpperCase(),
+                                                        style: const TextStyle(
+                                                          fontFamily: 'Inter',
+                                                          fontWeight: FontWeight.w900,
+                                                          fontSize: 32,
+                                                          color: Colors.white,
+                                                          letterSpacing: 1.5,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 8),
+                                                      // Weather information
+                                                      _buildWeatherInfo(confirmationState.departureAirportCode),
+                                                    ],
                                                   ),
-                                                  const SizedBox(height: 8),
-                                                  Text(
-                                                    confirmationState.departureAirportCode.toUpperCase(),
-                                                    style: GoogleFonts.inter(
-                                                      fontWeight: FontWeight.w900,
-                                                      fontSize: 32,
-                                                      color: Colors.white,
-                                                      letterSpacing: 1.5,
+                                                ),
+                                                
+                                                // City name at bottom
+                                                Positioned(
+                                                  bottom: 20,
+                                                  left: 0,
+                                                  right: 0,
+                                                  child: Center(
+                                                    child: Text(
+                                                      confirmationState.fromCity.toUpperCase(),
+                                                      style: const TextStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontWeight: FontWeight.w600,
+                                                        fontSize: 16,
+                                                        color: Colors.white,
+                                                        letterSpacing: 1.0,
+                                                      ),
                                                     ),
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
@@ -273,27 +304,58 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                                                 ],
                                               ),
                                             ),
-                                            child: Center(
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  const Icon(
-                                                    Icons.flight_land,
-                                                    color: Colors.white,
-                                                    size: 48,
+                                            child: Stack(
+                                              children: [
+                                                // Main content (icon, IATA, temperature) - centered
+                                                Center(
+                                                  child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      // Flight icon
+                                                      const Icon(
+                                                        Icons.flight_land,
+                                                        color: Colors.white,
+                                                        size: 48,
+                                                      ),
+                                                      const SizedBox(height: 12), // Reduced margin
+                                                      
+                                                      // IATA code
+                                                      Text(
+                                                        confirmationState.arrivalAirportCode.toUpperCase(),
+                                                        style: const TextStyle(
+                                                          fontFamily: 'Inter',
+                                                          fontWeight: FontWeight.w900,
+                                                          fontSize: 32,
+                                                          color: Colors.white,
+                                                          letterSpacing: 1.5,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 8),
+                                                      // Weather information
+                                                      _buildWeatherInfo(confirmationState.arrivalAirportCode),
+                                                    ],
                                                   ),
-                                                  const SizedBox(height: 8),
-                                                  Text(
-                                                    confirmationState.arrivalAirportCode.toUpperCase(),
-                                                    style: GoogleFonts.inter(
-                                                      fontWeight: FontWeight.w900,
-                                                      fontSize: 32,
-                                                      color: Colors.white,
-                                                      letterSpacing: 1.5,
+                                                ),
+                                                
+                                                // City name at bottom
+                                                Positioned(
+                                                  bottom: 20,
+                                                  left: 0,
+                                                  right: 0,
+                                                  child: Center(
+                                                    child: Text(
+                                                      confirmationState.toCity.toUpperCase(),
+                                                      style: const TextStyle(
+                                                        fontFamily: 'Inter',
+                                                        fontWeight: FontWeight.w600,
+                                                        fontSize: 16,
+                                                        color: Colors.white,
+                                                        letterSpacing: 1.0,
+                                                      ),
                                                     ),
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
@@ -841,6 +903,32 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildWeatherInfo(String airportCode) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final globalWeather = ref.watch(globalWeatherNotifierProvider);
+        final weather = globalWeather[airportCode];
+        
+        if (weather != null) {
+          // Just show temperature with simple formatting
+          return Text(
+            '${weather.current.temperature.round()}°C',
+            style: const TextStyle(
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w800, // Slightly bolder
+              fontSize: 20, // Larger font size
+              color: Colors.white,
+              letterSpacing: 0.5,
+            ),
+          );
+        } else {
+          // Show nothing when weather data is not available
+          return const SizedBox.shrink();
+        }
+      },
     );
   }
 } 
