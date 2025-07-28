@@ -154,13 +154,13 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: Color(0xFF1F2937),
+              primary: AppTheme.textPrimary,
               onPrimary: Colors.white,
-              onSurface: Color(0xFF1F2937),
+              onSurface: AppTheme.textPrimary,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: Color(0xFF1F2937),
+                foregroundColor: AppTheme.textPrimary,
               ),
             ),
           ),
@@ -185,7 +185,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Please select both departure and arrival airports to continue'),
-          backgroundColor: const Color(0xFFDC2626),
+          backgroundColor: AppTheme.destructive,
           duration: const Duration(seconds: 4),
           action: SnackBarAction(
             label: 'Got it',
@@ -219,13 +219,13 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: AppTheme.background,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF7F8FA),
+        backgroundColor: AppTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF111827)),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
@@ -234,7 +234,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
             fontFamily: 'Inter',
             fontWeight: FontWeight.w700,
             fontSize: 24,
-            color: Color(0xFF111827),
+            color: AppTheme.textPrimary,
           ),
         ),
         centerTitle: false,
@@ -527,7 +527,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF059393),
+                        backgroundColor: AppTheme.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -582,7 +582,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                 fontFamily: 'Inter',
                 fontWeight: FontWeight.w400,
                 fontSize: 14,
-                color: Color(0xFF4B5563),
+                color: AppTheme.textSecondary,
               ),
             ),
             Text(' *',
@@ -590,7 +590,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                 fontFamily: 'Inter',
                 fontWeight: FontWeight.w400,
                 fontSize: 14,
-                color: Color(0xFF9CA3AF),
+                color: AppTheme.textDisabled,
               ),
             ),
           ],
@@ -603,12 +603,12 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
           builder: (context, controller, focusNode) {
             return Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppTheme.cardBackground,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Color(0xFFE5E7EB)),
+                border: Border.all(color: AppTheme.borderPrimary),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: AppTheme.shadowSecondary,
                     blurRadius: 2,
                     offset: Offset(0, 1),
                   ),
