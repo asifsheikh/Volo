@@ -47,11 +47,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   void _listenToAuthChanges() {
     _authRepository.authStateChanges.listen((user) {
-      state = state.copyWith(
-        user: user,
-        isAuthenticated: user != null,
-        error: null,
-      );
+      print('AuthNotifier: Auth state changed - user: ${user?.id}');
+      try {
+        state = state.copyWith(
+          user: user,
+          isAuthenticated: user != null,
+          error: null,
+        );
+        print('AuthNotifier: Auth state updated successfully');
+      } catch (e) {
+        print('AuthNotifier: Error in auth state change listener: $e');
+        state = state.copyWith(
+          error: 'Auth state change error: $e',
+        );
+      }
     });
   }
 
@@ -60,30 +69,43 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String verificationId,
     required String smsCode,
   }) async {
+    print('AuthNotifier: Starting signInWithPhone');
     state = state.copyWith(isLoading: true, error: null);
 
-    final result = await _authRepository.signInWithPhone(
-      phoneNumber: phoneNumber,
-      verificationId: verificationId,
-      smsCode: smsCode,
-    );
+    try {
+      final result = await _authRepository.signInWithPhone(
+        phoneNumber: phoneNumber,
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
 
-    result.fold(
-      (failure) {
-        state = state.copyWith(
-          isLoading: false,
-          error: failure.message ?? 'An error occurred',
-        );
-      },
-      (user) {
-        state = state.copyWith(
-          isLoading: false,
-          user: user,
-          isAuthenticated: true,
-          error: null,
-        );
-      },
-    );
+      print('AuthNotifier: Repository result received');
+
+      result.fold(
+        (failure) {
+          print('AuthNotifier: SignInWithPhone failed - ${failure.message}');
+          state = state.copyWith(
+            isLoading: false,
+            error: failure.message ?? 'An error occurred',
+          );
+        },
+        (user) {
+          print('AuthNotifier: SignInWithPhone successful - user: ${user.id}');
+          state = state.copyWith(
+            isLoading: false,
+            user: user,
+            isAuthenticated: true,
+            error: null,
+          );
+        },
+      );
+    } catch (e) {
+      print('AuthNotifier: Exception in signInWithPhone: $e');
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Sign in failed: $e',
+      );
+    }
   }
 
   Future<String?> sendOTP({required String phoneNumber}) async {
