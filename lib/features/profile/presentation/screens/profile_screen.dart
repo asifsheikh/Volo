@@ -238,7 +238,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 const SizedBox(height: 24),
                 
-                // Main Sections
+                // My Circle & My Flight Journey Section
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -318,117 +318,130 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           // TODO: Navigate to My Flight Journey screen
                         },
                       ),
-                      const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
-                      
-                      // Settings
-                      ListTile(
-                        leading: Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: Color(0x33008080),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.settings,
-                              color: Color(0xFF008080),
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                        title: const Text(
-                          'Settings',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 18,
-                            color: Color(0xFF333333),
-                          ),
-                        ),
-                        trailing: const Icon(
-                          Icons.arrow_forward_ios,
-                          color: Color(0xFF9CA3AF),
-                          size: 16,
-                        ),
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => SettingsScreen(
-                                username: profileData.username,
-                                phoneNumber: profileData.phoneNumber,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      
-                      // Debug Tools (only in debug mode)
-                      if (kDebugMode) ...[
-                        const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
-                        ListTile(
-                          leading: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Color(0x33008080),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.bug_report,
-                                color: Color(0xFF008080),
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                          title: Row(
-                            children: [
-                              const Text(
-                                'Debug Tools',
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 18,
-                                  color: Color(0xFF333333),
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFF6B35),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: const Text(
-                                  'DEBUG',
-                                  style: TextStyle(
-                                    fontFamily: 'Inter',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 8,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          trailing: const Icon(
-                            Icons.arrow_forward_ios,
-                            color: Color(0xFF9CA3AF),
-                            size: 16,
-                          ),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const DebugToolsScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
                     ],
                   ),
                 ),
+                
+                const SizedBox(height: 16),
+                
+                // Settings Section
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: ListTile(
+                    leading: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: Color(0x33008080),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.settings,
+                          color: Color(0xFF008080),
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                    title: const Text(
+                      'Settings',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 18,
+                        color: Color(0xFF333333),
+                      ),
+                    ),
+                    trailing: const Icon(
+                      Icons.arrow_forward_ios,
+                      color: Color(0xFF9CA3AF),
+                      size: 16,
+                    ),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => SettingsScreen(
+                            username: profileData.username,
+                            phoneNumber: profileData.phoneNumber,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                
+                // Debug Tools Section (only in debug mode)
+                if (kDebugMode) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: ListTile(
+                      leading: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Color(0x33FF6B35), // Orange background
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.bug_report,
+                            color: Color(0xFFFF6B35), // Orange icon
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                      title: Row(
+                        children: [
+                          const Text(
+                            'Debug Tools',
+                            style: TextStyle(
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 18,
+                              color: Color(0xFF333333),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF6B35),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'DEBUG',
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 8,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Color(0xFF9CA3AF),
+                        size: 16,
+                      ),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const DebugToolsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
