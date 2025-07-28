@@ -21,8 +21,8 @@ class UserModel extends UserEntity {
       email: user.email,
       photoURL: user.photoURL,
       isEmailVerified: user.emailVerified,
-      createdAt: user.metadata.creationTime?.toDate(),
-      lastSignInAt: user.metadata.lastSignInTime?.toDate(),
+      createdAt: user.metadata.creationTime,
+      lastSignInAt: user.metadata.lastSignInTime,
     );
   }
 

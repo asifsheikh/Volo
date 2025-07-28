@@ -40,10 +40,15 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   bool _canResend = true;
   int _resendCountdown = 0;
   Timer? _countdownTimer;
+  bool _hasAttemptedVerification = false; // Track if user has attempted verification
 
   @override
   void initState() {
     super.initState();
+    // Clear any stale errors when the screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(authNotifierProvider).clearError();
+    });
   }
 
   @override
@@ -80,6 +85,11 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     });
   }
 
+  /// Check if the OTP is valid for enabling the button
+  bool get _isOtpValid {
+    return _otp.length == 6;
+  }
+
   /// Handles OTP verification when user enters the 6-digit code
   /// 
   /// This method:
@@ -88,6 +98,11 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   /// 3. Handles success and error cases
   /// 4. Shows appropriate user feedback
   Future<void> _onVerify() async {
+    // Set flag that user has attempted verification
+    setState(() {
+      _hasAttemptedVerification = true;
+    });
+
     if (_otp.length != 6) {
       // Show error via Riverpod state
       return;
@@ -285,7 +300,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               ),
                             ),
-                            if (error != null) ...[
+                            if (error != null && _hasAttemptedVerification) ...[
                               const SizedBox(height: 8),
                               Text(
                                 error,
@@ -303,8 +318,15 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                           width: double.infinity,
                           height: 60,
                           child: ElevatedButton(
-                            onPressed: isLoading ? null : _onVerify,
-                            style: AppTheme.primaryButton,
+                            onPressed: (isLoading || !_isOtpValid) ? null : _onVerify,
+                            style: AppTheme.primaryButton.copyWith(
+                              backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
+                                if (states.contains(MaterialState.disabled)) {
+                                  return AppTheme.primary.withOpacity(0.5);
+                                }
+                                return AppTheme.primary;
+                              }),
+                            ),
                             child: isLoading
                                 ? const SizedBox(
                                     width: 20,
@@ -316,7 +338,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                   )
                                 : Text(
                                     'Verify & Continue',
-                                    style: AppTheme.titleLarge.copyWith(color: AppTheme.textOnPrimary),
+                                    style: AppTheme.titleLarge.copyWith(
+                                      color: _isOtpValid ? AppTheme.textOnPrimary : AppTheme.textOnPrimary.withOpacity(0.7),
+                                    ),
                                   ),
                           ),
                         ),
