@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'firebase_options.dart';
 import 'core/auth_wrapper.dart';
 import 'theme/app_theme.dart';
+import 'dart:developer' as developer;
 
 // Global navigator key for accessing context from providers
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -11,9 +13,23 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    // Initialize Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    
+    // Initialize Firebase App Check
+    await FirebaseAppCheck.instance.activate(
+      // Use debug provider for development
+      androidProvider: AndroidProvider.debug,
+      appleProvider: AppleProvider.debug,
+    );
+    
+    developer.log('Firebase initialized successfully', name: 'VoloApp');
+  } catch (e) {
+    developer.log('Failed to initialize Firebase: $e', name: 'VoloApp');
+  }
   
   runApp(
     const ProviderScope(

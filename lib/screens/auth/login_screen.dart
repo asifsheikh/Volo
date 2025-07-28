@@ -199,6 +199,31 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       String fullPhoneNumber = '+$formattedCountryCode$formattedNumber';
+      
+      // Debug logging
+      developer.log('LoginScreen: Attempting to send OTP to: $fullPhoneNumber', name: 'VoloAuth');
+      developer.log('LoginScreen: Firebase Auth instance: ${_auth.app.name}', name: 'VoloAuth');
+      developer.log('LoginScreen: Debug mode: ${kDebugMode}', name: 'VoloAuth');
+
+      // In debug mode, allow test phone numbers
+      if (kDebugMode && (formattedNumber == '9999999999' || formattedNumber == '1234567890')) {
+        developer.log('LoginScreen: Using test phone number in debug mode', name: 'VoloAuth');
+        // For test numbers, we'll simulate a successful OTP send
+        setState(() {
+          _isLoading = false;
+        });
+        
+        // Navigate to OTP screen with a mock verification ID
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => OtpScreen(
+              phoneNumber: fullPhoneNumber,
+              verificationId: 'test_verification_id_${DateTime.now().millisecondsSinceEpoch}',
+            ),
+          ),
+        );
+        return;
+      }
 
       // Send OTP via Firebase Phone Authentication
       await _auth.verifyPhoneNumber(
@@ -206,6 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Auto-verification callback (Android only)
         verificationCompleted: (PhoneAuthCredential credential) async {
+          developer.log('LoginScreen: Auto-verification completed', name: 'VoloAuth');
           // Auto-verification if SMS is not required (e.g., test numbers)
           await _auth.signInWithCredential(credential);
           if (mounted) {
@@ -222,7 +248,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Error handling callback
         verificationFailed: (FirebaseAuthException e) {
-          print('Firebase Phone Auth Error: ${e.code} - ${e.message}');
+          developer.log('LoginScreen: Verification failed - Code: ${e.code}, Message: ${e.message}', name: 'VoloAuth');
           setState(() {
             _isLoading = false;
             _errorText = _getUserFriendlyErrorMessage(e);
@@ -231,6 +257,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Success callback - OTP sent successfully
         codeSent: (String verificationId, int? resendToken) {
+          developer.log('LoginScreen: OTP sent successfully, verificationId: $verificationId', name: 'VoloAuth');
           setState(() {
             _isLoading = false;
           });
@@ -250,6 +277,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Auto-retrieval timeout callback
         codeAutoRetrievalTimeout: (String verificationId) {
+          developer.log('LoginScreen: Auto-retrieval timeout', name: 'VoloAuth');
           setState(() {
             _isLoading = false;
           });
@@ -267,13 +295,13 @@ class _LoginScreenState extends State<LoginScreen> {
         timeout: const Duration(seconds: 60), // 60 second timeout
       );
     } on FirebaseAuthException catch (e) {
-      print('Firebase Phone Auth Error: ${e.code} - ${e.message}');
+      developer.log('LoginScreen: FirebaseAuthException - Code: ${e.code}, Message: ${e.message}', name: 'VoloAuth');
       setState(() {
         _isLoading = false;
         _errorText = _getUserFriendlyErrorMessage(e);
       });
     } catch (e) {
-      print('General Error: $e');
+      developer.log('LoginScreen: General Error: $e', name: 'VoloAuth');
       setState(() {
         _isLoading = false;
         _errorText = 'An unexpected error occurred. Please try again.';
