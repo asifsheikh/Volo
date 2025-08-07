@@ -25,7 +25,7 @@ class WelcomeBackScreen extends ConsumerWidget {
                 Material(
                   elevation: 2,
                   borderRadius: BorderRadius.circular(24),
-                  shadowColor: Colors.black.withOpacity(0.08),
+                  shadowColor: AppTheme.shadowPrimary,
                   color: Colors.transparent,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(24),
@@ -40,51 +40,27 @@ class WelcomeBackScreen extends ConsumerWidget {
                 const SizedBox(height: 40),
                 Text(
                   'Welcome back, $userName! 👋',
-                  style: const TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 28,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.textPrimary,
-                  ),
+                  style: AppTheme.headlineLarge,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Ready to keep your loved ones updated about your flights?',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 16,
-                    color: AppTheme.textSecondary,
+                                  Text(
+                    'Ready to keep your loved ones updated about your flights?',
+                    style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
                 const SizedBox(height: 48),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 4,
-                    ),
+                    style: AppTheme.primaryButton,
                     onPressed: () {
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (_) => MainNavigationScreen(username: userName)),
                         (route) => false,
                       );
                     },
-                    child: const Text(
-                      'Let\'s Go!',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: const Text('Let\'s Go!'),
                   ),
                 ),
               ],

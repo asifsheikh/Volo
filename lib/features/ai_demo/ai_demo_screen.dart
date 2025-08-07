@@ -129,9 +129,9 @@ class _AIDemoScreenState extends State<AIDemoScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Text Generation',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: AppTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
                     TextField(
@@ -166,32 +166,30 @@ class _AIDemoScreenState extends State<AIDemoScreen> {
                     ),
                     if (_generatedText.isNotEmpty) ...[
                       const SizedBox(height: 16),
-                      const Text(
+                      Text(
                         'Generated Text:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: AppTheme.titleMedium,
                       ),
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(8),
+                        decoration: AppTheme.cardDecoration.copyWith(
+                          color: AppTheme.background,
                         ),
                         child: Text(_generatedText),
                       ),
                     ],
                     if (_streamedText.isNotEmpty) ...[
                       const SizedBox(height: 16),
-                      const Text(
-                        'Streamed Text:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                                              Text(
+                          'Streamed Text:',
+                          style: AppTheme.titleMedium,
+                        ),
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.blue[50],
-                          borderRadius: BorderRadius.circular(8),
+                        decoration: AppTheme.cardDecoration.copyWith(
+                          color: AppTheme.background,
                         ),
                         child: Text(_streamedText),
                       ),
@@ -213,9 +211,9 @@ class _AIDemoScreenState extends State<AIDemoScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           'Chat Conversation',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: AppTheme.titleLarge,
                         ),
                         ElevatedButton(
                           onPressed: _startChat,

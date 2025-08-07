@@ -45,7 +45,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                       Material(
                         elevation: 4,
                         borderRadius: BorderRadius.circular(24),
-                        shadowColor: Colors.black.withOpacity(0.08),
+                        shadowColor: AppTheme.shadowPrimary,
                         color: Colors.transparent,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(24),
