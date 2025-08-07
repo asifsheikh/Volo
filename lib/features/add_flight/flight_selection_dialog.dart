@@ -49,38 +49,26 @@ class FlightSelectionDialog extends StatelessWidget {
                     children: [
                       Text(
                         _getDialogTitle(),
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 20,
-                          color: Color(0xFF111827),
-                        ),
+                        style: AppTheme.headlineSmall,
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Select which flight you want to add',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
                       ),
                       if (originalFlightCount != null && originalFlightCount! > flights.length) ...[
                         const SizedBox(height: 4),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.blue[50],
+                            color: AppTheme.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             '${originalFlightCount! - flights.length} duplicate flights removed automatically',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
+                            style: AppTheme.bodySmall.copyWith(
                               fontWeight: FontWeight.w500,
-                              fontSize: 12,
-                              color: Colors.blue[700],
+                              color: AppTheme.primary,
                             ),
                           ),
                         ),
@@ -123,18 +111,13 @@ class FlightSelectionDialog extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: Colors.grey[300]!),
+                    side: BorderSide(color: AppTheme.borderPrimary),
                   ),
                 ),
-                child: const Text(
-                  'Cancel',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                    color: Color(0xFF6B7280),
+                                  child: Text(
+                    'Cancel',
+                    style: AppTheme.titleMedium.copyWith(color: AppTheme.textSecondary),
                   ),
-                ),
               ),
             ),
           ],

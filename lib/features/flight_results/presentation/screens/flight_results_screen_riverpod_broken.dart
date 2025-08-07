@@ -150,20 +150,16 @@ class _FlightResultsScreenState extends ConsumerState<FlightResultsScreen> {
             children: [
               Text(
                 '${allFlights.length} flights found',
-                style: const TextStyle(
-                  fontFamily: 'Inter',
+                style: AppTheme.bodyMedium.copyWith(
                   fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  color: Color(0xFF374151),
+                  color: AppTheme.textPrimary,
                 ),
               ),
               Text(
                 'From \$${_getLowestPrice(allFlights)}',
-                style: const TextStyle(
-                  fontFamily: 'Inter',
+                style: AppTheme.bodyMedium.copyWith(
                   fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                  color: Color(0xFF059669),
+                  color: AppTheme.success,
                 ),
               ),
             ],
