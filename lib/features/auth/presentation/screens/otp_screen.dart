@@ -241,7 +241,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                       Material(
                         elevation: 2,
                         borderRadius: BorderRadius.circular(24),
-                        shadowColor: Colors.black.withOpacity(0.08),
+                        shadowColor: AppTheme.shadowPrimary,
                         color: Colors.transparent,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(24),
@@ -310,7 +310,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                               const SizedBox(height: 8),
                               Text(
                                 error,
-                                style: const TextStyle(color: Colors.red, fontSize: 14),
+                                style: AppTheme.bodySmall.copyWith(color: AppTheme.destructive),
                               ),
                             ],
                           ],
@@ -339,7 +339,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                     height: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      valueColor: AlwaysStoppedAnimation<Color>(AppTheme.textOnPrimary),
                                     ),
                                   )
                                 : Text(

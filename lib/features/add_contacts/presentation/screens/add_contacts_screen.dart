@@ -865,10 +865,10 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
         // Show permission denied message
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('We need access to your contacts to add people to notify.'),
-              backgroundColor: Colors.red,
-            ),
+                      SnackBar(
+            content: const Text('We need access to your contacts to add people to notify.'),
+            backgroundColor: AppTheme.destructive,
+          ),
           );
         }
         return;
@@ -886,10 +886,10 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
       if (contactsWithPhones.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('No contacts with phone numbers found in your device.'),
-              backgroundColor: Colors.orange,
-            ),
+                      SnackBar(
+            content: const Text('No contacts with phone numbers found in your device.'),
+            backgroundColor: AppTheme.warning,
+          ),
           );
         }
         return;
@@ -931,10 +931,10 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
         if (ref.read(addContactsProviderProvider.notifier).contactExists(newContact)) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('This contact is already added to your list.'),
-                backgroundColor: Colors.orange,
-              ),
+                        SnackBar(
+            content: const Text('This contact is already added to your list.'),
+            backgroundColor: AppTheme.warning,
+          ),
             );
           }
           return;
@@ -947,9 +947,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
       print('Error picking contact: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Unable to access contacts. Please try again.'),
-            backgroundColor: Colors.red,
+          SnackBar(
+            content: const Text('Unable to access contacts. Please try again.'),
+            backgroundColor: AppTheme.destructive,
           ),
         );
       }
