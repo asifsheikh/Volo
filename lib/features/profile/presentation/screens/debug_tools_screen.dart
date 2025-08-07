@@ -22,13 +22,9 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
+          title: Text(
             'Remote Config Values',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-            ),
+            style: AppTheme.titleLarge,
           ),
           content: SizedBox(
             width: double.maxFinite,
@@ -41,19 +37,17 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: configValues['status'] == 'initialized' 
-                        ? const Color(0xFFD1FAE5) 
-                        : const Color(0xFFFEE2E2),
+                        ? AppTheme.success.withOpacity(0.1)
+                        : AppTheme.destructive.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
                     configValues['status'] == 'initialized' ? 'Active' : 'Not Initialized',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
+                    style: AppTheme.bodySmall.copyWith(
                       fontWeight: FontWeight.w500,
-                      fontSize: 12,
                       color: configValues['status'] == 'initialized' 
-                          ? const Color(0xFF065F46) 
-                          : const Color(0xFFDC2626),
+                          ? AppTheme.success
+                          : AppTheme.destructive,
                     ),
                   ),
                 ),
