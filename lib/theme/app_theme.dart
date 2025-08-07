@@ -158,6 +158,10 @@ class AppTheme {
     color: textPrimary,
   );
 
+  static final TextStyle bodyMediumSecondary = bodyMedium.copyWith(
+    color: textSecondary,
+  );
+
   static const TextStyle bodySmall = TextStyle(
     fontFamily: fontFamily,
     fontWeight: FontWeight.w400,
@@ -188,6 +192,15 @@ class AppTheme {
     fontSize: 11,
     height: 1.2,
     color: textSecondary, // Now uses secondary text color for better contrast
+  );
+
+  static const TextStyle linkStyle = TextStyle(
+    fontFamily: fontFamily,
+    fontWeight: FontWeight.w500,
+    fontSize: 14,
+    height: 1.4,
+    color: primary,
+    decoration: TextDecoration.underline,
   );
 
   // ============================================================================

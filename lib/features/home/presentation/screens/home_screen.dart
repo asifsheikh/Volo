@@ -83,9 +83,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Text(
                   'Add your flight details and Volo will keep your family and friends updated in real time, so you can focus on your journey.',
                   textAlign: TextAlign.center,
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: AppTheme.textSecondary.withOpacity(0.8),
-                  ),
+                  style: AppTheme.bodyMediumSecondary,
                 ),
                 
                 const SizedBox(height: 56),
@@ -93,7 +91,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // Primary CTA Button - Most prominent element
                 SizedBox(
                   width: double.infinity,
-                  height: 60,
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.of(context).push(
@@ -103,19 +100,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       );
                     },
                     icon: const Icon(
-                      Icons.flight_takeoff, 
-                      color: Colors.white, 
+                      Icons.flight_takeoff,
                       size: 24,
                     ),
-                    label: const Text(
-                      'Add Your Flight',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                    ),
+                    label: const Text('Add Your Flight'),
                     style: AppTheme.primaryButton,
                   ),
                 ),
@@ -134,9 +122,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   },
                   child: Text(
                     'How does Volo work?',
-                    style: AppTheme.bodySmall.copyWith(
-                      color: AppTheme.textSecondary.withOpacity(0.7),
-                      decoration: TextDecoration.underline,
+                    style: AppTheme.linkStyle.copyWith(
+                      color: AppTheme.textSecondary,
                     ),
                   ),
                 ),
@@ -176,12 +163,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-                      ElevatedButton(
-              onPressed: () {
-                ref.invalidate(homeProviderProvider(widget.username));
-              },
-              child: const Text('Retry'),
-            ),
+          ElevatedButton(
+            onPressed: () {
+              ref.invalidate(homeProviderProvider(widget.username));
+            },
+            style: AppTheme.primaryButton,
+            child: const Text('Retry'),
+          ),
         ],
       ),
     );

@@ -1,6 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'dart:developer' as developer;
 
 import '../../../../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
@@ -96,18 +98,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       String fullPhoneNumber = '+$formattedCountryCode$formattedNumber';
 
-      print('LoginScreen: Sending OTP for phone: $fullPhoneNumber');
+      developer.log('LoginScreen: Sending OTP for phone: $fullPhoneNumber', name: 'LoginScreen');
 
       // Send OTP via Riverpod
       final verificationId = await ref.read(authNotifierProvider).sendOTP(
         phoneNumber: fullPhoneNumber,
       );
 
-      print('LoginScreen: OTP result - verificationId: $verificationId');
+      developer.log('LoginScreen: OTP result - verificationId: $verificationId', name: 'LoginScreen');
 
       // If successful, navigate to OTP screen
       if (mounted && verificationId != null) {
-        print('LoginScreen: Navigating to OTP screen');
+        developer.log('LoginScreen: Navigating to OTP screen', name: 'LoginScreen');
         // Clear any errors before navigation since we're successful
         ref.read(authNotifierProvider).clearError();
         
@@ -120,11 +122,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         );
       } else {
-        print('LoginScreen: OTP sending failed - verificationId is null');
+        developer.log('LoginScreen: OTP sending failed - verificationId is null', name: 'LoginScreen');
       }
     } catch (e) {
       // Error handling is done via Riverpod state
-      print('Error in _onContinue: $e');
+      developer.log('Error in _onContinue: $e', name: 'LoginScreen');
     }
   }
 
@@ -138,10 +140,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.background,
-        elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -161,7 +161,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Material(
                         elevation: 2,
                         borderRadius: BorderRadius.circular(24),
-                        shadowColor: Colors.black.withOpacity(0.08),
+                        shadowColor: AppTheme.shadowPrimary,
                         color: Colors.transparent,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(24),
@@ -197,16 +197,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             IntlPhoneField(
                               controller: _phoneController,
                               initialCountryCode: 'IN',
-                              decoration: InputDecoration(
+                              decoration: AppTheme.inputDecoration.copyWith(
                                 labelText: 'Phone number',
+                                errorText: (error != null && _hasAttemptedSubmission && !isLoading) ? error : null,
+                                errorStyle: const TextStyle(color: AppTheme.destructive),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide(
-                                    color: (error != null && _hasAttemptedSubmission && !isLoading) ? Colors.red : Colors.transparent,
+                                    color: (error != null && _hasAttemptedSubmission && !isLoading)
+                                        ? AppTheme.destructive
+                                        : AppTheme.borderPrimary,
                                   ),
                                 ),
-                                errorText: (error != null && _hasAttemptedSubmission && !isLoading) ? error : null,
-                                errorStyle: const TextStyle(color: Colors.red),
                               ),
                               onChanged: (phone) {
                                 setState(() {
@@ -234,32 +236,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 24.0),
                         child: SizedBox(
                           width: double.infinity,
-                          height: 60,
                           child: ElevatedButton(
                             onPressed: (isLoading || !_isPhoneNumberValid) ? null : _onContinue,
-                            style: AppTheme.primaryButton.copyWith(
-                              backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-                                if (states.contains(MaterialState.disabled)) {
-                                  return AppTheme.primary.withOpacity(0.5);
-                                }
-                                return AppTheme.primary;
-                              }),
-                            ),
+                            style: (isLoading || !_isPhoneNumberValid)
+                                ? AppTheme.disabledButton
+                                : AppTheme.primaryButton,
                             child: isLoading
                                 ? const SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      valueColor: AlwaysStoppedAnimation<Color>(AppTheme.textOnPrimary),
                                     ),
                                   )
-                                : Text(
-                                    'Send OTP',
-                                    style: AppTheme.titleLarge.copyWith(
-                                      color: _isPhoneNumberValid ? AppTheme.textOnPrimary : AppTheme.textOnPrimary.withOpacity(0.7),
-                                    ),
-                                  ),
+                                : const Text('Send OTP'),
                           ),
                         ),
                       ),
@@ -288,16 +279,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: [
                         TextSpan(
                           text: 'Terms',
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                          ),
+                          style: AppTheme.linkStyle,
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              developer.log('Navigate to Terms screen', name: 'LoginScreen');
+                            },
                         ),
-                        TextSpan(text: ' and '),
+                        const TextSpan(text: ' and '),
                         TextSpan(
                           text: 'Privacy Policy',
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                          ),
+                          style: AppTheme.linkStyle,
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              developer.log('Navigate to Privacy Policy screen', name: 'LoginScreen');
+                            },
                         ),
                       ],
                     ),
