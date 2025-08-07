@@ -102,16 +102,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 // Profile Picture Section
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
+                  decoration: AppTheme.elevatedCardDecoration.copyWith(
                     borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
                   ),
                   child: Column(
                     children: [
@@ -123,13 +115,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: const Color(0xFF008080), // Teal border
+                                color: AppTheme.primary,
                                 width: 3,
                               ),
                             ),
                             child: CircleAvatar(
                               radius: 48,
-                              backgroundColor: Colors.white,
+                              backgroundColor: AppTheme.cardBackground,
                               backgroundImage: profileData.profilePictureUrl != null
                                   ? NetworkImage(profileData.profilePictureUrl!)
                                   : null,
@@ -137,7 +129,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   ? Icon(
                                       Icons.person,
                                       size: 48,
-                                      color: Color(0xFF9CA3AF),
+                                      color: AppTheme.textSecondary,
                                     )
                                   : null,
                             ),
@@ -156,21 +148,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                   height: 32,
                                   decoration: BoxDecoration(
                                     color: _isUpdatingProfilePicture 
-                                        ? Color(0xFF9CA3AF)
-                                        : Color(0xFF008080),
+                                        ? AppTheme.textSecondary
+                                        : AppTheme.primary,
                                     shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 6,
-                                        offset: Offset(0, 4),
-                                      ),
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 4,
-                                        offset: Offset(0, 2),
-                                      ),
-                                    ],
+                                                                            boxShadow: [
+                                          BoxShadow(
+                                            color: AppTheme.shadowPrimary,
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                          BoxShadow(
+                                            color: AppTheme.shadowPrimary,
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
                                   ),
                                   child: _isUpdatingProfilePicture
                                       ? const SizedBox(
@@ -178,12 +170,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                           height: 16,
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2,
-                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                            valueColor: AlwaysStoppedAnimation<Color>(AppTheme.textOnPrimary),
                                           ),
                                         )
                                       : const Icon(
                                           Icons.camera_alt,
-                                          color: Colors.white,
+                                          color: AppTheme.textOnPrimary,
                                           size: 18,
                                         ),
                                 ),
@@ -195,27 +187,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       const SizedBox(height: 16),
                       Text(
                         profileData.username,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 24,
-                          color: Color(0xFF111827),
-                        ),
+                        style: AppTheme.headlineMedium,
                       ),
                       const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.phone, size: 18, color: Color(0xFF6B7280)),
+                          Icon(Icons.phone, size: 18, color: AppTheme.textSecondary),
                           const SizedBox(width: 6),
                           Text(
                             profileData.phoneNumber,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 16,
-                              color: Color(0xFF6B7280),
-                            ),
+                            style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
                           ),
                         ],
                       ),
@@ -225,12 +207,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         child: Text(
                           'To change your phone number, please log out and log in again.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 15,
-                            color: Color(0xFF6B7280),
-                          ),
+                          style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
                         ),
                       ),
                     ],

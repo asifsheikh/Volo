@@ -32,7 +32,7 @@ class WeatherCityCard extends ConsumerWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: AppTheme.shadowPrimary,
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -48,12 +48,12 @@ class WeatherCityCard extends ConsumerWidget {
                 weather.current.weather_icon_info.url,
                 width: 80,
                 height: 80,
-                color: Colors.white.withOpacity(0.2),
+                color: AppTheme.textOnPrimary.withOpacity(0.2),
                 errorBuilder: (context, error, stackTrace) {
                   return Icon(
                     _getFallbackWeatherIcon(weather.current.weather_icon_info.code),
                     size: 80,
-                    color: Colors.white.withOpacity(0.2),
+                    color: AppTheme.textOnPrimary.withOpacity(0.2),
                   );
                 },
               ),

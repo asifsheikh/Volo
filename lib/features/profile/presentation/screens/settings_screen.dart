@@ -91,8 +91,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Unable to sign out. Please try again.'),
-          backgroundColor: Colors.red,
+          content: const Text('Unable to sign out. Please try again.'),
+          backgroundColor: AppTheme.destructive,
           duration: const Duration(seconds: 4),
         ),
       );
@@ -106,44 +106,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
+          title: Text(
             'Delete Account',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-              color: Color(0xFFEF4444),
-            ),
+            style: AppTheme.titleLarge.copyWith(color: AppTheme.destructive),
           ),
-          content: const Text(
+          content: Text(
             'This action cannot be undone. All your flight data and contacts will be permanently deleted.',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w400,
-              fontSize: 16,
-            ),
+            style: AppTheme.bodyLarge,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text(
+              child: Text(
                 'Cancel',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF6B7280),
-                ),
+                style: AppTheme.titleMedium.copyWith(color: AppTheme.textSecondary),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text(
+              child: Text(
                 'Delete',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFFEF4444),
-                ),
+                style: AppTheme.titleMedium.copyWith(color: AppTheme.destructive),
               ),
             ),
           ],
@@ -172,7 +155,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Unable to delete account. Please try again.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.destructive,
           duration: const Duration(seconds: 4),
         ),
       );

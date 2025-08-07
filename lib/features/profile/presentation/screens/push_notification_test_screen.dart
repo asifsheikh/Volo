@@ -111,9 +111,9 @@ class _PushNotificationTestScreenState extends ConsumerState<PushNotificationTes
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppTheme.cardBackground,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[300]!),
+                  border: Border.all(color: AppTheme.borderPrimary),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
