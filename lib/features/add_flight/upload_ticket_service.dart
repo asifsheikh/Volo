@@ -93,7 +93,7 @@ class UploadTicketService {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      backgroundColor: Colors.white,
+              backgroundColor: AppTheme.cardBackground,
       builder: (BuildContext context) {
         return SafeArea(
           child: Padding(
@@ -106,7 +106,7 @@ class UploadTicketService {
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: AppTheme.textSecondary,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -385,22 +385,8 @@ class UploadTicketService {
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF008080),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: const Text(
-                'Open Camera',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
-              ),
+              style: AppTheme.primaryButton,
+                              child: const Text('Open Camera'),
             ),
           ],
         );

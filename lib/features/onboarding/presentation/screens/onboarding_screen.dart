@@ -91,11 +91,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(errorMessage),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.destructive,
             duration: const Duration(seconds: 6),
             action: SnackBarAction(
               label: 'Retry',
-              textColor: Colors.white,
+              textColor: AppTheme.textOnPrimary,
               onPressed: _completeOnboarding,
             ),
           ),
@@ -134,7 +134,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             Icon(
               Icons.error_outline,
               size: 64,
-              color: Colors.red[300],
+              color: AppTheme.destructive,
             ),
             const SizedBox(height: 16),
             Text(
@@ -144,7 +144,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             const SizedBox(height: 8),
             Text(
               error,
-              style: AppTheme.bodyMedium.copyWith(color: Colors.grey[600]),
+              style: AppTheme.bodyMediumSecondary,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),

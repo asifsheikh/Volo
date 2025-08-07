@@ -103,8 +103,7 @@ class _ContactPickerDialogState extends State<ContactPickerDialog> {
       child: Container(
         width: double.maxFinite,
         height: MediaQuery.of(context).size.height * 0.8,
-        decoration: BoxDecoration(
-          color: Colors.white,
+        decoration: AppTheme.cardDecoration.copyWith(
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -112,9 +111,9 @@ class _ContactPickerDialogState extends State<ContactPickerDialog> {
             // Header
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: AppTheme.cardBackground,
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
                 ),
@@ -124,20 +123,14 @@ class _ContactPickerDialogState extends State<ContactPickerDialog> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Select Contact',
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 20,
-                          color: Color(0xFF111827),
-                        ),
+                        style: AppTheme.headlineSmall,
                       ),
                       IconButton(
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(
                           Icons.close,
-                          color: Color(0xFF6B7280),
                           size: 24,
                         ),
                       ),

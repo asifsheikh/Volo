@@ -96,12 +96,12 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> with SingleTicker
                     borderRadius: BorderRadius.circular(9999),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: AppTheme.shadowPrimary,
                         blurRadius: 4,
                         offset: const Offset(0, 4),
                       ),
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: AppTheme.shadowPrimary,
                         blurRadius: 10,
                         offset: const Offset(0, 10),
                       ),
@@ -128,7 +128,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> with SingleTicker
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: AppTheme.shadowSecondary,
                 blurRadius: 2,
                 offset: const Offset(0, 1),
               ),
@@ -185,7 +185,7 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> with SingleTicker
           Icon(
             Icons.error_outline,
             size: 64,
-            color: Colors.grey[400],
+            color: AppTheme.textSecondary,
           ),
           const SizedBox(height: 16),
           Text(

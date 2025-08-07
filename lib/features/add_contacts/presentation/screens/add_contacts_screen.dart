@@ -84,30 +84,19 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                     width: 36,
                     height: 36,
                     margin: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.95),
+                    decoration: AppTheme.cardDecoration.copyWith(
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
                     ),
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 16),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
                   title: const Text(
                     'Add Contacts',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w700,
-                      fontSize: 20,
-                      color: Colors.white, // White color
+                    style: AppTheme.headlineSmall.copyWith(
+                      color: AppTheme.textOnPrimary,
                     ),
                   ),
                   centerTitle: false, // Left align the title
@@ -139,7 +128,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                       begin: Alignment.centerLeft,
                                       end: Alignment.centerRight,
                                       colors: [
-                                        Colors.black.withOpacity(0.4),
+                                        AppTheme.shadowPrimary.withOpacity(0.4),
                                         Colors.transparent,
                                       ],
                                     ),
@@ -152,9 +141,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             // Flight icon
-                                            const Icon(
+                                            Icon(
                                               Icons.flight_takeoff,
-                                              color: Colors.white,
+                                              color: AppTheme.textOnPrimary,
                                               size: 48,
                                             ),
                                             const SizedBox(height: 12), // Reduced margin
@@ -162,11 +151,8 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                             // IATA code
                                             Text(
                                               args.departureAirportCode.toUpperCase(),
-                                              style: const TextStyle(
-                                                fontFamily: 'Inter',
-                                                fontWeight: FontWeight.w900,
-                                                fontSize: 32,
-                                                color: Colors.white,
+                                              style: AppTheme.headlineLarge.copyWith(
+                                                color: AppTheme.textOnPrimary,
                                                 letterSpacing: 1.5,
                                               ),
                                             ),
