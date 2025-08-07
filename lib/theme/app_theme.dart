@@ -234,6 +234,20 @@ class AppTheme {
     textStyle: titleMedium,
   );
 
+  /// Secondary outlined button style
+  static ButtonStyle get secondaryOutlinedButton => OutlinedButton.styleFrom(
+    backgroundColor: Colors.white,
+    foregroundColor: textPrimary,
+    side: const BorderSide(color: borderPrimary, width: 1),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    shadowColor: shadowPrimary,
+    elevation: 1,
+    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+    textStyle: bodyMedium,
+  );
+
   /// Disabled button style
   static ButtonStyle get disabledButton => ElevatedButton.styleFrom(
     backgroundColor: secondary,

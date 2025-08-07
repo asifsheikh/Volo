@@ -118,7 +118,7 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
     final bannerHeight = screenHeight * 0.5; // 50% of screen height
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: AppTheme.background,
       body: LayoutBuilder(
         builder: (context, constraints) {
           final availableHeight = constraints.maxHeight;
@@ -154,172 +154,27 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                                   // Background Images
                                   Row(
                                     children: [
-                                      // Departing City (Left 50%)
-                                      Expanded(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            image: DecorationImage(
-                                              image: NetworkImage(widget.args.departureImage.isNotEmpty 
-                                                  ? widget.args.departureImage 
-                                                  : widget.args.departureThumbnail.isNotEmpty
-                                                      ? widget.args.departureThumbnail
-                                                      : 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=400&fit=crop'),
-                                              fit: BoxFit.cover,
-                                              onError: (exception, stackTrace) {
-                                                // Fallback to gradient
-                                              },
-                                            ),
-                                          ),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                begin: Alignment.centerLeft,
-                                                end: Alignment.centerRight,
-                                                colors: [
-                                                  Colors.black.withOpacity(0.4),
-                                                  Colors.transparent,
-                                                ],
-                                              ),
-                                            ),
-                                            child: Stack(
-                                              children: [
-                                                // Main content (icon, IATA, temperature) - centered
-                                                Center(
-                                                  child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    children: [
-                                                      // Flight icon
-                                                      const Icon(
-                                                        Icons.flight_takeoff,
-                                                        color: Colors.white,
-                                                        size: 48,
-                                                      ),
-                                                      const SizedBox(height: 12), // Reduced margin
-                                                      
-                                                      // IATA code
-                                                      Text(
-                                                        widget.args.departureAirportCode.toUpperCase(),
-                                                        style: const TextStyle(
-                                                          fontFamily: 'Inter',
-                                                          fontWeight: FontWeight.w900,
-                                                          fontSize: 32,
-                                                          color: Colors.white,
-                                                          letterSpacing: 1.5,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(height: 8),
-                                                      // Weather information
-                                                      _buildWeatherInfo(widget.args.departureAirportCode),
-                                                    ],
-                                                  ),
-                                                ),
-                                                
-                                                // City name at bottom
-                                                Positioned(
-                                                  bottom: 20,
-                                                  left: 0,
-                                                  right: 0,
-                                                  child: Center(
-                                                    child: Text(
-                                                      widget.args.fromCity.toUpperCase(),
-                                                      style: const TextStyle(
-                                                        fontFamily: 'Inter',
-                                                        fontWeight: FontWeight.w600,
-                                                        fontSize: 16,
-                                                        color: Colors.white,
-                                                        letterSpacing: 1.0,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                      _buildCityBanner(
+                                        imageUrl: widget.args.departureImage.isNotEmpty
+                                            ? widget.args.departureImage
+                                            : widget.args.departureThumbnail.isNotEmpty
+                                                ? widget.args.departureThumbnail
+                                                : 'https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&h=400&fit=crop',
+                                        city: widget.args.fromCity,
+                                        airportCode: widget.args.departureAirportCode,
+                                        icon: Icons.flight_takeoff,
+                                        isDeparture: true,
                                       ),
-                                      
-                                      // Arriving City (Right 50%)
-                                      Expanded(
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            image: DecorationImage(
-                                              image: NetworkImage(widget.args.arrivalImage.isNotEmpty 
-                                                  ? widget.args.arrivalImage 
-                                                  : widget.args.arrivalThumbnail.isNotEmpty
-                                                      ? widget.args.arrivalThumbnail
-                                                      : 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=400&fit=crop'),
-                                              fit: BoxFit.cover,
-                                              onError: (exception, stackTrace) {
-                                                // Fallback to gradient
-                                              },
-                                            ),
-                                          ),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                begin: Alignment.centerRight,
-                                                end: Alignment.centerLeft,
-                                                colors: [
-                                                  Colors.black.withOpacity(0.4),
-                                                  Colors.transparent,
-                                                ],
-                                              ),
-                                            ),
-                                            child: Stack(
-                                              children: [
-                                                // Main content (icon, IATA, temperature) - centered
-                                                Center(
-                                                  child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    children: [
-                                                      // Flight icon
-                                                      const Icon(
-                                                        Icons.flight_land,
-                                                        color: Colors.white,
-                                                        size: 48,
-                                                      ),
-                                                      const SizedBox(height: 12), // Reduced margin
-                                                      
-                                                      // IATA code
-                                                      Text(
-                                                        widget.args.arrivalAirportCode.toUpperCase(),
-                                                        style: const TextStyle(
-                                                          fontFamily: 'Inter',
-                                                          fontWeight: FontWeight.w900,
-                                                          fontSize: 32,
-                                                          color: Colors.white,
-                                                          letterSpacing: 1.5,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(height: 8),
-                                                      // Weather information
-                                                      _buildWeatherInfo(widget.args.arrivalAirportCode),
-                                                    ],
-                                                  ),
-                                                ),
-                                                
-                                                // City name at bottom
-                                                Positioned(
-                                                  bottom: 20,
-                                                  left: 0,
-                                                  right: 0,
-                                                  child: Center(
-                                                    child: Text(
-                                                      widget.args.toCity.toUpperCase(),
-                                                      style: const TextStyle(
-                                                        fontFamily: 'Inter',
-                                                        fontWeight: FontWeight.w600,
-                                                        fontSize: 16,
-                                                        color: Colors.white,
-                                                        letterSpacing: 1.0,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                      _buildCityBanner(
+                                        imageUrl: widget.args.arrivalImage.isNotEmpty
+                                            ? widget.args.arrivalImage
+                                            : widget.args.arrivalThumbnail.isNotEmpty
+                                                ? widget.args.arrivalThumbnail
+                                                : 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=400&fit=crop',
+                                        city: widget.args.toCity,
+                                        airportCode: widget.args.arrivalAirportCode,
+                                        icon: Icons.flight_land,
+                                        isDeparture: false,
                                       ),
                                     ],
                                   ),
@@ -339,12 +194,7 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                                   // Title
                                   Text(
                                     "You're all set!",
-                                    style: AppTheme.bodyLarge.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 28,
-                                      height: 32 / 28,
-                                      color: const Color(0xFF1F2937),
-                                    ),
+                                    style: AppTheme.headlineLarge,
                                     textAlign: TextAlign.center,
                                   ),
                                   const SizedBox(height: 16),
@@ -353,15 +203,10 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                                   Column(
                                     children: [
                                       Text(
-                                        widget.args.contactNames.isNotEmpty 
+                                        widget.args.contactNames.isNotEmpty
                                             ? "We'll handle the updates to your closed family members from now on."
                                             : "We'll take care of your flight notifications from now on.",
-                                        style: AppTheme.bodyLarge.copyWith(
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 16,
-                                          height: 26 / 16,
-                                          color: const Color(0xFF4B5563),
-                                        ),
+                                        style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
                                         textAlign: TextAlign.center,
                                       ),
                                       const SizedBox(height: 16),
@@ -369,33 +214,25 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                                       // Enhanced Alert Information
                                       Container(
                                         padding: const EdgeInsets.all(16),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFF9FAFB),
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(
-                                            color: const Color(0xFFE5E7EB),
-                                            width: 1,
-                                          ),
+                                        decoration: AppTheme.cardDecoration.copyWith(
+                                          color: AppTheme.background,
+                                          border: Border.all(color: AppTheme.borderPrimary),
                                         ),
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Row(
                                               children: [
-                                                Icon(
+                                                const Icon(
                                                   Icons.notifications_active,
                                                   size: 18,
-                                                  color: const Color(0xFF059393),
+                                                  color: AppTheme.primary,
                                                 ),
                                                 const SizedBox(width: 8),
                                                 Expanded(
                                                   child: Text(
                                                     'Real-time alerts will be sent via WhatsApp',
-                                                    style: AppTheme.bodyLarge.copyWith(
-                                                      fontWeight: FontWeight.w600,
-                                                      fontSize: 14,
-                                                      color: const Color(0xFF374151),
-                                                    ),
+                                                    style: AppTheme.titleSmall,
                                                   ),
                                                 ),
                                               ],
@@ -420,17 +257,7 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                                   if (widget.args.contactNames.isNotEmpty) ...[
                                     Container(
                                       width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(18),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(0.08),
-                                            blurRadius: 18,
-                                            offset: const Offset(0, 6),
-                                          ),
-                                        ],
-                                      ),
+                                      decoration: AppTheme.elevatedCardDecoration,
                                       child: Padding(
                                         padding: const EdgeInsets.all(20),
                                         child: Column(
@@ -441,12 +268,12 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                                               width: 48,
                                               height: 48,
                                               decoration: BoxDecoration(
-                                                color: const Color(0xFFF3F4F6),
+                                                color: AppTheme.background,
                                                 borderRadius: BorderRadius.circular(24),
                                               ),
                                               child: const Icon(
                                                 Icons.people,
-                                                color: Color(0xFF6B7280),
+                                                color: AppTheme.textSecondary,
                                                 size: 24,
                                               ),
                                             ),
@@ -455,12 +282,7 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                                             // Contact names
                                             Text(
                                               _formatContactNames(widget.args.contactNames),
-                                              style: AppTheme.bodyLarge.copyWith(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 18,
-                                                height: 24 / 18,
-                                                color: const Color(0xFF1F2937),
-                                              ),
+                                              style: AppTheme.titleLarge,
                                               textAlign: TextAlign.center,
                                             ),
                                             const SizedBox(height: 12),
@@ -471,17 +293,13 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                                               children: [
                                                 const Icon(
                                                   Icons.message,
-                                                  color: Color(0xFF25D366),
+                                                  color: AppTheme.success,
                                                   size: 18,
                                                 ),
                                                 const SizedBox(width: 6),
                                                 Text(
                                                   'will be notified via WhatsApp',
-                                                  style: AppTheme.bodyLarge.copyWith(
-                                                    fontWeight: FontWeight.w400,
-                                                    fontSize: 14,
-                                                    color: const Color(0xFF6B7280),
-                                                  ),
+                                                  style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
                                                 ),
                                               ],
                                             ),
@@ -496,36 +314,16 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                                   if (hasContacts) ...[
                                     SizedBox(
                                       width: double.infinity,
-                                      height: 56,
-                                      child: ElevatedButton(
+                                      child: ElevatedButton.icon(
                                         onPressed: () {
                                           Navigator.of(context).popUntil((route) => route.isFirst);
                                         },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xFF059393),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(14),
-                                          ),
-                                          elevation: 0,
+                                        style: AppTheme.primaryButton,
+                                        icon: const Text(
+                                          "✈️",
+                                          style: TextStyle(fontSize: 20),
                                         ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "Let's go!",
-                                              style: AppTheme.bodyLarge.copyWith(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 18,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            const Text(
-                                              "✈️",
-                                              style: TextStyle(fontSize: 20),
-                                            ),
-                                          ],
-                                        ),
+                                        label: const Text("Let's go!"),
                                       ),
                                     ),
                                     const SizedBox(height: 20),
@@ -633,20 +431,12 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                         child: Container(
                           width: 36,
                           height: 36,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.95),
+                          decoration: AppTheme.cardDecoration.copyWith(
                             shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.15),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
                           ),
                           child: IconButton(
                             padding: EdgeInsets.zero,
-                            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF6B7280), size: 16),
+                            icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 16),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
@@ -662,16 +452,8 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                           child: Container(
                             width: 36,
                             height: 36,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.95),
+                            decoration: AppTheme.cardDecoration.copyWith(
                               shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.15),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
                             ),
                             child: IconButton(
                               padding: EdgeInsets.zero,
@@ -695,10 +477,10 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9FAFB),
+                    color: AppTheme.background,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: AppTheme.shadowPrimary,
                         blurRadius: 4,
                         offset: const Offset(0, -2),
                       ),
@@ -709,36 +491,16 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                     children: [
                       SizedBox(
                         width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
+                        child: ElevatedButton.icon(
                           onPressed: () {
                             Navigator.of(context).popUntil((route) => route.isFirst);
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF059393),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            elevation: 0,
+                          style: AppTheme.primaryButton,
+                          icon: const Text(
+                            "✈️",
+                            style: TextStyle(fontSize: 20),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Let's go!",
-                                style: AppTheme.bodyLarge.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Text(
-                                "✈️",
-                                style: TextStyle(fontSize: 20),
-                              ),
-                            ],
-                          ),
+                          label: const Text("Let's go!"),
                         ),
                       ),
                     ],
@@ -785,22 +547,89 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
             height: 4,
             margin: const EdgeInsets.only(top: 6, right: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFF059393),
+              color: AppTheme.primary,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
           Expanded(
             child: Text(
               text,
-              style: AppTheme.bodyLarge.copyWith(
-                fontWeight: FontWeight.w400,
-                fontSize: 13,
-                color: const Color(0xFF6B7280),
-                height: 1.4,
-              ),
+              style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCityBanner({
+    required String imageUrl,
+    required String city,
+    required String airportCode,
+    required IconData icon,
+    required bool isDeparture,
+  }) {
+    return Expanded(
+      child: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: NetworkImage(imageUrl),
+            fit: BoxFit.cover,
+            onError: (exception, stackTrace) {},
+          ),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: isDeparture ? Alignment.centerLeft : Alignment.centerRight,
+              end: isDeparture ? Alignment.centerRight : Alignment.centerLeft,
+              colors: [
+                Colors.black.withOpacity(0.4),
+                Colors.transparent,
+              ],
+            ),
+          ),
+          child: Stack(
+            children: [
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      icon,
+                      color: AppTheme.textOnPrimary,
+                      size: 48,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      airportCode.toUpperCase(),
+                      style: AppTheme.headlineLarge.copyWith(
+                        color: AppTheme.textOnPrimary,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _buildWeatherInfo(airportCode),
+                  ],
+                ),
+              ),
+              Positioned(
+                bottom: 20,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Text(
+                    city.toUpperCase(),
+                    style: AppTheme.titleMedium.copyWith(
+                      color: AppTheme.textOnPrimary,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -819,11 +648,8 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(
               '${weather.current.temperature.round()}°C',
-              style: const TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w800,
-                fontSize: 20,
-                color: Colors.white,
+              style: AppTheme.headlineSmall.copyWith(
+                color: AppTheme.textOnPrimary,
                 letterSpacing: 0.5,
               ),
             ),

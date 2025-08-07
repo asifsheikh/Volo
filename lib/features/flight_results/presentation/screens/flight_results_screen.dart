@@ -27,7 +27,6 @@ class FlightResultsScreen extends StatelessWidget {
         backgroundColor: AppTheme.background,
         elevation: 0,
         scrolledUnderElevation: 0,
-        surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
@@ -46,17 +45,7 @@ class FlightResultsScreen extends StatelessWidget {
             Container(
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppTheme.cardBackground,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
+              decoration: AppTheme.cardDecoration,
               child: Row(
                 children: [
                   Expanded(
@@ -76,14 +65,14 @@ class FlightResultsScreen extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: AppTheme.textPrimary,
-                      borderRadius: BorderRadius.circular(20),
+                    padding: const EdgeInsets.all(8),
+                    decoration: const BoxDecoration(
+                      color: AppTheme.primary,
+                      shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.flight_takeoff,
-                      color: Colors.white,
+                      color: AppTheme.textOnPrimary,
                       size: 16,
                     ),
                   ),
@@ -111,36 +100,19 @@ class FlightResultsScreen extends StatelessWidget {
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppTheme.cardBackground,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
+              decoration: AppTheme.cardDecoration,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     '${allFlights.length} flights found',
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: Color(0xFF374151),
-                    ),
+                    style: AppTheme.bodyMedium,
                   ),
                   Text(
                     'From \$${_getLowestPrice(allFlights)}',
-                    style: const TextStyle(
-                      fontFamily: 'Inter',
+                    style: AppTheme.bodyMedium.copyWith(
+                      color: AppTheme.success,
                       fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      color: Color(0xFF059669),
                     ),
                   ),
                 ],
@@ -173,30 +145,20 @@ class FlightResultsScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.flight_takeoff,
             size: 64,
-            color: Color(0xFF9CA3AF),
+            color: AppTheme.textTertiary,
           ),
           const SizedBox(height: 16),
           Text(
             'No flights found',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-              color: Color(0xFF374151),
-            ),
+            style: AppTheme.titleLarge,
           ),
           const SizedBox(height: 8),
           Text(
             'Try adjusting your search criteria',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w400,
-              fontSize: 14,
-              color: Color(0xFF6B7280),
-            ),
+            style: AppTheme.bodyMedium,
           ),
         ],
       ),
@@ -209,24 +171,14 @@ class FlightResultsScreen extends StatelessWidget {
     
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      decoration: AppTheme.cardDecoration,
       child: Column(
         children: [
           // Flight header
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isBest ? const Color(0xFF059669).withOpacity(0.1) : Colors.transparent,
+              color: isBest ? AppTheme.success.withOpacity(0.1) : Colors.transparent,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -252,12 +204,12 @@ class FlightResultsScreen extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE5E7EB),
+                      color: AppTheme.borderPrimary,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
                       Icons.flight,
-                      color: Color(0xFF6B7280),
+                      color: AppTheme.textSecondary,
                       size: 20,
                     ),
                   ),
@@ -271,21 +223,11 @@ class FlightResultsScreen extends StatelessWidget {
                     children: [
                       Text(
                         mainFlight.airline,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                          color: Color(0xFF111827),
-                        ),
+                        style: AppTheme.titleMedium,
                       ),
                       Text(
                         mainFlight.flightNumber,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                          color: Color(0xFF6B7280),
-                        ),
+                        style: AppTheme.bodyMedium,
                       ),
                     ],
                   ),
@@ -297,28 +239,18 @@ class FlightResultsScreen extends StatelessWidget {
                   children: [
                     Text(
                       '\$${flight.price}',
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18,
-                        color: Color(0xFF111827),
-                      ),
+                      style: AppTheme.titleLarge,
                     ),
                     if (isBest)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF059669),
+                          color: AppTheme.success,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Best',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 10,
-                            color: Colors.white,
-                          ),
+                          style: AppTheme.labelSmall.copyWith(color: AppTheme.textOnPrimary),
                         ),
                       ),
                   ],
@@ -342,22 +274,12 @@ class FlightResultsScreen extends StatelessWidget {
                         children: [
                           Text(
                             _formatTime(mainFlight.departureAirport.time),
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w700,
-                              fontSize: 18,
-                              color: Color(0xFF111827),
-                            ),
+                            style: AppTheme.titleLarge,
                           ),
                           const SizedBox(height: 4),
                           Text(
                             mainFlight.departureAirport.id,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              color: Color(0xFF6B7280),
-                            ),
+                            style: AppTheme.bodyMedium,
                           ),
                         ],
                       ),
@@ -368,27 +290,19 @@ class FlightResultsScreen extends StatelessWidget {
                       children: [
                         Text(
                           _formatDuration(flight.totalDuration),
-                          style: const TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                            color: Color(0xFF6B7280),
-                          ),
+                          style: AppTheme.bodyMedium,
                         ),
                         const SizedBox(height: 4),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: isDirect ? const Color(0xFF059669).withOpacity(0.1) : const Color(0xFFF59E0B).withOpacity(0.1),
+                            color: isDirect ? AppTheme.success.withOpacity(0.1) : AppTheme.warning.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             isDirect ? 'Direct' : '${flight.flights.length - 1} stop${flight.flights.length > 2 ? 's' : ''}',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 10,
-                              color: isDirect ? const Color(0xFF059669) : const Color(0xFFF59E0B),
+                            style: AppTheme.labelSmall.copyWith(
+                              color: isDirect ? AppTheme.success : AppTheme.warning,
                             ),
                           ),
                         ),
@@ -402,22 +316,12 @@ class FlightResultsScreen extends StatelessWidget {
                         children: [
                           Text(
                             _formatTime(mainFlight.arrivalAirport.time),
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w700,
-                              fontSize: 18,
-                              color: Color(0xFF111827),
-                            ),
+                            style: AppTheme.titleLarge,
                           ),
                           const SizedBox(height: 4),
                           Text(
                             mainFlight.arrivalAirport.id,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                              color: Color(0xFF6B7280),
-                            ),
+                            style: AppTheme.bodyMedium,
                           ),
                         ],
                       ),
@@ -431,7 +335,7 @@ class FlightResultsScreen extends StatelessWidget {
                     margin: const EdgeInsets.only(top: 12),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF9FAFB),
+                      color: AppTheme.background,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
@@ -440,22 +344,12 @@ class FlightResultsScreen extends StatelessWidget {
                         if (mainFlight.airplane != null)
                           Text(
                             'Aircraft: ${mainFlight.airplane}',
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12,
-                              color: Color(0xFF374151),
-                            ),
+                            style: AppTheme.bodySmall,
                           ),
                         if (mainFlight.extensions.isNotEmpty)
                           Text(
                             mainFlight.extensions.first,
-                            style: const TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 12,
-                              color: Color(0xFF6B7280),
-                            ),
+                            style: AppTheme.bodySmall,
                           ),
                       ],
                     ),

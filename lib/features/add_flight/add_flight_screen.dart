@@ -189,7 +189,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
           duration: const Duration(seconds: 4),
           action: SnackBarAction(
             label: 'Got it',
-            textColor: Colors.white,
+            textColor: AppTheme.textOnPrimary,
             onPressed: () {},
           ),
         ),
@@ -230,15 +230,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
-          'Add Flight',
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w700,
-            fontSize: 24,
-            color: AppTheme.textPrimary,
-          ),
-        ),
+        title: const Text('Add Flight'),
         centerTitle: false,
       ),
       body: SafeArea(
@@ -258,130 +250,52 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                       Row(
                         children: [
                           Expanded(
-                            child: AnimatedBuilder(
-                              animation: _uploadButtonScale,
-                              builder: (context, child) {
-                                return Transform.scale(
-                                  scale: _uploadButtonScale.value,
-                                  child: SizedBox(
-                                    height: 58,
-                                    child: OutlinedButton(
-                                      onPressed: () async {
-                                        _uploadButtonController.forward().then((_) {
-                                          _uploadButtonController.reverse();
-                                        });
-                                        await UploadTicketService.uploadTicket(
-                                          context,
-                                          onSuccess: _populateFormFromTicket,
-                                        );
-                                      },
-                                      style: OutlinedButton.styleFrom(
-                                        backgroundColor: Colors.white,
-                                        side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        shadowColor: Colors.black.withValues(alpha: 0.05),
-                                        elevation: 1,
-                                        padding: EdgeInsets.zero,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(Icons.upload, color: Color(0xFF4B5563), size: 16),
-                                          const SizedBox(width: 6),
-                                          const Text(
-                                            'Upload Ticket',
-                                            style: TextStyle(
-                                              fontFamily: 'Inter',
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 14,
-                                              height: 1.2,
-                                              color: Color(0xFF374151),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                            child: OutlinedButton.icon(
+                              onPressed: () async {
+                                await UploadTicketService.uploadTicket(
+                                  context,
+                                  onSuccess: _populateFormFromTicket,
                                 );
                               },
+                              style: AppTheme.secondaryOutlinedButton,
+                              icon: const Icon(Icons.upload, size: 16),
+                              label: const Text('Upload Ticket'),
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: AnimatedBuilder(
-                              animation: _scanButtonScale,
-                              builder: (context, child) {
-                                return Transform.scale(
-                                  scale: _scanButtonScale.value,
-                                  child: SizedBox(
-                                    height: 58,
-                                    child: OutlinedButton(
-                                      onPressed: () async {
-                                        _scanButtonController.forward().then((_) {
-                                          _scanButtonController.reverse();
-                                        });
-                                        try {
-                                          final result = await UploadTicketService.scanPass(
+                            child: OutlinedButton.icon(
+                              onPressed: () async {
+                                try {
+                                  final result = await UploadTicketService.scanPass(
+                                    context,
+                                    onSuccess: _populateFormFromTicket,
+                                  );
+                                  print('Scan Pass result: $result');
+                                } catch (e) {
+                                  print('Scan Pass error: $e');
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: const Text('Unable to scan ticket. Please try uploading it instead.'),
+                                      backgroundColor: AppTheme.warning,
+                                      duration: const Duration(seconds: 4),
+                                      action: SnackBarAction(
+                                        label: 'Upload',
+                                        textColor: Colors.white,
+                                        onPressed: () async {
+                                          await UploadTicketService.uploadTicket(
                                             context,
                                             onSuccess: _populateFormFromTicket,
                                           );
-                                          print('Scan Pass result: $result');
-                                        } catch (e) {
-                                          print('Scan Pass error: $e');
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text('Unable to scan ticket. Please try uploading it instead.'),
-                                              backgroundColor: Colors.orange,
-                                              duration: const Duration(seconds: 4),
-                                              action: SnackBarAction(
-                                                label: 'Upload',
-                                                textColor: Colors.white,
-                                                onPressed: () async {
-                                                  await UploadTicketService.uploadTicket(
-                                                    context,
-                                                    onSuccess: _populateFormFromTicket,
-                                                  );
-                                                },
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      style: OutlinedButton.styleFrom(
-                                        backgroundColor: Colors.white,
-                                        side: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        shadowColor: Colors.black.withValues(alpha: 0.05),
-                                        elevation: 1,
-                                        padding: EdgeInsets.zero,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(Icons.camera_alt, color: Color(0xFF4B5563), size: 16),
-                                          const SizedBox(width: 6),
-                                          const Text(
-                                            'Scan Pass',
-                                            style: TextStyle(
-                                              fontFamily: 'Inter',
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 14,
-                                              height: 1.2,
-                                              color: Color(0xFF374151),
-                                            ),
-                                          ),
-                                        ],
+                                        },
                                       ),
                                     ),
-                                  ),
-                                );
+                                  );
+                                }
                               },
+                              style: AppTheme.secondaryOutlinedButton,
+                              icon: const Icon(Icons.camera_alt, size: 16),
+                              label: const Text('Scan Pass'),
                             ),
                           ),
                         ],
@@ -393,13 +307,7 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                         child: Text(
                           "We'll automatically extract flight details from your ticket or boarding pass.",
                           textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            height: 1.33,
-                            color: Color(0xFF6B7280),
-                          ),
+                          style: AppTheme.bodySmall,
                         ),
                       ),
                       const SizedBox(height: 22),
@@ -408,30 +316,24 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                         width: 350,
                         child: Row(
                           children: [
-                            Expanded(
+                            const Expanded(
                               child: Divider(
-                                color: Color(0xFFD1D5DB),
+                                color: AppTheme.borderSecondary,
                                 thickness: 1,
                                 endIndent: 12,
                               ),
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8),
-                              child: const Text(
+                              child: Text(
                                 'or enter manually',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 12,
-                                  height: 1.33,
-                                  color: Color(0xFF9CA3AF),
-                                ),
+                                style: AppTheme.bodySmall.copyWith(color: AppTheme.textTertiary),
                               ),
                             ),
-                            Expanded(
+                            const Expanded(
                               child: Divider(
-                                color: Color(0xFFD1D5DB),
+                                color: AppTheme.borderSecondary,
                                 thickness: 1,
                                 indent: 12,
                               ),
@@ -489,17 +391,12 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(Icons.info_outline, color: Color(0xFF6B7280), size: 16),
-                          SizedBox(width: 8),
+                          const Icon(Icons.info_outline, color: AppTheme.textSecondary, size: 16),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               'Flight number helps us find exact matches.',
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w400,
-                                fontSize: 13,
-                                color: Color(0xFF6B7280),
-                              ),
+                              style: AppTheme.bodySmall.copyWith(fontSize: 13),
                             ),
                           ),
                         ],
@@ -518,9 +415,8 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                 builder: (context, ref, child) {
                   final isFormValid = _isFormValid;
                   return SizedBox(
-                    width: 350,
-                    height: 56,
-                    child: ElevatedButton(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
                       onPressed: isFormValid
                           ? () {
                               if (_formKey.currentState!.validate()) {
@@ -528,30 +424,9 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
                               }
                             }
                           : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 10,
-                        shadowColor: Colors.black.withValues(alpha: 0.1),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.search, color: Colors.white, size: 20),
-                          SizedBox(width: 12),
-                          Text(
-                            'Find Flights',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
+                      style: isFormValid ? AppTheme.primaryButton : AppTheme.disabledButton,
+                      icon: const Icon(Icons.search, size: 20),
+                      label: const Text('Find Flights'),
                     ),
                   );
                 },
@@ -604,77 +479,48 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
           debounceDuration: const Duration(milliseconds: 300), // Debounce search
           builder: (context, controller, focusNode) {
             return Container(
-              decoration: BoxDecoration(
-                color: AppTheme.cardBackground,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.borderPrimary),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.shadowSecondary,
-                    blurRadius: 2,
-                    offset: Offset(0, 1),
-                  ),
-                ],
-              ),
+              decoration: AppTheme.cardDecoration,
               child: TextField(
                 controller: controller,
                 focusNode: focusNode,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.transparent,
+                decoration: AppTheme.inputDecoration.copyWith(
                   hintText: hintText,
-                  hintStyle: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 16,
-                    color: Color(0xFFADAEBC),
-                  ),
-                  prefixIcon: Icon(icon, color: Color(0xFF9CA3AF), size: 20),
+                  prefixIcon: Icon(icon, size: 20),
                   suffixIcon: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (isLoading)
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
+                        const Padding(
+                          padding: EdgeInsets.all(16.0),
                           child: SizedBox(
                             width: 16,
                             height: 16,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF9CA3AF)),
                             ),
                           ),
                         ),
-                      // Success indicator (green checkmark)
                       if (isAirportSelected && !isLoading)
                         Container(
-                          margin: EdgeInsets.only(right: 8),
-                          child: Icon(
+                          margin: const EdgeInsets.only(right: 8),
+                          child: const Icon(
                             Icons.check_circle,
-                            color: Color(0xFF10B981),
+                            color: AppTheme.success,
                             size: 20,
                           ),
                         ),
-                      // Dropdown indicator
                       Container(
-                        margin: EdgeInsets.only(right: 12),
+                        margin: const EdgeInsets.only(right: 12),
                         child: Icon(
                           Icons.keyboard_arrow_down,
-                          color: isAirportSelected ? Color(0xFF10B981) : Color(0xFF9CA3AF),
+                          color: isAirportSelected ? AppTheme.success : AppTheme.textTertiary,
                           size: 24,
                         ),
                       ),
                     ],
                   ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 ),
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 16,
-                  color: Color(0xFF1F2937),
-                ),
+                style: AppTheme.bodyLarge,
                 onTap: () {
                   // Show suggestions when field is tapped, but only if no airport is selected
                   if (controller.text.isEmpty && !isAirportSelected) {
@@ -788,25 +634,15 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
           itemBuilder: (context, AirportEntity airport) {
             return ListTile(
               dense: true,
-              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               title: Text(
                 '${airport.city} (${airport.iata})',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  color: Color(0xFF1F2937),
-                ),
+                style: AppTheme.bodyMedium,
               ),
               subtitle: airport.airport.toLowerCase() != airport.city.toLowerCase()
                   ? Text(
                       airport.airport,
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 12,
-                        color: Color(0xFF6B7280),
-                      ),
+                      style: AppTheme.bodySmall,
                     )
                   : null,
             );
@@ -820,20 +656,15 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.info_outline,
-                color: Color(0xFF6B7280),
+                color: AppTheme.textSecondary,
                 size: 14,
               ),
               const SizedBox(width: 6),
               Text(
                 'Please select a specific airport',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 12,
-                  color: Color(0xFF6B7280),
-                ),
+                style: AppTheme.bodySmall,
               ),
             ],
           ),
@@ -856,79 +687,25 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
       children: [
         Row(
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                fontSize: 14,
-                color: Color(0xFF4B5563),
-              ),
-            ),
+            Text(label, style: AppTheme.bodyMedium),
             if (optional)
-              Text(' (Optional)',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFF9CA3AF),
-                ),
-              ),
-            if (!optional)
-              Text(' *',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 14,
-                  color: Color(0xFF9CA3AF),
-                ),
-              ),
+              Text(' (Optional)', style: AppTheme.bodyMedium.copyWith(color: AppTheme.textTertiary))
+            else
+              Text(' *', style: AppTheme.bodyMedium.copyWith(color: AppTheme.textTertiary)),
           ],
         ),
         const SizedBox(height: 8),
         Container(
-          height: 58,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Color(0xFFE5E7EB)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 2,
-                offset: Offset(0, 1),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              const SizedBox(width: 16),
-              Icon(icon, color: Color(0xFF9CA3AF), size: 20),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextFormField(
-                  controller: controller,
-                  focusNode: focusNode,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: hintText,
-                    hintStyle: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                      color: Color(0xFFADAEBC),
-                    ),
-                  ),
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 16,
-                    color: Color(0xFF1F2937),
-                  ),
-                  onChanged: onChanged,
-                ),
-              ),
-            ],
+          decoration: AppTheme.cardDecoration,
+          child: TextFormField(
+            controller: controller,
+            focusNode: focusNode,
+            decoration: AppTheme.inputDecoration.copyWith(
+              hintText: hintText,
+              prefixIcon: Icon(icon, size: 20),
+            ),
+            style: AppTheme.bodyLarge,
+            onChanged: onChanged,
           ),
         ),
       ],
@@ -941,58 +718,28 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
       children: [
         Row(
           children: [
-            Text(
-              'Date',
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                fontSize: 14,
-                color: Color(0xFF4B5563),
-              ),
-            ),
-            Text(' *',
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w400,
-                fontSize: 14,
-                color: Color(0xFF9CA3AF),
-              ),
-            ),
+            Text('Date', style: AppTheme.bodyMedium),
+            Text(' *', style: AppTheme.bodyMedium.copyWith(color: AppTheme.textTertiary)),
           ],
         ),
         const SizedBox(height: 8),
         GestureDetector(
           onTap: _pickDate,
           child: Container(
-            height: 58,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Color(0xFFE5E7EB)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 2,
-                  offset: Offset(0, 1),
-                ),
-              ],
-            ),
+            decoration: AppTheme.cardDecoration,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: Row(
               children: [
-                const SizedBox(width: 16),
-                Icon(Icons.calendar_today, color: Color(0xFF9CA3AF), size: 20),
+                const Icon(Icons.calendar_today, size: 20),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     _selectedDate != null
                         ? DateFormat('MMM dd, yyyy').format(_selectedDate!)
                         : 'Select date',
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                      color: _selectedDate != null ? Color(0xFF1F2937) : Color(0xFFADAEBC),
-                    ),
+                    style: _selectedDate != null
+                        ? AppTheme.bodyLarge
+                        : AppTheme.bodyLarge.copyWith(color: AppTheme.textTertiary),
                   ),
                 ),
               ],
