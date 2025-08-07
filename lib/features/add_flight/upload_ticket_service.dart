@@ -474,7 +474,7 @@ class UploadTicketService {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please select a valid file (PDF, JPG, or PNG)'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.destructive,
             duration: Duration(seconds: 3),
           ),
         );

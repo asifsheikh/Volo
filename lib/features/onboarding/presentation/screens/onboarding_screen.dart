@@ -231,7 +231,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               children: [
                                 TextSpan(
                                   text: '*',
-                                  style: TextStyle(color: Colors.red),
+                                  style: TextStyle(color: AppTheme.destructive),
                                 ),
                               ],
                             ),
