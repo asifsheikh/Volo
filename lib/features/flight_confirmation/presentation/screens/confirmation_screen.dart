@@ -578,7 +578,7 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
               begin: isDeparture ? Alignment.centerLeft : Alignment.centerRight,
               end: isDeparture ? Alignment.centerRight : Alignment.centerLeft,
               colors: [
-                Colors.black.withOpacity(0.4),
+                AppTheme.shadowPrimary.withOpacity(0.4),
                 Colors.transparent,
               ],
             ),

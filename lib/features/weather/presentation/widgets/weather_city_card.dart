@@ -70,7 +70,7 @@ class WeatherCityCard extends ConsumerWidget {
                     children: [
                       Icon(
                         isDeparture ? Icons.flight_takeoff : Icons.flight_land,
-                        color: Colors.white,
+                        color: AppTheme.textOnPrimary,
                         size: 16,
                       ),
                       const SizedBox(width: 8),
@@ -78,7 +78,7 @@ class WeatherCityCard extends ConsumerWidget {
                         child: Text(
                           weather.cityName,
                           style: AppTheme.titleMedium.copyWith(
-                            color: Colors.white,
+                            color: AppTheme.textOnPrimary,
                             fontWeight: FontWeight.bold,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -93,7 +93,7 @@ class WeatherCityCard extends ConsumerWidget {
                       Text(
                         '${weather.current.temperature.round()}°C',
                         style: AppTheme.headlineMedium.copyWith(
-                          color: Colors.white,
+                          color: AppTheme.textOnPrimary,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

@@ -127,7 +127,7 @@ class _PushNotificationTestScreenState extends ConsumerState<PushNotificationTes
                       _fcmToken ?? 'Loading...',
                       style: AppTheme.bodySmall.copyWith(
                         fontFamily: 'monospace',
-                        backgroundColor: Colors.grey[100],
+                        backgroundColor: AppTheme.background,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -140,7 +140,7 @@ class _PushNotificationTestScreenState extends ConsumerState<PushNotificationTes
                       _storedFCMToken ?? 'Not stored',
                       style: AppTheme.bodySmall.copyWith(
                         fontFamily: 'monospace',
-                        backgroundColor: Colors.grey[100],
+                        backgroundColor: AppTheme.background,
                       ),
                     ),
                   ],
@@ -156,14 +156,7 @@ class _PushNotificationTestScreenState extends ConsumerState<PushNotificationTes
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _testFirebaseMessaging,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF059393),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                  style: AppTheme.primaryButton,
                   child: const Text(
                     'Test Firebase Messaging',
                     style: TextStyle(
@@ -179,13 +172,8 @@ class _PushNotificationTestScreenState extends ConsumerState<PushNotificationTes
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _testLocalNotification,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                  style: AppTheme.primaryButton.copyWith(
+                    backgroundColor: MaterialStateProperty.all(AppTheme.warning),
                   ),
                   child: const Text(
                     'Test Local Notification',
@@ -202,13 +190,8 @@ class _PushNotificationTestScreenState extends ConsumerState<PushNotificationTes
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _loadFCMToken,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[600],
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                  style: AppTheme.primaryButton.copyWith(
+                    backgroundColor: MaterialStateProperty.all(AppTheme.textSecondary),
                   ),
                   child: const Text(
                     'Refresh FCM Token',

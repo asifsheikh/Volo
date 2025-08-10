@@ -27,43 +27,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
+          title: Text(
             'Sign Out',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w600,
-              fontSize: 18,
-            ),
+            style: AppTheme.titleLarge.copyWith(color: AppTheme.destructive),
           ),
-          content: const Text(
+          content: Text(
             'Are you sure you want to sign out of your account?',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w400,
-              fontSize: 16,
-            ),
+            style: AppTheme.bodyLarge,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text(
+              child: Text(
                 'Cancel',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF6B7280),
-                ),
+                style: AppTheme.titleMedium.copyWith(color: AppTheme.textSecondary),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text(
+              child: Text(
                 'Sign Out',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFFEF4444),
-                ),
+                style: AppTheme.titleMedium.copyWith(color: AppTheme.destructive),
               ),
             ),
           ],

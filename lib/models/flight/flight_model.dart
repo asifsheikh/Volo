@@ -97,11 +97,6 @@ class Flight extends BaseModel {
   }
 
   @override
-  BaseModel copyWith() {
-    return this;
-  }
-
-  @override
   Flight copyWith({
     String? id,
     String? flightNumber,
@@ -167,11 +162,6 @@ class CarbonEmissions extends BaseModel {
   List<String> getValidationErrors() {
     if (kgCO2 < 0) return ['Carbon emissions cannot be negative'];
     return [];
-  }
-
-  @override
-  BaseModel copyWith() {
-    return this;
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_theme.dart';
 
 class FlightSelectionDialog extends StatelessWidget {
   final List<Map<String, dynamic>> flights;
@@ -33,12 +34,12 @@ class FlightSelectionDialog extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF008080).withOpacity(0.1),
+                    color: AppTheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.flight_takeoff,
-                    color: Color(0xFF008080),
+                    color: AppTheme.primary,
                     size: 24,
                   ),
                 ),
@@ -185,27 +186,23 @@ class _FlightOptionCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF008080).withOpacity(0.1),
+                        color: AppTheme.primary.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         flightNumber,
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
+                        style: AppTheme.bodySmall.copyWith(
                           fontWeight: FontWeight.w600,
-                          fontSize: 12,
-                          color: Color(0xFF008080),
+                          color: AppTheme.primary,
                         ),
                       ),
                     ),
                     const Spacer(),
                     Text(
                       _formatDate(departureDate),
-                      style: TextStyle(
-                        fontFamily: 'Inter',
+                      style: AppTheme.bodySmall.copyWith(
                         fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                        color: Colors.grey[600],
+                        color: AppTheme.textSecondary,
                       ),
                     ),
                   ],
@@ -233,7 +230,7 @@ class _FlightOptionCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: Icon(
                             Icons.flight_takeoff,
-                            color: Colors.grey[400],
+                            color: AppTheme.textSecondary,
                             size: 16,
                           ),
                         ),
@@ -255,16 +252,14 @@ class _FlightOptionCard extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Colors.orange[100],
+                            color: AppTheme.warning.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
                             'Via $layoverCity',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
+                            style: AppTheme.labelSmall.copyWith(
                               fontWeight: FontWeight.w500,
-                              fontSize: 10,
-                              color: Colors.orange[700],
+                              color: AppTheme.warning,
                             ),
                           ),
                         ),
@@ -279,16 +274,14 @@ class _FlightOptionCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: index == 0 ? Colors.blue[50] : Colors.green[50],
+                      color: index == 0 ? AppTheme.primary.withOpacity(0.1) : AppTheme.success.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       index == 0 ? 'Outbound' : 'Return',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
+                      style: AppTheme.labelSmall.copyWith(
                         fontWeight: FontWeight.w500,
-                        fontSize: 10,
-                        color: index == 0 ? Colors.blue[700] : Colors.green[700],
+                        color: index == 0 ? AppTheme.primary : AppTheme.success,
                       ),
                     ),
                   ),
@@ -332,12 +325,7 @@ class _AirportInfo extends StatelessWidget {
         // City name - primary focus for alignment
         Text(
           city,
-          style: const TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-            color: Color(0xFF111827),
-          ),
+          style: AppTheme.bodyMedium.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 4),
         // Airport code/name - secondary information
@@ -345,27 +333,23 @@ class _AirportInfo extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             decoration: BoxDecoration(
-              color: Colors.green[50],
+              color: AppTheme.success.withOpacity(0.1),
               borderRadius: BorderRadius.circular(3),
             ),
             child: Text(
               airport.toUpperCase(),
-              style: TextStyle(
-                fontFamily: 'Inter',
+              style: AppTheme.labelSmall.copyWith(
                 fontWeight: FontWeight.w600,
-                fontSize: 10,
-                color: Colors.green[700],
+                color: AppTheme.success,
               ),
             ),
           ),
         ] else ...[
           Text(
             airport,
-            style: TextStyle(
-              fontFamily: 'Inter',
+            style: AppTheme.bodySmall.copyWith(
               fontWeight: FontWeight.w400,
-              fontSize: 12,
-              color: Colors.grey[600],
+              color: AppTheme.textSecondary,
             ),
           ),
         ],

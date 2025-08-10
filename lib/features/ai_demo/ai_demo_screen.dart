@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_ai/firebase_ai.dart' show ChatSession;
 import 'ai_demo_service.dart';
+import '../../theme/app_theme.dart';
 
 class AIDemoScreen extends StatefulWidget {
   const AIDemoScreen({super.key});
@@ -226,7 +227,7 @@ class _AIDemoScreenState extends State<AIDemoScreen> {
                       Container(
                         height: 200,
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
+                          border: Border.all(color: AppTheme.borderPrimary),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: ListView.builder(
@@ -249,7 +250,7 @@ class _AIDemoScreenState extends State<AIDemoScreen> {
                                     ),
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: isUser ? Colors.blue[100] : Colors.grey[100],
+                                      color: isUser ? AppTheme.primary.withOpacity(0.1) : AppTheme.background,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(message['message'] ?? ''),

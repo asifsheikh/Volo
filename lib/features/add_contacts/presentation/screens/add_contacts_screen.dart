@@ -93,7 +93,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
-                  title: const Text(
+                  title: Text(
                     'Add Contacts',
                     style: AppTheme.headlineSmall.copyWith(
                       color: AppTheme.textOnPrimary,
@@ -171,11 +171,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                         child: Center(
                                           child: Text(
                                             args.departureCity.toUpperCase(),
-                                            style: const TextStyle(
-                                              fontFamily: 'Inter',
+                                            style: AppTheme.titleMedium.copyWith(
                                               fontWeight: FontWeight.w600,
-                                              fontSize: 16,
-                                              color: Colors.white,
+                                              color: AppTheme.textOnPrimary,
                                               letterSpacing: 1.0,
                                             ),
                                           ),
@@ -208,10 +206,10 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                     gradient: LinearGradient(
                                       begin: Alignment.centerRight,
                                       end: Alignment.centerLeft,
-                                      colors: [
-                                        Colors.black.withOpacity(0.4),
-                                        Colors.transparent,
-                                      ],
+                                                            colors: [
+                        AppTheme.shadowPrimary.withOpacity(0.4),
+                        Colors.transparent,
+                      ],
                                     ),
                                   ),
                                   child: Stack(
@@ -222,9 +220,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             // Flight icon
-                                            const Icon(
+                                            Icon(
                                               Icons.flight_land,
-                                              color: Colors.white,
+                                              color: AppTheme.textOnPrimary,
                                               size: 48,
                                             ),
                                             const SizedBox(height: 12), // Reduced margin
@@ -232,11 +230,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                             // IATA code
                                             Text(
                                               args.arrivalAirportCode.toUpperCase(),
-                                              style: const TextStyle(
-                                                fontFamily: 'Inter',
+                                              style: AppTheme.headlineLarge.copyWith(
                                                 fontWeight: FontWeight.w900,
-                                                fontSize: 32,
-                                                color: Colors.white,
+                                                color: AppTheme.textOnPrimary,
                                                 letterSpacing: 1.5,
                                               ),
                                             ),
@@ -255,11 +251,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                         child: Center(
                                           child: Text(
                                             args.arrivalCity.toUpperCase(),
-                                            style: const TextStyle(
-                                              fontFamily: 'Inter',
+                                            style: AppTheme.titleMedium.copyWith(
                                               fontWeight: FontWeight.w600,
-                                              fontSize: 16,
-                                              color: Colors.white,
+                                              color: AppTheme.textOnPrimary,
                                               letterSpacing: 1.0,
                                             ),
                                           ),
@@ -389,7 +383,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              backgroundColor: Colors.white,
+                              backgroundColor: AppTheme.cardBackground,
                             ),
                           ),
                         ),
@@ -406,9 +400,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                               margin: const EdgeInsets.only(bottom: 8),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppTheme.cardBackground,
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0xFFE5E7EB)),
+                                border: Border.all(color: AppTheme.borderPrimary),
                               ),
                               child: Row(
                                 children: [
@@ -417,17 +411,15 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                     width: 32,
                                     height: 32,
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF008080).withOpacity(0.1),
+                                      color: AppTheme.primary.withOpacity(0.1),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Center(
                                       child: Text(
                                         contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',
-                                        style: const TextStyle(
-                                          fontFamily: 'Inter',
+                                        style: AppTheme.bodyMedium.copyWith(
                                           fontWeight: FontWeight.w600,
-                                          fontSize: 14,
-                                          color: Color(0xFF008080),
+                                          color: AppTheme.primary,
                                         ),
                                       ),
                                     ),
@@ -441,22 +433,17 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                       children: [
                                         Text(
                                           contact.name,
-                                          style: const TextStyle(
-                                            fontFamily: 'Inter',
+                                          style: AppTheme.bodyMedium.copyWith(
                                             fontWeight: FontWeight.w500,
-                                            fontSize: 14,
-                                            color: Color(0xFF111827),
                                           ),
                                         ),
                                         if (contact.phoneNumber != null) ...[
                                           const SizedBox(height: 2),
                                           Text(
                                             contact.phoneNumber!,
-                                            style: const TextStyle(
-                                              fontFamily: 'Inter',
+                                            style: AppTheme.bodySmall.copyWith(
                                               fontWeight: FontWeight.w400,
-                                              fontSize: 12,
-                                              color: Color(0xFF6B7280),
+                                              color: AppTheme.textSecondary,
                                             ),
                                           ),
                                         ],
@@ -467,7 +454,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                                   // Remove button
                                   IconButton(
                                     onPressed: () => ref.read(addContactsProviderProvider.notifier).removeContact(index),
-                                    icon: const Icon(Icons.close, size: 20, color: Color(0xFF6B7280)),
+                                    icon: Icon(Icons.close, size: 20, color: AppTheme.textSecondary),
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
                                   ),

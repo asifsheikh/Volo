@@ -7,6 +7,7 @@ import 'dart:developer' as developer;
 import 'flight_ticket_extraction_service.dart';
 import 'flight_selection_dialog.dart';
 import 'package:lottie/lottie.dart';
+import '../../theme/app_theme.dart';
 
 /// Callback type for successful ticket extraction
 typedef TicketExtractionCallback = void Function(Map<String, dynamic> flightData);

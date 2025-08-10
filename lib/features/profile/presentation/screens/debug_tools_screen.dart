@@ -72,12 +72,7 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                             flex: 2,
                             child: Text(
                               entry.key,
-                              style: const TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                                color: Color(0xFF374151),
-                              ),
+                              style: AppTheme.bodyMedium.copyWith(fontWeight: FontWeight.w500),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -86,17 +81,12 @@ class _DebugToolsScreenState extends State<DebugToolsScreen> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF3F4F6),
+                                color: AppTheme.background,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
                                 entry.value.toString(),
-                                style: const TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
-                                  color: Color(0xFF1F2937),
-                                ),
+                                style: AppTheme.bodySmall.copyWith(fontWeight: FontWeight.w600),
                                 textAlign: TextAlign.center,
                               ),
                             ),
