@@ -215,7 +215,7 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
               backgroundColor: AppTheme.success,
             ),
           );
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(true); // Return true to indicate success
         }
       } catch (e) {
         if (mounted) {
