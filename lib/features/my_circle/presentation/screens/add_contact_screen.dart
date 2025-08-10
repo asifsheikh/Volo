@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../theme/app_theme.dart';
-import '../../../../services/firebase_service.dart';
+import '../../../../services/ai_service.dart';
 
 class AddContactScreen extends ConsumerStatefulWidget {
   final String username;
@@ -57,8 +57,8 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
       // Use Firebase AI to generate sample message
       final template = "${widget.username}'s flight is starting its descent and is expected to touch down at London Heathrow in about 20 minutes. Current weather in London is 5°C with light rain — a perfect London welcome! ☔";
       
-      // Use Firebase service for AI message generation
-      String message = await FirebaseService.generateFlightMessage(
+      // Use dedicated AI service for message generation
+      String message = await AIService().generateFlightMessage(
         username: widget.username,
         language: _selectedLanguage!,
         customTemplate: template,
@@ -80,8 +80,8 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
   }
 
   Future<String> _generateAIMessage(String template, String language) async {
-    // Use Firebase service for AI message generation
-    return await FirebaseService.generateFlightMessage(
+    // Use dedicated AI service for message generation
+    return await AIService().generateFlightMessage(
       username: widget.username,
       language: language,
       customTemplate: template,
