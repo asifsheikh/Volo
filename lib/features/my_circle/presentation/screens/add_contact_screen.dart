@@ -195,16 +195,6 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Contact Name
-              _buildTextField(
-                controller: _contactNameController,
-                label: 'Contact Name',
-                hint: 'What do you call them? (e.g., Mom, Dad, Jo)',
-                icon: Icons.person_outline,
-                validator: (value) => value == null || value.trim().isEmpty ? 'Contact name is required' : null,
-              ),
-              const SizedBox(height: 16),
-              
               // WhatsApp Number
               _buildTextField(
                 controller: _whatsappNumberController,
@@ -216,6 +206,16 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
                   icon: Icon(Icons.contact_phone, color: AppTheme.primary),
                   onPressed: _openContactPicker,
                 ),
+              ),
+              const SizedBox(height: 16),
+              
+              // Contact Name
+              _buildTextField(
+                controller: _contactNameController,
+                label: 'Contact Name',
+                hint: 'What do you call them? (e.g., Mom, Dad, Jo)',
+                icon: Icons.person_outline,
+                validator: (value) => value == null || value.trim().isEmpty ? 'Contact name is required' : null,
               ),
               const SizedBox(height: 16),
               
