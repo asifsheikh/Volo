@@ -92,6 +92,14 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
     );
   }
 
+  Future<bool> _checkContactExists(String phoneNumber) async {
+    try {
+      return await MyCircleService.contactExists(phoneNumber);
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<void> _openContactPicker() async {
     try {
       // Request permission to access contacts
@@ -144,6 +152,8 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
                 ? '${selectedContact.name.first} ${selectedContact.name.last}'.trim()
                 : 'Unknown Contact';
         
+
+        
         // Update the form fields
         setState(() {
           _contactNameController.text = contactName;
@@ -169,10 +179,28 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
       setState(() { _isLoading = true; });
       
       try {
+        final whatsappNumber = _whatsappNumberController.text.trim();
+        final contactName = _contactNameController.text.trim();
+        
+        // Check if contact already exists in My Circle
+        final exists = await MyCircleService.contactExists(whatsappNumber);
+        if (exists) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('$contactName is already in your circle!'),
+                backgroundColor: AppTheme.warning,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
+          return;
+        }
+
         // Create contact form data
         final contactForm = MyCircleContactForm(
-          name: _contactNameController.text.trim(),
-          whatsappNumber: _whatsappNumberController.text.trim(),
+          name: contactName,
+          whatsappNumber: whatsappNumber,
           timezone: _selectedTimezone!,
           language: _selectedLanguage!,
         );
