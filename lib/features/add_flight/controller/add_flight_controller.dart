@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:developer' as developer;
 import '../add_flight_screen.dart';
+import '../data/models/airport_model.dart';
 
 class AddFlightController extends ChangeNotifier {
   // Form controllers
@@ -13,11 +14,11 @@ class AddFlightController extends ChangeNotifier {
   DateTime? selectedDate;
   String? selectedDepartureCity;
   String? selectedArrivalCity;
-  Airport? selectedDepartureAirport;
-  Airport? selectedArrivalAirport;
+  AirportModel? selectedDepartureAirport;
+  AirportModel? selectedArrivalAirport;
   
   // Airport data
-  List<Airport> allAirports = [];
+  List<AirportModel> allAirports = [];
   bool isLoadingAirports = false;
 
   // Form validation getter
@@ -35,7 +36,7 @@ class AddFlightController extends ChangeNotifier {
       final String jsonString = await DefaultAssetBundle.of(context)
           .loadString('assets/airports_global.json');
       final List<dynamic> jsonList = json.decode(jsonString);
-      allAirports = jsonList.map((json) => Airport.fromJson(json)).toList();
+      allAirports = jsonList.map((json) => AirportModel.fromJson(json)).toList();
       isLoadingAirports = false;
       notifyListeners();
       debugPrint('Loaded ${allAirports.length} airports');
@@ -50,9 +51,9 @@ class AddFlightController extends ChangeNotifier {
   }
 
   // Get airport suggestions
-  Future<List<Airport>> getAirportSuggestions(String query) async {
+  Future<List<AirportModel>> getAirportSuggestions(String query) async {
     final lowercaseQuery = query.toLowerCase();
-    final List<Airport> filtered = [];
+    final List<AirportModel> filtered = [];
     for (final airport in allAirports) {
       final cityLower = airport.city.toLowerCase();
       final airportLower = airport.airport.toLowerCase();
@@ -83,7 +84,7 @@ class AddFlightController extends ChangeNotifier {
     return filtered.take(8).toList();
   }
 
-  int _calculateScore(Airport airport, String query) {
+  int _calculateScore(AirportModel airport, String query) {
     final cityLower = airport.city.toLowerCase();
     final airportLower = airport.airport.toLowerCase();
     final iataLower = airport.iata.toLowerCase();
@@ -98,7 +99,7 @@ class AddFlightController extends ChangeNotifier {
   }
 
   // Find airport object by city name and IATA code (only exact matches)
-  Airport? findAirportByCityAndIata(String city, String iata) {
+  AirportModel? findAirportByCityAndIata(String city, String iata) {
     final normalizedCity = city.toLowerCase().trim();
     final normalizedIata = iata.toUpperCase().trim();
     
@@ -147,7 +148,7 @@ class AddFlightController extends ChangeNotifier {
         
         if (isDepartureValidIata) {
           // If it's a valid IATA code, try to find the airport
-          final Airport? departureAirportObj = findAirportByCityAndIata(departureCity, departureAirport);
+          final AirportModel? departureAirportObj = findAirportByCityAndIata(departureCity, departureAirport);
           if (departureAirportObj != null) {
             // Use the airport object to populate (same as dropdown selection)
             onDepartureAirportSelected(departureAirportObj);
@@ -179,7 +180,7 @@ class AddFlightController extends ChangeNotifier {
         
         if (isArrivalValidIata) {
           // If it's a valid IATA code, try to find the airport
-          final Airport? arrivalAirportObj = findAirportByCityAndIata(arrivalCity, arrivalAirport);
+          final AirportModel? arrivalAirportObj = findAirportByCityAndIata(arrivalCity, arrivalAirport);
           if (arrivalAirportObj != null) {
             // Use the airport object to populate (same as dropdown selection)
             onArrivalAirportSelected(arrivalAirportObj);
@@ -209,14 +210,14 @@ class AddFlightController extends ChangeNotifier {
   }
 
   // Airport selection methods
-  void onDepartureAirportSelected(Airport airport) {
+  void onDepartureAirportSelected(AirportModel airport) {
     departureCityController.text = airport.displayName;
     selectedDepartureCity = airport.displayName;
     selectedDepartureAirport = airport;
     notifyListeners();
   }
 
-  void onArrivalAirportSelected(Airport airport) {
+  void onArrivalAirportSelected(AirportModel airport) {
     arrivalCityController.text = airport.displayName;
     selectedArrivalCity = airport.displayName;
     selectedArrivalAirport = airport;
