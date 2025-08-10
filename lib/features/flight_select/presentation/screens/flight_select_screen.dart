@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import '../../../../services/flight_api_service.dart';
 import '../../../../services/network_service.dart';
 import '../../../../widgets/network_error_widget.dart';
-import '../../../add_contacts/presentation/screens/add_contacts_screen.dart';
+import '../../../add_contacts/presentation/screens/add_trip_contacts_screen.dart';
 import '../../../add_contacts/domain/entities/add_contacts_state.dart' as domain;
 import '../../../../theme/app_theme.dart';
 
@@ -514,7 +514,7 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
                     }
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => AddContactsScreen(
+                        builder: (context) => AddTripContactsScreen(
                           args: domain.AddContactsArgs(
                             selectedFlight: option,
                             departureCity: depCity,

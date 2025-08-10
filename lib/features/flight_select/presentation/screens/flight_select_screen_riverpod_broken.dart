@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../theme/app_theme.dart';
-import '../../../../features/add_contacts/presentation/screens/add_contacts_screen.dart';
+import '../../../../features/add_contacts/presentation/screens/add_trip_contacts_screen.dart';
 import '../../../../features/add_contacts/domain/entities/add_contacts_state.dart' as add_contacts_domain;
 import '../providers/flight_select_provider.dart';
 import '../../domain/entities/flight_select_state.dart' as domain;
@@ -560,11 +560,11 @@ class _FlightSelectScreenState extends ConsumerState<FlightSelectScreen> with Ti
                       arrivalThumbnail: '',
                     );
                     
-                    print('Flight Select Debug: AddContactsScreenArgs created with IATA codes: ${args.departureAirportCode}, ${args.arrivalAirportCode}');
+                    print('Flight Select Debug: AddTripContactsScreenArgs created with IATA codes: ${args.departureAirportCode}, ${args.arrivalAirportCode}');
                     
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => AddContactsScreen(args: args),
+                        builder: (context) => AddTripContactsScreen(args: args),
                       ),
                     );
                   },

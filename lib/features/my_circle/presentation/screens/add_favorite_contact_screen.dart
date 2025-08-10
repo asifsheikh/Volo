@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../theme/app_theme.dart';
@@ -9,12 +10,12 @@ import '../../../../widgets/contact_picker_dialog.dart';
 import '../../domain/entities/my_circle_contact.dart';
 import '../../data/models/my_circle_contact_model.dart';
 
-class AddContactScreen extends ConsumerStatefulWidget {
+class AddFavoriteContactScreen extends ConsumerStatefulWidget {
   final String username;
   final bool editMode;
   final MyCircleContactModel? existingContact;
   
-  const AddContactScreen({
+  const AddFavoriteContactScreen({
     Key? key, 
     required this.username,
     this.editMode = false,
@@ -22,10 +23,10 @@ class AddContactScreen extends ConsumerStatefulWidget {
   }) : super(key: key);
 
   @override
-  ConsumerState<AddContactScreen> createState() => _AddContactScreenState();
+  ConsumerState<AddFavoriteContactScreen> createState() => _AddFavoriteContactScreenState();
 }
 
-class _AddContactScreenState extends ConsumerState<AddContactScreen> {
+class _AddFavoriteContactScreenState extends ConsumerState<AddFavoriteContactScreen> {
   final _formKey = GlobalKey<FormState>();
   final _contactNameController = TextEditingController();
   final _whatsappNumberController = TextEditingController();
@@ -184,7 +185,10 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
         _generateSampleMessage();
       }
     } catch (e) {
-      print('Error picking contact: $e');
+      // Log error for debugging but don't show verbose output to user
+      if (kDebugMode) {
+        print('Contact picker error: ${e.toString()}');
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Unable to access contacts. Please try again.'),

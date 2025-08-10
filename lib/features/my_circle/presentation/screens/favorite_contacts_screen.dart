@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../services/my_circle_service.dart';
 import '../../data/models/my_circle_contact_model.dart';
-import 'add_contact_screen.dart';
+import 'add_favorite_contact_screen.dart';
 
 class FavoriteContactsScreen extends ConsumerStatefulWidget {
   final String username;
@@ -59,7 +59,7 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
   void _handleAddContact() async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => AddContactScreen(username: widget.username),
+                        builder: (context) => AddFavoriteContactScreen(username: widget.username),
       ),
     );
     
@@ -390,7 +390,7 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
       onTap: () async {
         final result = await Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => AddContactScreen(
+            builder: (context) => AddFavoriteContactScreen(
               username: widget.username,
               editMode: true,
               existingContact: contact,

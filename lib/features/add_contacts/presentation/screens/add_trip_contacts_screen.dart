@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../features/flight_confirmation/presentation/screens/confirmation_screen.dart';
@@ -17,19 +18,19 @@ import '../../../../features/weather/presentation/providers/weather_provider.dar
 
 
 /// Add Contacts Screen using Riverpod + Clean Architecture
-class AddContactsScreen extends ConsumerStatefulWidget {
+class AddTripContactsScreen extends ConsumerStatefulWidget {
   final domain.AddContactsArgs args;
   
-  const AddContactsScreen({
+  const AddTripContactsScreen({
     Key? key, 
     required this.args,
   }) : super(key: key);
 
   @override
-  ConsumerState<AddContactsScreen> createState() => _AddContactsScreenState();
+  ConsumerState<AddTripContactsScreen> createState() => _AddTripContactsScreenState();
 }
 
-class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
+class _AddTripContactsScreenState extends ConsumerState<AddTripContactsScreen> {
   bool _weatherLoaded = false;
 
   @override
@@ -46,7 +47,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
       final args = widget.args;
       final iataCodes = [args.departureAirportCode, args.arrivalAirportCode];
       
+      if (kDebugMode) {
       print('Add Contacts Debug: Auto-loading weather for IATA codes: $iataCodes');
+    }
       
       final globalWeatherNotifier = ref.read(globalWeatherNotifierProvider.notifier);
       globalWeatherNotifier.loadWeatherData(iataCodes);
@@ -931,7 +934,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                 textColor: AppTheme.textOnPrimary,
                 onPressed: () {
                   // TODO: Navigate to My Circle screen
-                  print('Navigate to My Circle screen');
+                  if (kDebugMode) {
+        print('Navigate to My Circle screen');
+      }
                 },
               ),
             ),
@@ -988,7 +993,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
         );
       }
     } catch (e) {
-      print('Error picking My Circle contact: $e');
+      if (kDebugMode) {
+        print('Error picking My Circle contact: $e');
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1122,7 +1129,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
         final globalWeather = ref.watch(globalWeatherNotifierProvider);
         final weather = globalWeather[airportCode];
         
-        print('Weather Debug: Building weather for $airportCode, weather data: ${weather != null ? 'available' : 'null'}');
+        if (kDebugMode) {
+          print('Weather Debug: Building weather for $airportCode, weather data: ${weather != null ? 'available' : 'null'}');
+        }
         
         if (weather != null) {
           // Just show temperature with simple formatting
@@ -1138,7 +1147,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
           );
         } else {
           // Show nothing when weather data is not available
+          if (kDebugMode) {
           print('Weather Debug: No weather data for $airportCode, showing SizedBox.shrink()');
+        }
           return const SizedBox.shrink();
         }
       },
