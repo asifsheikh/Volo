@@ -1,12 +1,18 @@
 import '../../domain/entities/my_circle_contact.dart';
 
-class MyCircleContactModel extends MyCircleContact {
+class MyCircleContactModel {
+  final String id;
+  final String name;
+  final String whatsappNumber;
+  final String timezone;
+  final String language;
+
   const MyCircleContactModel({
-    required super.id,
-    required super.name,
-    required super.whatsappNumber,
-    required super.timezone,
-    required super.language,
+    required this.id,
+    required this.name,
+    required this.whatsappNumber,
+    required this.timezone,
+    required this.language,
   });
 
   factory MyCircleContactModel.fromJson(Map<String, dynamic> json) {
@@ -29,6 +35,16 @@ class MyCircleContactModel extends MyCircleContact {
     );
   }
 
+  factory MyCircleContactModel.fromEntity(MyCircleContact entity) {
+    return MyCircleContactModel(
+      id: entity.id,
+      name: entity.name,
+      whatsappNumber: entity.whatsappNumber,
+      timezone: entity.timezone,
+      language: entity.language,
+    );
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
@@ -36,6 +52,16 @@ class MyCircleContactModel extends MyCircleContact {
       'timezone': timezone,
       'language': language,
     };
+  }
+
+  MyCircleContact toEntity() {
+    return MyCircleContact(
+      id: id,
+      name: name,
+      whatsappNumber: whatsappNumber,
+      timezone: timezone,
+      language: language,
+    );
   }
 
   MyCircleContactModel copyWith({
