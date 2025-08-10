@@ -408,22 +408,16 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            // Circular Avatar
+            // Intelligent Circular Avatar
             Container(
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: AppTheme.primary.withOpacity(0.1),
+                color: _getContactColor(contact.name),
                 shape: BoxShape.circle,
               ),
               child: Center(
-                child: Text(
-                  contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',
-                  style: AppTheme.titleLarge.copyWith(
-                    color: AppTheme.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                child: _getContactIcon(contact.name),
               ),
             ),
             
@@ -495,5 +489,213 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
         ),
       ),
     );
+  }
+
+  /// Get intelligent icon based on contact name
+  Widget _getContactIcon(String name) {
+    final lowerName = name.toLowerCase().trim();
+    
+    // Family relationships
+    if (lowerName.contains('mom') || lowerName.contains('mother') || lowerName.contains('mama')) {
+      return FaIcon(
+        FontAwesomeIcons.personDress,
+        color: Colors.white,
+        size: 24,
+      );
+    }
+    
+    if (lowerName.contains('dad') || lowerName.contains('father') || lowerName.contains('papa')) {
+      return FaIcon(
+        FontAwesomeIcons.person,
+        color: Colors.white,
+        size: 24,
+      );
+    }
+    
+    if (lowerName.contains('brother') || lowerName.contains('bro')) {
+      return FaIcon(
+        FontAwesomeIcons.person,
+        color: Colors.white,
+        size: 24,
+      );
+    }
+    
+    if (lowerName.contains('sister') || lowerName.contains('sis')) {
+      return FaIcon(
+        FontAwesomeIcons.personDress,
+        color: Colors.white,
+        size: 24,
+      );
+    }
+    
+    if (lowerName.contains('grandma') || lowerName.contains('grandmother') || lowerName.contains('nana')) {
+      return FaIcon(
+        FontAwesomeIcons.personDress,
+        color: Colors.white,
+        size: 24,
+      );
+    }
+    
+    if (lowerName.contains('grandpa') || lowerName.contains('grandfather') || lowerName.contains('papa')) {
+      return FaIcon(
+        FontAwesomeIcons.person,
+        color: Colors.white,
+        size: 24,
+      );
+    }
+    
+    if (lowerName.contains('uncle')) {
+      return FaIcon(
+        FontAwesomeIcons.person,
+        color: Colors.white,
+        size: 24,
+      );
+    }
+    
+    if (lowerName.contains('aunt')) {
+      return FaIcon(
+        FontAwesomeIcons.personDress,
+        color: Colors.white,
+        size: 24,
+      );
+    }
+    
+    // Partner relationships
+    if (lowerName.contains('wife') || lowerName.contains('spouse') || lowerName.contains('partner')) {
+      return FaIcon(
+        FontAwesomeIcons.heart,
+        color: Colors.white,
+        size: 24,
+      );
+    }
+    
+    if (lowerName.contains('husband') || lowerName.contains('boyfriend')) {
+      return FaIcon(
+        FontAwesomeIcons.heart,
+        color: Colors.white,
+        size: 24,
+      );
+    }
+    
+    // Professional relationships
+    if (lowerName.contains('boss') || lowerName.contains('manager') || lowerName.contains('colleague')) {
+      return FaIcon(
+        FontAwesomeIcons.briefcase,
+        color: Colors.white,
+        size: 24,
+      );
+    }
+    
+    if (lowerName.contains('doctor') || lowerName.contains('dr.')) {
+      return FaIcon(
+        FontAwesomeIcons.userDoctor,
+        color: Colors.white,
+        size: 24,
+      );
+    }
+    
+    // Friend relationships
+    if (lowerName.contains('friend') || lowerName.contains('buddy') || lowerName.contains('pal')) {
+      return FaIcon(
+        FontAwesomeIcons.userGroup,
+        color: Colors.white,
+        size: 24,
+      );
+    }
+    
+    // Default to first letter
+    return Text(
+      name.isNotEmpty ? name[0].toUpperCase() : '?',
+      style: AppTheme.titleLarge.copyWith(
+        color: Colors.white,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+
+  /// Get intelligent color based on contact name
+  Color _getContactColor(String name) {
+    final lowerName = name.toLowerCase().trim();
+    
+    // Family - Warm colors
+    if (lowerName.contains('mom') || lowerName.contains('mother') || lowerName.contains('mama')) {
+      return const Color(0xFFFF6B9D); // Pink
+    }
+    
+    if (lowerName.contains('dad') || lowerName.contains('father') || lowerName.contains('papa')) {
+      return const Color(0xFF4A90E2); // Blue
+    }
+    
+    if (lowerName.contains('brother') || lowerName.contains('bro')) {
+      return const Color(0xFF50C878); // Green
+    }
+    
+    if (lowerName.contains('sister') || lowerName.contains('sis')) {
+      return const Color(0xFFFFB6C1); // Light pink
+    }
+    
+    if (lowerName.contains('grandma') || lowerName.contains('grandmother') || lowerName.contains('nana')) {
+      return const Color(0xFFDDA0DD); // Plum
+    }
+    
+    if (lowerName.contains('grandpa') || lowerName.contains('grandfather')) {
+      return const Color(0xFF8B4513); // Brown
+    }
+    
+    if (lowerName.contains('uncle')) {
+      return const Color(0xFF4682B4); // Steel blue
+    }
+    
+    if (lowerName.contains('aunt')) {
+      return const Color(0xFFFF69B4); // Hot pink
+    }
+    
+    // Partner - Romantic colors
+    if (lowerName.contains('wife') || lowerName.contains('spouse') || lowerName.contains('partner')) {
+      return const Color(0xFFE91E63); // Pink
+    }
+    
+    if (lowerName.contains('husband') || lowerName.contains('boyfriend')) {
+      return const Color(0xFF9C27B0); // Purple
+    }
+    
+    // Professional - Business colors
+    if (lowerName.contains('boss') || lowerName.contains('manager') || lowerName.contains('colleague')) {
+      return const Color(0xFF607D8B); // Blue grey
+    }
+    
+    if (lowerName.contains('doctor') || lowerName.contains('dr.')) {
+      return const Color(0xFF00BCD4); // Cyan
+    }
+    
+    // Friend - Social colors
+    if (lowerName.contains('friend') || lowerName.contains('buddy') || lowerName.contains('pal')) {
+      return const Color(0xFF4CAF50); // Green
+    }
+    
+    // Default - Generate color from name hash
+    return _generateColorFromName(name);
+  }
+
+  /// Generate consistent color from name hash
+  Color _generateColorFromName(String name) {
+    final colors = [
+      const Color(0xFFE91E63), // Pink
+      const Color(0xFF9C27B0), // Purple
+      const Color(0xFF3F51B5), // Indigo
+      const Color(0xFF2196F3), // Blue
+      const Color(0xFF00BCD4), // Cyan
+      const Color(0xFF009688), // Teal
+      const Color(0xFF4CAF50), // Green
+      const Color(0xFF8BC34A), // Light green
+      const Color(0xFFFFEB3B), // Yellow
+      const Color(0xFFFF9800), // Orange
+      const Color(0xFFFF5722), // Deep orange
+      const Color(0xFF795548), // Brown
+      const Color(0xFF9E9E9E), // Grey
+    ];
+    
+    int hash = name.hashCode;
+    return colors[hash.abs() % colors.length];
   }
 }
