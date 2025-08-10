@@ -17,8 +17,7 @@ abstract class MyCircleRemoteDataSource {
   /// Delete a contact from My Circle
   Future<void> deleteContact(String contactId);
   
-  /// Toggle contact active status
-  Future<void> toggleContactStatus(String contactId, bool isActive);
+
   
   /// Check if a contact exists by WhatsApp number
   Future<bool> contactExists(String whatsappNumber);
@@ -71,15 +70,11 @@ class MyCircleRemoteDataSourceImpl implements MyCircleRemoteDataSource {
         throw Exception('A contact with this WhatsApp number already exists in your circle');
       }
 
-      final now = DateTime.now();
       final contactData = {
         'name': contact.name.trim(),
         'whatsappNumber': contact.whatsappNumber.trim(),
         'timezone': contact.timezone,
         'language': contact.language,
-        'isActive': true,
-        'createdAt': now,
-        'updatedAt': now,
       };
 
       final docRef = await _myCircleCollection.add(contactData);
@@ -117,7 +112,6 @@ class MyCircleRemoteDataSourceImpl implements MyCircleRemoteDataSource {
         'whatsappNumber': contact.whatsappNumber.trim(),
         'timezone': contact.timezone,
         'language': contact.language,
-        'updatedAt': DateTime.now(),
       };
 
       await _myCircleCollection.doc(contactId).update(updates);
@@ -143,22 +137,7 @@ class MyCircleRemoteDataSourceImpl implements MyCircleRemoteDataSource {
     }
   }
 
-  @override
-  Future<void> toggleContactStatus(String contactId, bool isActive) async {
-    try {
-      developer.log('MyCircleRemoteDataSource: Toggling contact status: $contactId to $isActive', name: 'VoloMyCircle');
-      
-      await _myCircleCollection.doc(contactId).update({
-        'isActive': isActive,
-        'updatedAt': DateTime.now(),
-      });
-      
-      developer.log('MyCircleRemoteDataSource: Contact status updated successfully', name: 'VoloMyCircle');
-    } catch (e) {
-      developer.log('MyCircleRemoteDataSource: Error toggling contact status: $e', name: 'VoloMyCircle');
-      rethrow;
-    }
-  }
+
 
   @override
   Future<bool> contactExists(String whatsappNumber) async {

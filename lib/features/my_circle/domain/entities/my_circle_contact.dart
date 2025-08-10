@@ -11,9 +11,6 @@ class MyCircleContact with _$MyCircleContact {
     required String whatsappNumber,
     required String timezone,
     required String language,
-    @Default(false) bool isActive,
-    DateTime? createdAt,
-    DateTime? updatedAt,
   }) = _MyCircleContact;
 
   factory MyCircleContact.fromJson(Map<String, dynamic> json) => _$MyCircleContactFromJson(json);

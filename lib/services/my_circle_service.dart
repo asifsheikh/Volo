@@ -55,15 +55,11 @@ class MyCircleService {
         throw Exception('A contact with this WhatsApp number already exists in your circle');
       }
 
-      final now = DateTime.now();
       final contactData = {
         'name': contact.name.trim(),
         'whatsappNumber': contact.whatsappNumber.trim(),
         'timezone': contact.timezone,
         'language': contact.language,
-        'isActive': true,
-        'createdAt': now,
-        'updatedAt': now,
       };
 
       final docRef = await _getMyCircleCollection().add(contactData);
@@ -101,7 +97,6 @@ class MyCircleService {
         'whatsappNumber': contact.whatsappNumber.trim(),
         'timezone': contact.timezone,
         'language': contact.language,
-        'updatedAt': DateTime.now(),
       };
 
       await _getMyCircleCollection().doc(contactId).update(updates);
@@ -127,22 +122,7 @@ class MyCircleService {
     }
   }
 
-  /// Toggle contact active status
-  static Future<void> toggleContactStatus(String contactId, bool isActive) async {
-    try {
-      developer.log('MyCircleService: Toggling contact status: $contactId to $isActive', name: 'VoloMyCircle');
-      
-      await _getMyCircleCollection().doc(contactId).update({
-        'isActive': isActive,
-        'updatedAt': DateTime.now(),
-      });
-      
-      developer.log('MyCircleService: Contact status updated successfully', name: 'VoloMyCircle');
-    } catch (e) {
-      developer.log('MyCircleService: Error toggling contact status: $e', name: 'VoloMyCircle');
-      rethrow;
-    }
-  }
+
 
   /// Check if a contact exists by WhatsApp number
   static Future<bool> contactExists(String whatsappNumber) async {
@@ -159,16 +139,7 @@ class MyCircleService {
     }
   }
 
-  /// Get active contacts only
-  static Future<List<MyCircleContactModel>> getActiveContacts() async {
-    try {
-      final allContacts = await getMyCircleContacts();
-      return allContacts.where((contact) => contact.isActive).toList();
-    } catch (e) {
-      developer.log('MyCircleService: Error getting active contacts: $e', name: 'VoloMyCircle');
-      rethrow;
-    }
-  }
+
 
   /// Get contact by ID
   static Future<MyCircleContactModel?> getContactById(String contactId) async {
