@@ -1,4 +1,6 @@
 import '../../services/ai_service.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_ai/firebase_ai.dart';
 
 class AIDemoService {
   static final AIDemoService _instance = AIDemoService._internal();
