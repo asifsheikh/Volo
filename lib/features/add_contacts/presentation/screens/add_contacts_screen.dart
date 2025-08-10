@@ -89,6 +89,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                     margin: const EdgeInsets.all(8),
                     decoration: AppTheme.cardDecoration.copyWith(
                       shape: BoxShape.circle,
+                      borderRadius: null, // Remove borderRadius when using circle shape
                     ),
                     child: IconButton(
                       padding: EdgeInsets.zero,

@@ -428,6 +428,7 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                           height: 36,
                           decoration: AppTheme.cardDecoration.copyWith(
                             shape: BoxShape.circle,
+                            borderRadius: null, // Remove borderRadius when using circle shape
                           ),
                           child: IconButton(
                             padding: EdgeInsets.zero,
@@ -449,6 +450,7 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                             height: 36,
                             decoration: AppTheme.cardDecoration.copyWith(
                               shape: BoxShape.circle,
+                              borderRadius: null, // Remove borderRadius when using circle shape
                             ),
                             child: IconButton(
                               padding: EdgeInsets.zero,
