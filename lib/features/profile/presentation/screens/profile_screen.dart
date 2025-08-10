@@ -10,6 +10,7 @@ import '../../../../services/firebase_service.dart';
 import '../../../../services/profile_picture_service.dart';
 import '../../../../services/remote_config_service.dart';
 import '../../../../features/ai_demo/ai_demo_screen.dart';
+import '../../../../features/my_circle/presentation/screens/favorite_contacts_screen.dart';
 import '../../../../theme/app_theme.dart';
 import 'push_notification_test_screen.dart';
 import 'settings_screen.dart';
@@ -202,8 +203,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
                           'To change your phone number, please log out and log in again.',
                           textAlign: TextAlign.center,
@@ -217,10 +218,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 
                 // My Circle & My Flight Journey Section
                 Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                  ),
+                  decoration: AppTheme.elevatedCardDecoration,
                   child: Column(
                     children: [
                       // My Circle
@@ -229,36 +227,37 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: Color(0x33008080),
+                            color: AppTheme.primary.withOpacity(0.2),
                             shape: BoxShape.circle,
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Icon(
                               Icons.groups,
-                              color: Color(0xFF008080),
+                              color: AppTheme.primary,
                               size: 20,
                             ),
                           ),
                         ),
-                        title: const Text(
+                        title: Text(
                           'My Circle',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 18,
-                            color: Color(0xFF333333),
-                          ),
+                          style: AppTheme.titleMedium,
                         ),
-                        trailing: const Icon(
+                        trailing: Icon(
                           Icons.arrow_forward_ios,
-                          color: Color(0xFF9CA3AF),
+                          color: AppTheme.textSecondary,
                           size: 16,
                         ),
                         onTap: () {
-                          // TODO: Navigate to My Circle screen
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => FavoriteContactsScreen(
+                                username: profileData.username,
+                              ),
+                            ),
+                          );
                         },
                       ),
-                      const Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: Color(0xFFF3F4F6)),
+                      Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: AppTheme.borderPrimary),
                       
                       // My Flight Journey
                       ListTile(
@@ -266,29 +265,24 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: Color(0x33008080),
+                            color: AppTheme.primary.withOpacity(0.2),
                             shape: BoxShape.circle,
                           ),
-                          child: const Center(
+                          child: Center(
                             child: Icon(
                               Icons.flight_takeoff,
-                              color: Color(0xFF008080),
+                              color: AppTheme.primary,
                               size: 20,
                             ),
                           ),
                         ),
-                        title: const Text(
+                        title: Text(
                           'My Flight Journey',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 18,
-                            color: Color(0xFF333333),
-                          ),
+                          style: AppTheme.titleMedium,
                         ),
-                        trailing: const Icon(
+                        trailing: Icon(
                           Icons.arrow_forward_ios,
-                          color: Color(0xFF9CA3AF),
+                          color: AppTheme.textSecondary,
                           size: 16,
                         ),
                         onTap: () {
@@ -303,38 +297,30 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 
                 // Settings Section
                 Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                  ),
+                  decoration: AppTheme.elevatedCardDecoration,
                   child: ListTile(
                     leading: Container(
                       width: 32,
                       height: 32,
                       decoration: BoxDecoration(
-                        color: Color(0x33008080),
+                        color: AppTheme.primary.withOpacity(0.2),
                         shape: BoxShape.circle,
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Icon(
                           Icons.settings,
-                          color: Color(0xFF008080),
+                          color: AppTheme.primary,
                           size: 20,
                         ),
                       ),
                     ),
-                    title: const Text(
+                    title: Text(
                       'Settings',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 18,
-                        color: Color(0xFF333333),
-                      ),
+                      style: AppTheme.titleMedium,
                     ),
-                    trailing: const Icon(
+                    trailing: Icon(
                       Icons.arrow_forward_ios,
-                      color: Color(0xFF9CA3AF),
+                      color: AppTheme.textSecondary,
                       size: 16,
                     ),
                     onTap: () {
@@ -354,59 +340,46 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 if (kDebugMode) ...[
                   const SizedBox(height: 16),
                   Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                    ),
+                    decoration: AppTheme.elevatedCardDecoration,
                     child: ListTile(
                       leading: Container(
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: Color(0x33FF6B35), // Orange background
+                          color: AppTheme.warning.withOpacity(0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Icon(
                             Icons.bug_report,
-                            color: Color(0xFFFF6B35), // Orange icon
+                            color: AppTheme.warning,
                             size: 20,
                           ),
                         ),
                       ),
                       title: Row(
                         children: [
-                          const Text(
+                          Text(
                             'Debug Tools',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                              color: Color(0xFF333333),
-                            ),
+                            style: AppTheme.titleMedium,
                           ),
                           const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFF6B35),
+                              color: AppTheme.warning,
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Text(
+                            child: Text(
                               'DEBUG',
-                              style: TextStyle(
-                                fontFamily: 'Inter',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 8,
-                                color: Colors.white,
-                              ),
+                              style: AppTheme.labelSmall.copyWith(color: AppTheme.textOnPrimary),
                             ),
                           ),
                         ],
                       ),
-                      trailing: const Icon(
+                      trailing: Icon(
                         Icons.arrow_forward_ios,
-                        color: Color(0xFF9CA3AF),
+                        color: AppTheme.textSecondary,
                         size: 16,
                       ),
                       onTap: () {
