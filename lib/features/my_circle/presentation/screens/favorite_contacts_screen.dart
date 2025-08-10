@@ -499,11 +499,23 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
           Positioned(
             top: 12,
             right: 12,
-            child: IconButton(
-              onPressed: () {
-                // TODO: Implement edit functionality
-                print('Edit contact: ${contact.name}');
-              },
+                          child: IconButton(
+                onPressed: () async {
+                  final result = await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => AddContactScreen(
+                        username: widget.username,
+                        editMode: true,
+                        existingContact: contact,
+                      ),
+                    ),
+                  );
+                  
+                  // Reload contacts if changes were made
+                  if (result == true) {
+                    _loadContacts();
+                  }
+                },
               icon: FaIcon(
                 FontAwesomeIcons.penToSquare,
                 color: AppTheme.textSecondary,

@@ -10,7 +10,15 @@ import '../../domain/entities/my_circle_contact.dart';
 
 class AddContactScreen extends ConsumerStatefulWidget {
   final String username;
-  const AddContactScreen({Key? key, required this.username}) : super(key: key);
+  final bool editMode;
+  final MyCircleContactModel? existingContact;
+  
+  const AddContactScreen({
+    Key? key, 
+    required this.username,
+    this.editMode = false,
+    this.existingContact,
+  }) : super(key: key);
 
   @override
   ConsumerState<AddContactScreen> createState() => _AddContactScreenState();
@@ -41,8 +49,19 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedLanguage = 'English';
-    _selectedTimezone = 'UTC';
+    
+    if (widget.editMode && widget.existingContact != null) {
+      // Pre-fill form with existing contact data
+      _contactNameController.text = widget.existingContact!.name;
+      _whatsappNumberController.text = widget.existingContact!.whatsappNumber;
+      _selectedLanguage = widget.existingContact!.language;
+      _selectedTimezone = widget.existingContact!.timezone;
+    } else {
+      // Default values for new contact
+      _selectedLanguage = 'English';
+      _selectedTimezone = 'UTC';
+    }
+    
     _generateSampleMessage();
   }
 
@@ -182,40 +201,64 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
         final whatsappNumber = _whatsappNumberController.text.trim();
         final contactName = _contactNameController.text.trim();
         
-        // Check if contact already exists in My Circle
-        final exists = await MyCircleService.contactExists(whatsappNumber);
-        if (exists) {
+        if (widget.editMode && widget.existingContact != null) {
+          // Edit mode - update existing contact
+          final contactForm = MyCircleContactForm(
+            name: contactName,
+            whatsappNumber: whatsappNumber,
+            timezone: _selectedTimezone!,
+            language: _selectedLanguage!,
+          );
+
+          // Update contact in Firestore
+          await MyCircleService.updateContact(widget.existingContact!.id, contactForm);
+          
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('$contactName is already in your circle!'),
-                backgroundColor: AppTheme.warning,
-                duration: const Duration(seconds: 3),
+                content: Text('${contactName} updated successfully!'),
+                backgroundColor: AppTheme.success,
+                duration: const Duration(seconds: 2),
               ),
             );
+            Navigator.of(context).pop(true); // Return true to indicate success
           }
-          return;
-        }
+        } else {
+          // Add mode - check for duplicates and add new contact
+          final exists = await MyCircleService.contactExists(whatsappNumber);
+          if (exists) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('$contactName is already in your circle!'),
+                  backgroundColor: AppTheme.warning,
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            }
+            return;
+          }
 
-        // Create contact form data
-        final contactForm = MyCircleContactForm(
-          name: contactName,
-          whatsappNumber: whatsappNumber,
-          timezone: _selectedTimezone!,
-          language: _selectedLanguage!,
-        );
+          // Create contact form data
+          final contactForm = MyCircleContactForm(
+            name: contactName,
+            whatsappNumber: whatsappNumber,
+            timezone: _selectedTimezone!,
+            language: _selectedLanguage!,
+          );
 
-        // Save contact to Firestore
-        await MyCircleService.addContact(contactForm);
-        
-        if (mounted) {
-          Navigator.of(context).pop(true); // Return true to indicate success
+          // Save contact to Firestore
+          await MyCircleService.addContact(contactForm);
+          
+          if (mounted) {
+            Navigator.of(context).pop(true); // Return true to indicate success
+          }
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error adding contact: ${e.toString()}'),
+              content: Text('Error ${widget.editMode ? 'updating' : 'adding'} contact: ${e.toString()}'),
               backgroundColor: AppTheme.destructive,
             ),
           );
@@ -239,7 +282,10 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
           icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Add Contact', style: AppTheme.headlineMedium),
+        title: Text(
+          widget.editMode ? 'Edit Contact' : 'Add Contact', 
+          style: AppTheme.headlineMedium
+        ),
         centerTitle: false, // Left align the title
       ),
       body: Form(
@@ -465,7 +511,9 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
                         FaIcon(FontAwesomeIcons.userPlus, size: 20, color: AppTheme.textOnPrimary),
                       const SizedBox(width: 8),
                       Text(
-                        _isLoading ? 'Adding...' : 'Add to My Circle',
+                        _isLoading 
+                            ? (widget.editMode ? 'Updating...' : 'Adding...') 
+                            : (widget.editMode ? 'Update Contact' : 'Add to My Circle'),
                         style: AppTheme.titleMedium.copyWith(
                           color: AppTheme.textOnPrimary,
                           fontWeight: FontWeight.w600,
@@ -475,6 +523,41 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
                   ),
                 ),
               ),
+              
+              // Delete Button (only in edit mode)
+              if (widget.editMode) ...[
+                const SizedBox(height: 16),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppTheme.destructive,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: ElevatedButton.icon(
+                    onPressed: _isLoading ? null : _handleDelete,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: AppTheme.destructive,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                      shadowColor: Colors.transparent,
+                    ),
+                    icon: FaIcon(FontAwesomeIcons.trash, size: 20, color: AppTheme.destructive),
+                    label: Text(
+                      'Delete Contact',
+                      style: AppTheme.titleMedium.copyWith(
+                        color: AppTheme.destructive,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -592,5 +675,102 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _handleDelete() async {
+    if (widget.existingContact == null) return;
+    
+    // Show confirmation dialog
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              FaIcon(
+                FontAwesomeIcons.trash,
+                color: AppTheme.destructive,
+                size: 24,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Delete Contact',
+                style: AppTheme.titleLarge.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            'Are you sure you want to delete ${widget.existingContact!.name} from your circle? This action cannot be undone.',
+            style: AppTheme.bodyMedium,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(
+                'Cancel',
+                style: AppTheme.bodyMedium.copyWith(
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.destructive,
+                foregroundColor: AppTheme.textOnPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                'Delete',
+                style: AppTheme.bodyMedium.copyWith(
+                  color: AppTheme.textOnPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete != true) return;
+
+    setState(() { _isLoading = true; });
+    
+    try {
+      // Delete contact from Firestore
+      await MyCircleService.deleteContact(widget.existingContact!.id);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${widget.existingContact!.name} deleted from your circle!'),
+            backgroundColor: AppTheme.success,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        Navigator.of(context).pop(true); // Return true to indicate success
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error deleting contact: ${e.toString()}'),
+            backgroundColor: AppTheme.destructive,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() { _isLoading = false; });
+      }
+    }
   }
 }
