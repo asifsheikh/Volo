@@ -1,10 +1,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter/material.dart';
 import '../../domain/entities/add_contacts_state.dart' as domain;
-import '../../domain/usecases/get_device_contacts.dart';
-import '../../domain/usecases/save_trip.dart';
-import 'package:volo/widgets/contact_picker_dialog.dart';
+import '../../../my_circle/presentation/widgets/my_circle_contact_picker_dialog.dart';
+import '../../../my_circle/data/models/my_circle_contact_model.dart';
+import '../../../../services/my_circle_service.dart';
 import '../../../../main.dart';
 
 part 'add_contacts_provider.g.dart';
@@ -92,26 +91,17 @@ class AddContactsProvider extends _$AddContactsProvider {
     return state.enableNotifications || state.selectedContacts.isNotEmpty;
   }
 
-  /// Pick a contact from device
+  /// Pick a contact from My Circle
   Future<void> pickContact() async {
     try {
-      // Request permission to access contacts
-      if (!await FlutterContacts.requestPermission(readonly: true)) {
-        setError('We need access to your contacts to add people to notify.');
-        return;
-      }
+      setLoading(true);
+      
+      // Get contacts from user's My Circle
+      final List<MyCircleContactModel> myCircleContacts = await MyCircleService.getMyCircleContacts();
 
-      // Get all contacts with phone numbers
-      final List<Contact> contacts = await FlutterContacts.getContacts(
-        withProperties: true,
-        withPhoto: false,
-      );
-
-      // Filter contacts that have phone numbers
-      final contactsWithPhones = contacts.where((contact) => contact.phones.isNotEmpty).toList();
-
-      if (contactsWithPhones.isEmpty) {
-        setError('No contacts with phone numbers found in your device.');
+      if (myCircleContacts.isEmpty) {
+        setError('No contacts found in your circle. Please add contacts to your circle first.');
+        setLoading(false);
         return;
       }
 
@@ -121,42 +111,43 @@ class AddContactsProvider extends _$AddContactsProvider {
           .map((contact) => contact.phoneNumber!)
           .toList();
 
-      // Show contact picker dialog
-      final selectedContact = await showDialog<Contact>(
+      // Show My Circle contact picker dialog
+      final selectedContact = await showDialog<MyCircleContactModel>(
         context: navigatorKey.currentContext!,
-        builder: (context) => ContactPickerDialog(
-          contacts: contactsWithPhones,
+        builder: (context) => MyCircleContactPickerDialog(
+          contacts: myCircleContacts,
           selectedPhoneNumbers: selectedPhoneNumbers,
         ),
       );
 
       if (selectedContact == null) {
+        setLoading(false);
         return; // User cancelled
       }
 
-      final phoneNumber = selectedContact.phones.first.number;
-      final contactName = selectedContact.displayName.isNotEmpty 
-          ? selectedContact.displayName 
-          : (selectedContact.name.first.isNotEmpty || selectedContact.name.last.isNotEmpty)
-              ? '${selectedContact.name.first} ${selectedContact.name.last}'.trim()
-              : 'Unknown Contact';
-      
       // Check if contact already exists
-      if (contactExists(domain.Contact(id: selectedContact.id, name: contactName, phoneNumber: phoneNumber))) {
+      if (contactExists(domain.Contact(
+        id: selectedContact.id, 
+        name: selectedContact.name, 
+        phoneNumber: selectedContact.whatsappNumber
+      ))) {
         setError('This contact is already added to your list.');
+        setLoading(false);
         return;
       }
       
       // Add the contact
       addContact(domain.Contact(
-        id: selectedContact.id, // Use device contact ID
-        name: contactName,
-        phoneNumber: phoneNumber,
+        id: selectedContact.id,
+        name: selectedContact.name,
+        phoneNumber: selectedContact.whatsappNumber,
       ));
       
       clearError();
+      setLoading(false);
     } catch (e) {
-      setError('Unable to access contacts. Please try again.');
+      setError('Unable to load contacts from your circle. Please try again.');
+      setLoading(false);
     }
   }
 } 

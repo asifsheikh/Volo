@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
+
 import '../../../../features/flight_confirmation/presentation/screens/confirmation_screen.dart';
 import '../../../../features/flight_confirmation/models/confirmation_args.dart';
-import '../../widgets/contact_picker_dialog.dart';
+
 import '../../../my_circle/presentation/widgets/my_circle_contact_picker_dialog.dart';
 import '../../../my_circle/data/models/my_circle_contact_model.dart';
 import '../../../../services/my_circle_service.dart';
 import '../providers/add_contacts_provider.dart';
 import '../../domain/entities/add_contacts_state.dart' as domain;
 import '../../domain/usecases/save_trip.dart';
-import '../../../../services/trip_service.dart';
+
 import '../../../../widgets/loading_dialog.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../features/weather/presentation/providers/weather_provider.dart';
-import '../../../../features/weather/domain/entities/weather_state.dart' as weather_domain;
+
 
 /// Add Contacts Screen using Riverpod + Clean Architecture
 class AddContactsScreen extends ConsumerStatefulWidget {
@@ -87,9 +87,16 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                     width: 36,
                     height: 36,
                     margin: const EdgeInsets.all(8),
-                    decoration: AppTheme.cardDecoration.copyWith(
+                    decoration: BoxDecoration(
+                      color: AppTheme.cardBackground,
                       shape: BoxShape.circle,
-                      borderRadius: null, // Remove borderRadius when using circle shape
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.shadowPrimary,
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: IconButton(
                       padding: EdgeInsets.zero,
@@ -371,19 +378,33 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                           width: double.infinity,
                           height: 48,
                           child: OutlinedButton.icon(
-                            onPressed: () => ref.read(addContactsProviderProvider.notifier).pickContact(),
-                            icon: const Icon(Icons.add, color: Color(0xFF008080), size: 20),
-                            label: const Text(
-                              'Select from My Circle',
+                            onPressed: addContactsState.isLoading 
+                                ? null 
+                                : () => ref.read(addContactsProviderProvider.notifier).pickContact(),
+                            icon: addContactsState.isLoading
+                                ? SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                                    ),
+                                  )
+                                : const Icon(Icons.add, color: Color(0xFF008080), size: 20),
+                            label: Text(
+                              addContactsState.isLoading ? 'Loading...' : 'Select from My Circle',
                               style: TextStyle(
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
-                                color: Color(0xFF008080),
+                                color: addContactsState.isLoading ? AppTheme.textSecondary : Color(0xFF008080),
                               ),
                             ),
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Color(0xFF008080), width: 1.5),
+                              side: BorderSide(
+                                color: addContactsState.isLoading ? AppTheme.borderPrimary : Color(0xFF008080), 
+                                width: 1.5
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -391,6 +412,50 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                             ),
                           ),
                         ),
+                        
+                        // Error Display
+                        if (addContactsState.errorMessage != null) ...[
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppTheme.destructive.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: AppTheme.destructive.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.error_outline,
+                                  color: AppTheme.destructive,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    addContactsState.errorMessage!,
+                                    style: AppTheme.bodySmall.copyWith(
+                                      color: AppTheme.destructive,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () => ref.read(addContactsProviderProvider.notifier).clearError(),
+                                  icon: Icon(
+                                    Icons.close,
+                                    color: AppTheme.destructive,
+                                    size: 16,
+                                  ),
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                         
                         // Selected Contacts
                         if (addContactsState.selectedContacts.isNotEmpty) ...[

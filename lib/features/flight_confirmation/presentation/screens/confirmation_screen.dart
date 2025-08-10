@@ -426,9 +426,16 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                         child: Container(
                           width: 36,
                           height: 36,
-                          decoration: AppTheme.cardDecoration.copyWith(
+                          decoration: BoxDecoration(
+                            color: AppTheme.cardBackground,
                             shape: BoxShape.circle,
-                            borderRadius: null, // Remove borderRadius when using circle shape
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.shadowPrimary,
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: IconButton(
                             padding: EdgeInsets.zero,
@@ -448,9 +455,16 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                           child: Container(
                             width: 36,
                             height: 36,
-                            decoration: AppTheme.cardDecoration.copyWith(
+                            decoration: BoxDecoration(
+                              color: AppTheme.cardBackground,
                               shape: BoxShape.circle,
-                              borderRadius: null, // Remove borderRadius when using circle shape
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppTheme.shadowPrimary,
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
                             child: IconButton(
                               padding: EdgeInsets.zero,

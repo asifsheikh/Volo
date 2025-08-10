@@ -410,12 +410,12 @@ class _MyCircleContactPickerDialogState extends State<MyCircleContactPickerDialo
                           margin: const EdgeInsets.only(bottom: 8),
                           decoration: BoxDecoration(
                             color: isSelected 
-                                ? AppTheme.primary.withOpacity(0.1)
+                                ? AppTheme.textSecondary.withOpacity(0.1)
                                 : AppTheme.cardBackground,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: isSelected 
-                                  ? AppTheme.primary
+                                  ? AppTheme.textSecondary
                                   : AppTheme.borderPrimary,
                               width: isSelected ? 2 : 1,
                             ),
@@ -426,17 +426,25 @@ class _MyCircleContactPickerDialogState extends State<MyCircleContactPickerDialo
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                color: _getContactColor(contact.name),
+                                color: isSelected 
+                                    ? AppTheme.textSecondary.withOpacity(0.3)
+                                    : _getContactColor(contact.name),
                                 shape: BoxShape.circle,
                               ),
                               child: Center(
-                                child: _getContactIcon(contact.name),
+                                child: isSelected
+                                    ? Icon(
+                                        Icons.person_off,
+                                        color: AppTheme.textSecondary,
+                                        size: 20,
+                                      )
+                                    : _getContactIcon(contact.name),
                               ),
                             ),
                             title: Text(
                               contact.name,
                               style: AppTheme.titleMedium.copyWith(
-                                color: AppTheme.textPrimary,
+                                color: isSelected ? AppTheme.textSecondary : AppTheme.textPrimary,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -448,7 +456,7 @@ class _MyCircleContactPickerDialogState extends State<MyCircleContactPickerDialo
                                   children: [
                                     FaIcon(
                                       FontAwesomeIcons.whatsapp,
-                                      color: AppTheme.success,
+                                      color: isSelected ? AppTheme.textSecondary : AppTheme.success,
                                       size: 12,
                                     ),
                                     const SizedBox(width: 6),
@@ -477,18 +485,38 @@ class _MyCircleContactPickerDialogState extends State<MyCircleContactPickerDialo
                                     ),
                                   ],
                                 ),
+                                if (isSelected) ...[
+                                  const SizedBox(height: 4),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.textSecondary.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      'Already selected',
+                                      style: AppTheme.bodySmall.copyWith(
+                                        color: AppTheme.textSecondary,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                             trailing: isSelected
                                 ? FaIcon(
                                     FontAwesomeIcons.checkCircle,
-                                    color: AppTheme.primary,
+                                    color: AppTheme.textSecondary,
                                     size: 20,
                                   )
                                 : null,
-                            onTap: () {
-                              Navigator.of(context).pop(contact);
-                            },
+                            onTap: isSelected 
+                                ? null 
+                                : () {
+                                    Navigator.of(context).pop(contact);
+                                  },
                           ),
                         );
                       },
