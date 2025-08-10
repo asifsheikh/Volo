@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/foundation.dart';
 import 'package:confetti/confetti.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:math';
 import '../../models/confirmation_args.dart';
 import '../../../../theme/app_theme.dart';
@@ -291,8 +292,8 @@ class _ConfirmationScreenState extends ConsumerState<ConfirmationScreen> {
                                             Row(
                                               mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
-                                                const Icon(
-                                                  Icons.message,
+                                                FaIcon(
+                                                  FontAwesomeIcons.whatsapp,
                                                   color: AppTheme.success,
                                                   size: 18,
                                                 ),
