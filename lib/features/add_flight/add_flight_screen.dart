@@ -648,6 +648,8 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
             );
           },
           onSelected: (AirportEntity airport) {
+            // Close keyboard when an item is selected
+            FocusScope.of(context).unfocus();
             onSelected(airport);
           },
         ),

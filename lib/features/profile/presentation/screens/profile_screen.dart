@@ -11,7 +11,7 @@ import '../../../../services/firebase_service.dart';
 import '../../../../services/profile_picture_service.dart';
 import '../../../../services/remote_config_service.dart';
 import '../../../../features/ai_demo/ai_demo_screen.dart';
-import '../../../../features/my_circle/presentation/screens/favorite_contacts_screen.dart';
+
 import '../../../../theme/app_theme.dart';
 import 'push_notification_test_screen.dart';
 import 'settings_screen.dart';
@@ -217,49 +217,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 const SizedBox(height: 24),
                 
-                // My Circle & My Flight Journey Section
+                // My Flight Journey Section
                 Container(
                   decoration: AppTheme.elevatedCardDecoration,
                   child: Column(
                     children: [
-                      // My Circle
-                      ListTile(
-                        leading: Container(
-                          width: 32,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            color: AppTheme.primary.withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: FaIcon(
-                              FontAwesomeIcons.users,
-                              color: AppTheme.primary,
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                        title: Text(
-                          'My Circle',
-                          style: AppTheme.titleMedium,
-                        ),
-                        trailing: Icon(
-                          Icons.arrow_forward_ios,
-                          color: AppTheme.textSecondary,
-                          size: 16,
-                        ),
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => FavoriteContactsScreen(
-                                username: profileData.username,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                      Divider(height: 1, thickness: 1, indent: 16, endIndent: 16, color: AppTheme.borderPrimary),
-                      
                       // My Flight Journey
                       ListTile(
                         leading: Container(

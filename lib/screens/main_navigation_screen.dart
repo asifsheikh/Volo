@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../features/home/presentation/screens/home_screen.dart';
 import '../features/flights/presentation/screens/flights_screen.dart';
+import '../features/my_circle/presentation/screens/favorite_contacts_screen.dart';
 import '../theme/app_theme.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -58,6 +59,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         children: [
           HomeScreen(username: widget.username),
           FlightsScreen(username: widget.username),
+          FavoriteContactsScreen(username: widget.username),
         ],
       ),
       bottomNavigationBar: Container(
@@ -84,6 +86,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               icon: Icon(Icons.flight_outlined),
               activeIcon: Icon(Icons.flight),
               label: 'Flights',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people_outline),
+              activeIcon: Icon(Icons.people),
+              label: 'My Circle',
             ),
           ],
           selectedItemColor: AppTheme.primary,

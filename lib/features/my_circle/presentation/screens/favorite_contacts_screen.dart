@@ -73,20 +73,76 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.background,
-      appBar: AppBar(
-        backgroundColor: AppTheme.background,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textPrimary),
-          onPressed: () => Navigator.of(context).pop(),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'My Circle',
+                          style: AppTheme.headlineMedium,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Manage your favorite people',
+                          style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Add Contact Button
+                  if (_contacts.isNotEmpty)
+                    Align(
+                      alignment: Alignment.center,
+                      child: GestureDetector(
+                        onTap: _handleAddContact,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppTheme.primary,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppTheme.shadowPrimary,
+                                blurRadius: 4,
+                                offset: const Offset(0, 4),
+                              ),
+                              BoxShadow(
+                                color: AppTheme.shadowPrimary,
+                                blurRadius: 10,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: const Center(
+                            child: FaIcon(
+                              FontAwesomeIcons.userPlus,
+                              color: AppTheme.textOnPrimary,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            // Body Content
+            Expanded(
+              child: _buildBody(),
+            ),
+          ],
         ),
-        title: Text(
-          'My Circle',
-          style: AppTheme.headlineMedium,
-        ),
-        centerTitle: false, // Left align the title
       ),
-      body: _buildBody(),
     );
   }
 
@@ -312,223 +368,158 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
   }
 
   Widget _buildContactsList() {
-    print('FavoriteContactsScreen: Building contacts list with ${_contacts.length} contacts');
-    return Column(
-      children: [
-        // Contacts List
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(20),
-            itemCount: _contacts.length,
-            itemBuilder: (context, index) {
-              final contact = _contacts[index];
-              return _buildContactCard(contact);
-            },
-          ),
-        ),
-        
-        // Bottom Add Contact Button
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: AppTheme.background,
-            border: Border(
-              top: BorderSide(
-                color: AppTheme.borderPrimary,
-                width: 1,
-              ),
-            ),
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppTheme.primary,
-                  AppTheme.primary.withOpacity(0.8),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.primary.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ElevatedButton(
-              onPressed: _handleAddContact,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                foregroundColor: AppTheme.textOnPrimary,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 0,
-                shadowColor: Colors.transparent,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  FaIcon(FontAwesomeIcons.userPlus, size: 20, color: AppTheme.textOnPrimary),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Add More Contacts',
-                    style: AppTheme.titleMedium.copyWith(
-                      color: AppTheme.textOnPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
+    print('FavoriteContactsScreen: Building contacts grid with ${_contacts.length} contacts');
+    return GridView.builder(
+      padding: const EdgeInsets.all(20),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 0.85,
+      ),
+      itemCount: _contacts.length,
+      itemBuilder: (context, index) {
+        final contact = _contacts[index];
+        return _buildContactCard(contact);
+      },
     );
   }
 
   Widget _buildContactCard(MyCircleContactModel contact) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: AppTheme.cardBackground,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppTheme.borderPrimary,
-          width: 1,
+    return GestureDetector(
+      onTap: () async {
+        final result = await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => AddContactScreen(
+              username: widget.username,
+              editMode: true,
+              existingContact: contact,
+            ),
+          ),
+        );
+        
+        // Reload contacts if changes were made
+        if (result == true) {
+          _loadContacts();
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppTheme.cardBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppTheme.borderPrimary,
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.shadowPrimary,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.shadowPrimary,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                // Intelligent Circular Avatar
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: _getContactColor(contact.name),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: _getContactIcon(contact.name),
-                  ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Intelligent Circular Avatar
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: _getContactColor(contact.name),
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(width: 16),
-                
-                // Contact Info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        contact.name,
-                        style: AppTheme.titleMedium.copyWith(
-                          color: AppTheme.textPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          FaIcon(
-                            FontAwesomeIcons.whatsapp,
-                            color: AppTheme.success,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            contact.whatsappNumber,
-                            style: AppTheme.bodyMedium.copyWith(
-                              color: AppTheme.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.language,
-                            color: AppTheme.textSecondary,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            contact.language,
-                            style: AppTheme.bodySmall.copyWith(
-                              color: AppTheme.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Icon(
-                            Icons.public,
-                            color: AppTheme.textSecondary,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            contact.timezone,
-                            style: AppTheme.bodySmall.copyWith(
-                              color: AppTheme.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                child: Center(
+                  child: _getContactIcon(contact.name),
                 ),
-              ],
-            ),
-          ),
-          
-          // Edit Button (Pencil Icon) - Top Right
-          Positioned(
-            top: 12,
-            right: 12,
-                          child: IconButton(
-                onPressed: () async {
-                  final result = await Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => AddContactScreen(
-                        username: widget.username,
-                        editMode: true,
-                        existingContact: contact,
+              ),
+              const SizedBox(height: 12),
+              
+              // Contact Name
+              Text(
+                contact.name,
+                style: AppTheme.titleMedium.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+              
+              // WhatsApp Number
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FaIcon(
+                    FontAwesomeIcons.whatsapp,
+                    color: AppTheme.success,
+                    size: 12,
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      contact.whatsappNumber,
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppTheme.textSecondary,
                       ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  );
-                  
-                  // Reload contacts if changes were made
-                  if (result == true) {
-                    _loadContacts();
-                  }
-                },
-              icon: FaIcon(
-                FontAwesomeIcons.penToSquare,
-                color: AppTheme.textSecondary,
-                size: 18,
+                  ),
+                ],
               ),
-              padding: const EdgeInsets.all(4),
-              constraints: const BoxConstraints(
-                minWidth: 24,
-                minHeight: 24,
+              const SizedBox(height: 4),
+              
+              // Language and Timezone
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.language,
+                    color: AppTheme.textSecondary,
+                    size: 12,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    contact.language,
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppTheme.textSecondary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-            ),
+              const SizedBox(height: 2),
+              
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.public,
+                    color: AppTheme.textSecondary,
+                    size: 12,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    contact.timezone,
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppTheme.textSecondary,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
