@@ -273,7 +273,7 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
               _buildTextField(
                 controller: _contactNameController,
                 label: 'Contact Name',
-                hint: 'What do you call them? (e.g., Mom, Dad, Jo)',
+                hint: 'Mom, Dad, Brother, etc.',
                 icon: Icons.person_outline,
                 validator: (value) => value == null || value.trim().isEmpty ? 'Contact name is required' : null,
               ),
