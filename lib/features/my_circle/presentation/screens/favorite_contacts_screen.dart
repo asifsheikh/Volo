@@ -87,7 +87,7 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Flight Update Contacts',
+                        'My Circle',
                         style: AppTheme.titleLarge.copyWith(
                           fontWeight: FontWeight.w600,
                           color: AppTheme.textPrimary,
@@ -95,7 +95,7 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Add your favorite contacts who will\nreceive updates about your flights',
+                        'Add your favorite contacts to keep\nthem updated about your travels',
                         style: AppTheme.bodyMedium.copyWith(
                           color: AppTheme.textSecondary,
                         ),
@@ -144,7 +144,7 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
                       Icon(Icons.person_add, size: 20, color: AppTheme.textOnPrimary),
                       const SizedBox(width: 8),
                                               Text(
-                          'Add Flight Contact',
+                          'Add to My Circle',
                           style: AppTheme.titleMedium.copyWith(
                             color: AppTheme.textOnPrimary,
                             fontWeight: FontWeight.w600,
@@ -177,7 +177,7 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Your contacts will receive personalized WhatsApp messages about your flight status, delays, and arrivals.',
+                        'Your circle will receive personalized WhatsApp messages to keep them informed about your travels.',
                         style: AppTheme.bodyMedium.copyWith(
                           color: AppTheme.textPrimary,
                         ),
