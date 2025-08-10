@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../services/ai_service.dart';
+import '../../../../services/my_circle_service.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import '../../../../widgets/contact_picker_dialog.dart';
+import '../../domain/entities/my_circle_contact.dart';
 
 class AddContactScreen extends ConsumerStatefulWidget {
   final String username;
@@ -162,15 +164,45 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
     }
   }
 
-  void _handleSubmit() {
+  Future<void> _handleSubmit() async {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Contact added successfully!'),
-          backgroundColor: AppTheme.primary,
-        ),
-      );
-      Navigator.of(context).pop();
+      setState(() { _isLoading = true; });
+      
+      try {
+        // Create contact form data
+        final contactForm = MyCircleContactForm(
+          name: _contactNameController.text.trim(),
+          whatsappNumber: _whatsappNumberController.text.trim(),
+          timezone: _selectedTimezone!,
+          language: _selectedLanguage!,
+        );
+
+        // Save contact to Firestore
+        await MyCircleService.addContact(contactForm);
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Contact added to your circle successfully!'),
+              backgroundColor: AppTheme.success,
+            ),
+          );
+          Navigator.of(context).pop();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error adding contact: ${e.toString()}'),
+              backgroundColor: AppTheme.destructive,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() { _isLoading = false; });
+        }
+      }
     }
   }
 
@@ -384,7 +416,7 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
                   ],
                 ),
                 child: ElevatedButton(
-                  onPressed: _handleSubmit,
+                  onPressed: _isLoading ? null : _handleSubmit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
                     foregroundColor: AppTheme.textOnPrimary,
@@ -398,10 +430,20 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      FaIcon(FontAwesomeIcons.userPlus, size: 20, color: AppTheme.textOnPrimary),
+                      if (_isLoading)
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(AppTheme.textOnPrimary),
+                          ),
+                        )
+                      else
+                        FaIcon(FontAwesomeIcons.userPlus, size: 20, color: AppTheme.textOnPrimary),
                       const SizedBox(width: 8),
                       Text(
-                        'Add to My Circle',
+                        _isLoading ? 'Adding...' : 'Add to My Circle',
                         style: AppTheme.titleMedium.copyWith(
                           color: AppTheme.textOnPrimary,
                           fontWeight: FontWeight.w600,
