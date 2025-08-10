@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:io';
 import 'dart:developer' as developer;
 import '../providers/profile_provider.dart';
@@ -231,8 +232,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             shape: BoxShape.circle,
                           ),
                           child: Center(
-                            child: Icon(
-                              Icons.groups,
+                            child: FaIcon(
+                              FontAwesomeIcons.users,
                               color: AppTheme.primary,
                               size: 20,
                             ),
@@ -307,8 +308,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         shape: BoxShape.circle,
                       ),
                       child: Center(
-                        child: Icon(
-                          Icons.settings,
+                        child: FaIcon(
+                          FontAwesomeIcons.cog,
                           color: AppTheme.primary,
                           size: 20,
                         ),

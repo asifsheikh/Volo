@@ -79,8 +79,8 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
                           color: AppTheme.primary.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(
-                          Icons.group_outlined,
+                        child: FaIcon(
+                          FontAwesomeIcons.users,
                           size: 32,
                           color: AppTheme.primary,
                         ),
@@ -141,7 +141,7 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.person_add, size: 20, color: AppTheme.textOnPrimary),
+                      FaIcon(FontAwesomeIcons.userPlus, size: 20, color: AppTheme.textOnPrimary),
                       const SizedBox(width: 8),
                                               Text(
                           'Add to My Circle',

@@ -335,7 +335,7 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.person_add, size: 20, color: AppTheme.textOnPrimary),
+                      FaIcon(FontAwesomeIcons.userPlus, size: 20, color: AppTheme.textOnPrimary),
                       const SizedBox(width: 8),
                       Text(
                         'Add to My Circle',
