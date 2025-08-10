@@ -28,9 +28,7 @@ class MyCircleService {
     try {
       developer.log('MyCircleService: Fetching My Circle contacts', name: 'VoloMyCircle');
       
-      final querySnapshot = await _getMyCircleCollection()
-          .orderBy('createdAt', descending: true)
-          .get();
+      final querySnapshot = await _getMyCircleCollection().get();
 
       final contacts = querySnapshot.docs.map((doc) {
         return MyCircleContactModel.fromFirestore(doc.data(), doc.id);

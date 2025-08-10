@@ -32,18 +32,22 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
   /// Load contacts from Firestore
   Future<void> _loadContacts() async {
     try {
+      print('FavoriteContactsScreen: Loading contacts...');
       setState(() {
         _isLoading = true;
         _errorMessage = null;
       });
 
       final contacts = await MyCircleService.getMyCircleContacts();
+      print('FavoriteContactsScreen: Loaded ${contacts.length} contacts');
       
       setState(() {
         _contacts = contacts;
         _isLoading = false;
       });
+      print('FavoriteContactsScreen: State updated with ${_contacts.length} contacts');
     } catch (e) {
+      print('FavoriteContactsScreen: Error loading contacts: $e');
       setState(() {
         _errorMessage = e.toString();
         _isLoading = false;
@@ -308,6 +312,7 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
   }
 
   Widget _buildContactsList() {
+    print('FavoriteContactsScreen: Building contacts list with ${_contacts.length} contacts');
     return Column(
       children: [
         // Contacts List
