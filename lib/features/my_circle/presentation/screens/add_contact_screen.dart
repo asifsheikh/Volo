@@ -209,12 +209,6 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
         await MyCircleService.addContact(contactForm);
         
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Contact added to your circle successfully!'),
-              backgroundColor: AppTheme.success,
-            ),
-          );
           Navigator.of(context).pop(true); // Return true to indicate success
         }
       } catch (e) {

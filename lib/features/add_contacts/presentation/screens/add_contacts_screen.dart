@@ -4,6 +4,9 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import '../../../../features/flight_confirmation/presentation/screens/confirmation_screen.dart';
 import '../../../../features/flight_confirmation/models/confirmation_args.dart';
 import '../../widgets/contact_picker_dialog.dart';
+import '../../../my_circle/presentation/widgets/my_circle_contact_picker_dialog.dart';
+import '../../../my_circle/data/models/my_circle_contact_model.dart';
+import '../../../../services/my_circle_service.dart';
 import '../providers/add_contacts_provider.dart';
 import '../../domain/entities/add_contacts_state.dart' as domain;
 import '../../domain/usecases/save_trip.dart';
@@ -370,7 +373,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                             onPressed: () => ref.read(addContactsProviderProvider.notifier).pickContact(),
                             icon: const Icon(Icons.add, color: Color(0xFF008080), size: 20),
                             label: const Text(
-                              'Add Contact',
+                              'Select from My Circle',
                               style: TextStyle(
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w600,
@@ -674,7 +677,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Add Contacts',
+                      'Add from My Circle',
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w600,
@@ -683,7 +686,7 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
                       ),
                     ),
                     Text(
-                      'Notify your family and friends',
+                      'Select from your favorite contacts',
                       style: TextStyle(
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
@@ -847,36 +850,25 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
 
   Future<void> _pickContact() async {
     try {
-      // Request permission to access contacts
-      if (!await FlutterContacts.requestPermission(readonly: true)) {
-        // Show permission denied message
+      // Get My Circle contacts
+      final List<MyCircleContactModel> myCircleContacts = await MyCircleService.getMyCircleContacts();
+
+      if (myCircleContacts.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-            content: const Text('We need access to your contacts to add people to notify.'),
-            backgroundColor: AppTheme.destructive,
-          ),
-          );
-        }
-        return;
-      }
-
-      // Get all contacts with phone numbers
-      final List<Contact> contacts = await FlutterContacts.getContacts(
-        withProperties: true,
-        withPhoto: false,
-      );
-
-      // Filter contacts that have phone numbers
-      final contactsWithPhones = contacts.where((contact) => contact.phones.isNotEmpty).toList();
-
-      if (contactsWithPhones.isEmpty) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-            content: const Text('No contacts with phone numbers found in your device.'),
-            backgroundColor: AppTheme.warning,
-          ),
+            SnackBar(
+              content: const Text('No contacts in your My Circle. Add contacts to your circle first.'),
+              backgroundColor: AppTheme.warning,
+              duration: const Duration(seconds: 4),
+              action: SnackBarAction(
+                label: 'Go to My Circle',
+                textColor: AppTheme.textOnPrimary,
+                onPressed: () {
+                  // TODO: Navigate to My Circle screen
+                  print('Navigate to My Circle screen');
+                },
+              ),
+            ),
           );
         }
         return;
@@ -889,53 +881,52 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
           .map((contact) => contact.phoneNumber!)
           .toList();
 
-      // Show modern contact picker dialog
-      final Contact? selectedContact = await showDialog<Contact>(
+      // Show My Circle contact picker dialog
+      final MyCircleContactModel? selectedContact = await showDialog<MyCircleContactModel>(
         context: context,
         barrierDismissible: true,
         builder: (BuildContext context) {
-          return ContactPickerDialog(
-            contacts: contactsWithPhones,
+          return MyCircleContactPickerDialog(
+            contacts: myCircleContacts,
             selectedPhoneNumbers: selectedPhoneNumbers,
           );
         },
       );
 
       if (selectedContact != null) {
-        final phoneNumber = selectedContact.phones.first.number;
-        final contactName = selectedContact.displayName.isNotEmpty 
-            ? selectedContact.displayName 
-            : (selectedContact.name.first.isNotEmpty || selectedContact.name.last.isNotEmpty)
-                ? '${selectedContact.name.first} ${selectedContact.name.last}'.trim()
-                : 'Unknown Contact';
-        
-        final newContact = domain.Contact(
-          name: contactName,
-          phoneNumber: phoneNumber,
+        // Check if contact already exists in selected contacts
+        final contactExists = currentState.selectedContacts.any(
+          (contact) => contact.phoneNumber == selectedContact.whatsappNumber
         );
-        
-        // Check if contact already exists
-        if (ref.read(addContactsProviderProvider.notifier).contactExists(newContact)) {
+
+        if (contactExists) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-            content: const Text('This contact is already added to your list.'),
-            backgroundColor: AppTheme.warning,
-          ),
+              SnackBar(
+                content: Text('${selectedContact.name} is already in your notification list.'),
+                backgroundColor: AppTheme.warning,
+              ),
             );
           }
           return;
         }
-        
-        // Add contact
-        ref.read(addContactsProviderProvider.notifier).addContact(newContact);
+
+        // Add the selected contact to the list
+        final addContactsNotifier = ref.read(addContactsProviderProvider.notifier);
+        addContactsNotifier.addContact(
+          domain.Contact(
+            name: selectedContact.name,
+            phoneNumber: selectedContact.whatsappNumber,
+            avatar: null, // My Circle contacts don't have avatars
+          ),
+        );
       }
     } catch (e) {
-      print('Error picking contact: $e');
+      print('Error picking My Circle contact: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Unable to access contacts. Please try again.'),
+            content: const Text('Unable to load My Circle contacts. Please try again.'),
             backgroundColor: AppTheme.destructive,
           ),
         );

@@ -409,89 +409,114 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // Intelligent Circular Avatar
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: _getContactColor(contact.name),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: _getContactIcon(contact.name),
-              ),
-            ),
-            
-            const SizedBox(width: 16),
-            
-            // Contact Info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    contact.name,
-                    style: AppTheme.titleMedium.copyWith(
-                      color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Intelligent Circular Avatar
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: _getContactColor(contact.name),
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(height: 4),
-                  Row(
+                  child: Center(
+                    child: _getContactIcon(contact.name),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                
+                // Contact Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      FaIcon(
-                        FontAwesomeIcons.whatsapp,
-                        color: AppTheme.success,
-                        size: 14,
-                      ),
-                      const SizedBox(width: 6),
                       Text(
-                        contact.whatsappNumber,
-                        style: AppTheme.bodyMedium.copyWith(
-                          color: AppTheme.textSecondary,
+                        contact.name,
+                        style: AppTheme.titleMedium.copyWith(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w600,
                         ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          FaIcon(
+                            FontAwesomeIcons.whatsapp,
+                            color: AppTheme.success,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            contact.whatsappNumber,
+                            style: AppTheme.bodyMedium.copyWith(
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.language,
+                            color: AppTheme.textSecondary,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            contact.language,
+                            style: AppTheme.bodySmall.copyWith(
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Icon(
+                            Icons.public,
+                            color: AppTheme.textSecondary,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            contact.timezone,
+                            style: AppTheme.bodySmall.copyWith(
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.language,
-                        color: AppTheme.textSecondary,
-                        size: 14,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        contact.language,
-                        style: AppTheme.bodySmall.copyWith(
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Icon(
-                        Icons.public,
-                        color: AppTheme.textSecondary,
-                        size: 14,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        contact.timezone,
-                        style: AppTheme.bodySmall.copyWith(
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
+              ],
+            ),
+          ),
+          
+          // Edit Button (Pencil Icon) - Top Right
+          Positioned(
+            top: 12,
+            right: 12,
+            child: IconButton(
+              onPressed: () {
+                // TODO: Implement edit functionality
+                print('Edit contact: ${contact.name}');
+              },
+              icon: FaIcon(
+                FontAwesomeIcons.penToSquare,
+                color: AppTheme.textSecondary,
+                size: 18,
+              ),
+              padding: const EdgeInsets.all(4),
+              constraints: const BoxConstraints(
+                minWidth: 24,
+                minHeight: 24,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
