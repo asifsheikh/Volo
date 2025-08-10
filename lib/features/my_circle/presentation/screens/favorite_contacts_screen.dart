@@ -87,7 +87,7 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Your Circle',
+                        'Flight Update Contacts',
                         style: AppTheme.titleLarge.copyWith(
                           fontWeight: FontWeight.w600,
                           color: AppTheme.textPrimary,
@@ -95,7 +95,7 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Add your close ones to receive\nautomatic flight updates',
+                        'Add your favorite contacts who will\nreceive updates about your flights',
                         style: AppTheme.bodyMedium.copyWith(
                           color: AppTheme.textSecondary,
                         ),
@@ -143,13 +143,13 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
                     children: [
                       Icon(Icons.person_add, size: 20, color: AppTheme.textOnPrimary),
                       const SizedBox(width: 8),
-                      Text(
-                        'Add Contact',
-                        style: AppTheme.titleMedium.copyWith(
-                          color: AppTheme.textOnPrimary,
-                          fontWeight: FontWeight.w600,
+                                              Text(
+                          'Add Flight Contact',
+                          style: AppTheme.titleMedium.copyWith(
+                            color: AppTheme.textOnPrimary,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -177,7 +177,7 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Your contacts will receive personalized WhatsApp messages for all your flight events.',
+                        'Your contacts will receive personalized WhatsApp messages about your flight status, delays, and arrivals.',
                         style: AppTheme.bodyMedium.copyWith(
                           color: AppTheme.textPrimary,
                         ),
