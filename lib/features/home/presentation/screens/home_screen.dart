@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:developer' as developer;
 import '../../../../theme/app_theme.dart';
 import '../../../../features/add_flight/add_flight_screen.dart';
-import '../../../../features/profile/presentation/screens/profile_screen.dart';
 import '../providers/home_provider.dart';
-import '../../domain/repositories/home_repository.dart';
-import '../../data/repositories/home_repository_impl.dart';
 
 /// Home Screen using Riverpod + Clean Architecture
 class HomeScreen extends ConsumerStatefulWidget {
@@ -46,20 +42,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             top: MediaQuery.of(context).padding.top > 0 ? 16.0 : 24.0,
             bottom: 32.0,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  'Hey, ${homeState.username} 👋',
-                  style: AppTheme.headlineLarge.copyWith(fontWeight: FontWeight.w400),
-                ),
-              ),
-              GestureDetector(
-                onTap: () => _navigateToProfile(context, homeState),
-                child: _buildProfileAvatar(homeState),
-              ),
-            ],
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Hey, ${homeState.username} 👋',
+              style: AppTheme.headlineLarge.copyWith(fontWeight: FontWeight.w400),
+            ),
           ),
         ),
         
@@ -175,64 +163,5 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Navigate to profile screen with user data
-  void _navigateToProfile(BuildContext context, homeState) {
-    final repository = ref.read(homeRepositoryImplProvider);
-    final phoneNumber = repository.getUserPhoneNumber() ?? 'Unknown';
-    developer.log('HomeScreen: Navigating to profile with phone: $phoneNumber', name: 'VoloAuth');
-    
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ProfileScreen(
-          username: homeState.username,
-          phoneNumber: phoneNumber,
-        ),
-      ),
-    ).then((_) {
-      // Refresh profile picture when returning from profile screen
-      ref.invalidate(homeProviderProvider(widget.username));
-    });
-  }
 
-  Widget _buildProfileAvatar(homeState) {
-    if (homeState.isLoadingProfile) {
-      return CircleAvatar(
-        radius: 28,
-        backgroundColor: AppTheme.cardBackground,
-        child: CircularProgressIndicator(
-          color: AppTheme.textSecondary,
-        ),
-      );
-    }
-
-    if (homeState.isOffline) {
-      return CircleAvatar(
-        radius: 28,
-        backgroundColor: AppTheme.cardBackground,
-        child: Icon(
-          Icons.signal_wifi_off,
-          size: 28,
-          color: AppTheme.textSecondary,
-        ),
-      );
-    }
-
-    if (homeState.profilePictureUrl != null) {
-      return CircleAvatar(
-        radius: 28,
-        backgroundColor: AppTheme.cardBackground,
-        backgroundImage: NetworkImage(homeState.profilePictureUrl!),
-      );
-    }
-
-    return CircleAvatar(
-      radius: 28,
-      backgroundColor: AppTheme.cardBackground,
-      child: Icon(
-        Icons.person,
-        size: 28,
-        color: AppTheme.textSecondary,
-      ),
-    );
-  }
 } 

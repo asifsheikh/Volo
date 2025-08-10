@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../features/home/presentation/screens/home_screen.dart';
 import '../features/flights/presentation/screens/flights_screen.dart';
 import '../features/my_circle/presentation/screens/favorite_contacts_screen.dart';
+import '../features/profile/presentation/screens/profile_screen.dart';
+import '../features/home/data/repositories/home_repository_impl.dart';
 import '../theme/app_theme.dart';
 
-class MainNavigationScreen extends StatefulWidget {
+class MainNavigationScreen extends ConsumerStatefulWidget {
   final String username;
   final int initialIndex;
 
@@ -15,10 +18,10 @@ class MainNavigationScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<MainNavigationScreen> createState() => _MainNavigationScreenState();
+  ConsumerState<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
-class _MainNavigationScreenState extends State<MainNavigationScreen> {
+class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
   late int _currentIndex;
   late PageController _pageController;
 
@@ -60,6 +63,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           HomeScreen(username: widget.username),
           FlightsScreen(username: widget.username),
           FavoriteContactsScreen(username: widget.username),
+          ProfileScreen(
+            username: widget.username,
+            phoneNumber: ref.read(homeRepositoryImplProvider).getUserPhoneNumber() ?? 'Unknown',
+          ),
         ],
       ),
       bottomNavigationBar: Container(
@@ -91,6 +98,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               icon: Icon(Icons.people_outline),
               activeIcon: Icon(Icons.people),
               label: 'My Circle',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle_outlined),
+              activeIcon: Icon(Icons.account_circle),
+              label: 'Account',
             ),
           ],
           selectedItemColor: AppTheme.primary,
