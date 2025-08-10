@@ -20,7 +20,6 @@ mixin _$FlightConfirmationState {
   String get fromCity => throw _privateConstructorUsedError;
   String get toCity => throw _privateConstructorUsedError;
   List<String> get contactNames => throw _privateConstructorUsedError;
-  List<String> get contactAvatars => throw _privateConstructorUsedError;
   dynamic get selectedFlight => throw _privateConstructorUsedError;
   String get departureAirportCode => throw _privateConstructorUsedError;
   String get departureImage => throw _privateConstructorUsedError;
@@ -51,7 +50,6 @@ abstract class $FlightConfirmationStateCopyWith<$Res> {
     String fromCity,
     String toCity,
     List<String> contactNames,
-    List<String> contactAvatars,
     dynamic selectedFlight,
     String departureAirportCode,
     String departureImage,
@@ -87,7 +85,6 @@ class _$FlightConfirmationStateCopyWithImpl<
     Object? fromCity = null,
     Object? toCity = null,
     Object? contactNames = null,
-    Object? contactAvatars = null,
     Object? selectedFlight = freezed,
     Object? departureAirportCode = null,
     Object? departureImage = null,
@@ -113,10 +110,6 @@ class _$FlightConfirmationStateCopyWithImpl<
             contactNames: null == contactNames
                 ? _value.contactNames
                 : contactNames // ignore: cast_nullable_to_non_nullable
-                      as List<String>,
-            contactAvatars: null == contactAvatars
-                ? _value.contactAvatars
-                : contactAvatars // ignore: cast_nullable_to_non_nullable
                       as List<String>,
             selectedFlight: freezed == selectedFlight
                 ? _value.selectedFlight
@@ -181,7 +174,6 @@ abstract class _$$FlightConfirmationStateImplCopyWith<$Res>
     String fromCity,
     String toCity,
     List<String> contactNames,
-    List<String> contactAvatars,
     dynamic selectedFlight,
     String departureAirportCode,
     String departureImage,
@@ -217,7 +209,6 @@ class __$$FlightConfirmationStateImplCopyWithImpl<$Res>
     Object? fromCity = null,
     Object? toCity = null,
     Object? contactNames = null,
-    Object? contactAvatars = null,
     Object? selectedFlight = freezed,
     Object? departureAirportCode = null,
     Object? departureImage = null,
@@ -243,10 +234,6 @@ class __$$FlightConfirmationStateImplCopyWithImpl<$Res>
         contactNames: null == contactNames
             ? _value._contactNames
             : contactNames // ignore: cast_nullable_to_non_nullable
-                  as List<String>,
-        contactAvatars: null == contactAvatars
-            ? _value._contactAvatars
-            : contactAvatars // ignore: cast_nullable_to_non_nullable
                   as List<String>,
         selectedFlight: freezed == selectedFlight
             ? _value.selectedFlight
@@ -304,7 +291,6 @@ class _$FlightConfirmationStateImpl implements _FlightConfirmationState {
     required this.fromCity,
     required this.toCity,
     required final List<String> contactNames,
-    required final List<String> contactAvatars,
     this.selectedFlight,
     required this.departureAirportCode,
     required this.departureImage,
@@ -316,8 +302,7 @@ class _$FlightConfirmationStateImpl implements _FlightConfirmationState {
     this.hasShownConfetti = false,
     this.isLoading = false,
     this.errorMessage,
-  }) : _contactNames = contactNames,
-       _contactAvatars = contactAvatars;
+  }) : _contactNames = contactNames;
 
   @override
   final String fromCity;
@@ -329,14 +314,6 @@ class _$FlightConfirmationStateImpl implements _FlightConfirmationState {
     if (_contactNames is EqualUnmodifiableListView) return _contactNames;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_contactNames);
-  }
-
-  final List<String> _contactAvatars;
-  @override
-  List<String> get contactAvatars {
-    if (_contactAvatars is EqualUnmodifiableListView) return _contactAvatars;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_contactAvatars);
   }
 
   @override
@@ -367,7 +344,7 @@ class _$FlightConfirmationStateImpl implements _FlightConfirmationState {
 
   @override
   String toString() {
-    return 'FlightConfirmationState(fromCity: $fromCity, toCity: $toCity, contactNames: $contactNames, contactAvatars: $contactAvatars, selectedFlight: $selectedFlight, departureAirportCode: $departureAirportCode, departureImage: $departureImage, departureThumbnail: $departureThumbnail, arrivalAirportCode: $arrivalAirportCode, arrivalImage: $arrivalImage, arrivalThumbnail: $arrivalThumbnail, enableNotifications: $enableNotifications, hasShownConfetti: $hasShownConfetti, isLoading: $isLoading, errorMessage: $errorMessage)';
+    return 'FlightConfirmationState(fromCity: $fromCity, toCity: $toCity, contactNames: $contactNames, selectedFlight: $selectedFlight, departureAirportCode: $departureAirportCode, departureImage: $departureImage, departureThumbnail: $departureThumbnail, arrivalAirportCode: $arrivalAirportCode, arrivalImage: $arrivalImage, arrivalThumbnail: $arrivalThumbnail, enableNotifications: $enableNotifications, hasShownConfetti: $hasShownConfetti, isLoading: $isLoading, errorMessage: $errorMessage)';
   }
 
   @override
@@ -381,10 +358,6 @@ class _$FlightConfirmationStateImpl implements _FlightConfirmationState {
             const DeepCollectionEquality().equals(
               other._contactNames,
               _contactNames,
-            ) &&
-            const DeepCollectionEquality().equals(
-              other._contactAvatars,
-              _contactAvatars,
             ) &&
             const DeepCollectionEquality().equals(
               other.selectedFlight,
@@ -418,7 +391,6 @@ class _$FlightConfirmationStateImpl implements _FlightConfirmationState {
     fromCity,
     toCity,
     const DeepCollectionEquality().hash(_contactNames),
-    const DeepCollectionEquality().hash(_contactAvatars),
     const DeepCollectionEquality().hash(selectedFlight),
     departureAirportCode,
     departureImage,
@@ -449,7 +421,6 @@ abstract class _FlightConfirmationState implements FlightConfirmationState {
     required final String fromCity,
     required final String toCity,
     required final List<String> contactNames,
-    required final List<String> contactAvatars,
     final dynamic selectedFlight,
     required final String departureAirportCode,
     required final String departureImage,
@@ -469,8 +440,6 @@ abstract class _FlightConfirmationState implements FlightConfirmationState {
   String get toCity;
   @override
   List<String> get contactNames;
-  @override
-  List<String> get contactAvatars;
   @override
   dynamic get selectedFlight;
   @override

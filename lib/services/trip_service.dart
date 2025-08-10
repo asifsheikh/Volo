@@ -42,10 +42,10 @@ class TripService {
                 }
               }
 
-                /// Create a trip from flight option and contacts
+                /// Create a trip from flight option and contact IDs
               static Trip createTripFromFlightOption({
                 required dynamic flightOption, // FlightOption from search results
-                required List<dynamic> contacts, // ContactModel from add contacts screen
+                required List<String> contactIds, // Contact IDs from My Circle
                 required bool userNotifications,
                 required String departureCity,
                 required String arrivalCity,
@@ -103,15 +103,6 @@ class TripService {
                   flights: tripFlights,
                 );
 
-                // Convert contacts to TripContact
-                final tripContacts = contacts.map<TripContact>((contact) {
-                  return TripContact(
-                    name: contact.name,
-                    phoneNumber: contact.phoneNumber ?? '',
-                    relationship: 'family', // Default as discussed
-                  );
-                }).toList();
-
                 // Create metadata
                 final metadata = TripMetadata(
                   createdAt: now,
@@ -119,11 +110,11 @@ class TripService {
                   source: source ?? 'manual',
                 );
 
-                // Create and return trip
+                // Create and return trip with contact IDs
                 return Trip(
                   id: tripId,
                   tripData: tripData,
-                  contacts: tripContacts,
+                  contactIds: contactIds,
                   status: 'scheduled', // Initial status
                   userNotifications: userNotifications,
                   metadata: metadata,

@@ -142,13 +142,14 @@ class AddContactsProvider extends _$AddContactsProvider {
               : 'Unknown Contact';
       
       // Check if contact already exists
-      if (contactExists(domain.Contact(name: contactName, phoneNumber: phoneNumber))) {
+      if (contactExists(domain.Contact(id: selectedContact.id, name: contactName, phoneNumber: phoneNumber))) {
         setError('This contact is already added to your list.');
         return;
       }
       
       // Add the contact
       addContact(domain.Contact(
+        id: selectedContact.id, // Use device contact ID
         name: contactName,
         phoneNumber: phoneNumber,
       ));

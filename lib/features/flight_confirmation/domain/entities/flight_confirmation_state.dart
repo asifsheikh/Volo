@@ -8,7 +8,6 @@ class FlightConfirmationState with _$FlightConfirmationState {
     required String fromCity,
     required String toCity,
     required List<String> contactNames,
-    required List<String> contactAvatars,
     dynamic selectedFlight,
     required String departureAirportCode,
     required String departureImage,

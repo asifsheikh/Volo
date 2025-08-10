@@ -314,8 +314,8 @@ abstract class _AddContactsState implements AddContactsState {
 
 /// @nodoc
 mixin _$Contact {
+  String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String? get avatar => throw _privateConstructorUsedError;
   String? get phoneNumber => throw _privateConstructorUsedError;
 
   /// Create a copy of Contact
@@ -329,7 +329,7 @@ abstract class $ContactCopyWith<$Res> {
   factory $ContactCopyWith(Contact value, $Res Function(Contact) then) =
       _$ContactCopyWithImpl<$Res, Contact>;
   @useResult
-  $Res call({String name, String? avatar, String? phoneNumber});
+  $Res call({String id, String name, String? phoneNumber});
 }
 
 /// @nodoc
@@ -347,20 +347,20 @@ class _$ContactCopyWithImpl<$Res, $Val extends Contact>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? name = null,
-    Object? avatar = freezed,
     Object? phoneNumber = freezed,
   }) {
     return _then(
       _value.copyWith(
+            id: null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as String,
             name: null == name
                 ? _value.name
                 : name // ignore: cast_nullable_to_non_nullable
                       as String,
-            avatar: freezed == avatar
-                ? _value.avatar
-                : avatar // ignore: cast_nullable_to_non_nullable
-                      as String?,
             phoneNumber: freezed == phoneNumber
                 ? _value.phoneNumber
                 : phoneNumber // ignore: cast_nullable_to_non_nullable
@@ -379,7 +379,7 @@ abstract class _$$ContactImplCopyWith<$Res> implements $ContactCopyWith<$Res> {
   ) = __$$ContactImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String name, String? avatar, String? phoneNumber});
+  $Res call({String id, String name, String? phoneNumber});
 }
 
 /// @nodoc
@@ -396,20 +396,20 @@ class __$$ContactImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? name = null,
-    Object? avatar = freezed,
     Object? phoneNumber = freezed,
   }) {
     return _then(
       _$ContactImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String,
         name: null == name
             ? _value.name
             : name // ignore: cast_nullable_to_non_nullable
                   as String,
-        avatar: freezed == avatar
-            ? _value.avatar
-            : avatar // ignore: cast_nullable_to_non_nullable
-                  as String?,
         phoneNumber: freezed == phoneNumber
             ? _value.phoneNumber
             : phoneNumber // ignore: cast_nullable_to_non_nullable
@@ -422,18 +422,18 @@ class __$$ContactImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$ContactImpl implements _Contact {
-  const _$ContactImpl({required this.name, this.avatar, this.phoneNumber});
+  const _$ContactImpl({required this.id, required this.name, this.phoneNumber});
 
   @override
-  final String name;
+  final String id;
   @override
-  final String? avatar;
+  final String name;
   @override
   final String? phoneNumber;
 
   @override
   String toString() {
-    return 'Contact(name: $name, avatar: $avatar, phoneNumber: $phoneNumber)';
+    return 'Contact(id: $id, name: $name, phoneNumber: $phoneNumber)';
   }
 
   @override
@@ -441,14 +441,14 @@ class _$ContactImpl implements _Contact {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ContactImpl &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.avatar, avatar) || other.avatar == avatar) &&
             (identical(other.phoneNumber, phoneNumber) ||
                 other.phoneNumber == phoneNumber));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, name, avatar, phoneNumber);
+  int get hashCode => Object.hash(runtimeType, id, name, phoneNumber);
 
   /// Create a copy of Contact
   /// with the given fields replaced by the non-null parameter values.
@@ -461,15 +461,15 @@ class _$ContactImpl implements _Contact {
 
 abstract class _Contact implements Contact {
   const factory _Contact({
+    required final String id,
     required final String name,
-    final String? avatar,
     final String? phoneNumber,
   }) = _$ContactImpl;
 
   @override
-  String get name;
+  String get id;
   @override
-  String? get avatar;
+  String get name;
   @override
   String? get phoneNumber;
 

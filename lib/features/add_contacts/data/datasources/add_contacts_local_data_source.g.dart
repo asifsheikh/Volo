@@ -7,7 +7,7 @@ part of 'add_contacts_local_data_source.dart';
 // **************************************************************************
 
 String _$addContactsLocalDataSourceHash() =>
-    r'a982a758ccca5b97a5d09e8703f38ce6c37699fc';
+    r'340fd0de8a4f69e5a1926ed3aa8c94588f13c0cb';
 
 /// Local data source for add contacts
 ///

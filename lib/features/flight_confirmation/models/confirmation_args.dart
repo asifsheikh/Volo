@@ -2,7 +2,6 @@ class ConfirmationArgs {
   final String fromCity;
   final String toCity;
   final List<String> contactNames;
-  final List<String> contactAvatars;
   final dynamic selectedFlight; // Replace with your Flight model when available
   final String departureAirportCode;
   final String departureImage;
@@ -16,7 +15,6 @@ class ConfirmationArgs {
     required this.fromCity,
     required this.toCity,
     required this.contactNames,
-    required this.contactAvatars,
     this.selectedFlight,
     required this.departureAirportCode,
     required this.departureImage,

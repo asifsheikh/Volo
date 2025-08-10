@@ -35,9 +35,9 @@ class AddContactsLocalDataSource extends _$AddContactsLocalDataSource {
                 : 'Unknown Contact';
         
         return domain.Contact(
+          id: contact.id, // Use device contact ID as fallback
           name: contactName,
           phoneNumber: phoneNumber,
-          avatar: null, // Not loading photos for performance
         );
       }).toList();
 
@@ -59,7 +59,7 @@ class AddContactsLocalDataSource extends _$AddContactsLocalDataSource {
   /// Save trip to Firestore
   Future<void> saveTrip({
     required dynamic flightOption,
-    required List<domain.Contact> contacts,
+    required List<String> contactIds,
     required bool userNotifications,
     required String departureCity,
     required String arrivalCity,
@@ -71,17 +71,10 @@ class AddContactsLocalDataSource extends _$AddContactsLocalDataSource {
         throw Exception('User not authenticated');
       }
 
-      // Convert domain contacts to ContactModel for TripService
-      final contactModels = contacts.map((contact) => ContactModel(
-        name: contact.name,
-        phoneNumber: contact.phoneNumber,
-        avatar: contact.avatar,
-      )).toList();
-
-      // Create trip from flight option and contacts
+      // Create trip from flight option and contact IDs
       final trip = TripService.createTripFromFlightOption(
         flightOption: flightOption,
-        contacts: contactModels,
+        contactIds: contactIds,
         userNotifications: userNotifications,
         departureCity: departureCity,
         arrivalCity: arrivalCity,
@@ -103,15 +96,4 @@ class AddContactsLocalDataSource extends _$AddContactsLocalDataSource {
   }
 }
 
-// Temporary ContactModel for TripService compatibility
-class ContactModel {
-  final String name;
-  final String? avatar;
-  final String? phoneNumber;
-  
-  ContactModel({
-    required this.name,
-    this.avatar,
-    this.phoneNumber,
-  });
-} 
+ 

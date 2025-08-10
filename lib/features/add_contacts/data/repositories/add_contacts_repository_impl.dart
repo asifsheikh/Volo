@@ -28,7 +28,7 @@ class AddContactsRepositoryImpl extends _$AddContactsRepositoryImpl implements A
   @override
   Future<void> saveTrip({
     required dynamic flightOption,
-    required List<domain.Contact> contacts,
+    required List<String> contactIds,
     required bool userNotifications,
     required String departureCity,
     required String arrivalCity,
@@ -36,7 +36,7 @@ class AddContactsRepositoryImpl extends _$AddContactsRepositoryImpl implements A
     final dataSource = ref.read(addContactsLocalDataSourceProvider.notifier);
     return await dataSource.saveTrip(
       flightOption: flightOption,
-      contacts: contacts,
+      contactIds: contactIds,
       userNotifications: userNotifications,
       departureCity: departureCity,
       arrivalCity: arrivalCity,

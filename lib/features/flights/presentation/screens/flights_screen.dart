@@ -779,10 +779,10 @@ class _TripCardState extends State<_TripCard> {
   }
 
   List<Widget> _getContactInitials(Trip trip) {
-    final contacts = trip.contacts;
+    final contactIds = trip.contactIds;
     
     // If no contacts, show a message
-    if (contacts.isEmpty) {
+    if (contactIds.isEmpty) {
       return [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -817,12 +817,14 @@ class _TripCardState extends State<_TripCard> {
       ];
     }
     
+    // For now, show contact IDs as initials (we'll need to fetch contact details later)
     // Limit to first 3 contacts to avoid overflow
-    final displayContacts = contacts.take(3).toList();
+    final displayContactIds = contactIds.take(3).toList();
     
-    return List.generate(displayContacts.length, (index) {
-      final contact = displayContacts[index];
-      final initials = _getInitialsFromName(contact.name);
+    return List.generate(displayContactIds.length, (index) {
+      final contactId = displayContactIds[index];
+      // Use first 2 characters of contact ID as initials for now
+      final initials = contactId.length >= 2 ? contactId.substring(0, 2).toUpperCase() : '?';
       
       return Transform.translate(
         offset: Offset(-5.0 * index, 0), // Create overlap effect

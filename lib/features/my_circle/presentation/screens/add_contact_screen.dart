@@ -7,6 +7,7 @@ import '../../../../services/my_circle_service.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import '../../../../widgets/contact_picker_dialog.dart';
 import '../../domain/entities/my_circle_contact.dart';
+import '../../data/models/my_circle_contact_model.dart';
 
 class AddContactScreen extends ConsumerStatefulWidget {
   final String username;

@@ -24,7 +24,6 @@ class FlightConfirmationLocalDataSource extends _$FlightConfirmationLocalDataSou
         fromCity: args.fromCity,
         toCity: args.toCity,
         contactNames: args.contactNames,
-        contactAvatars: args.contactAvatars,
         selectedFlight: args.selectedFlight,
         departureAirportCode: args.departureAirportCode,
         departureImage: args.departureImage,

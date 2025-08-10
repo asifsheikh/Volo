@@ -6,7 +6,7 @@ part of 'save_trip.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$saveTripHash() => r'cdb4a49b0a039911e5f133f0268fc70cc71c9d8e';
+String _$saveTripHash() => r'8ee13901872220ffdcaecfbcef64e21cca914507';
 
 /// Use case for saving trip
 ///

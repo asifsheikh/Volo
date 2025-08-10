@@ -18,8 +18,8 @@ class AddContactsState with _$AddContactsState {
 @freezed
 class Contact with _$Contact {
   const factory Contact({
+    required String id,
     required String name,
-    String? avatar,
     String? phoneNumber,
   }) = _Contact;
 }

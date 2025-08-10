@@ -7,7 +7,7 @@ part of 'flight_confirmation_local_data_source.dart';
 // **************************************************************************
 
 String _$flightConfirmationLocalDataSourceHash() =>
-    r'452d40ceec17070ae907163232a9854326213778';
+    r'046470807c0c72393a400a8365e0e6afa16cae7a';
 
 /// Local data source for flight confirmation
 ///

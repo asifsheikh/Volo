@@ -915,9 +915,9 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
         final addContactsNotifier = ref.read(addContactsProviderProvider.notifier);
         addContactsNotifier.addContact(
           domain.Contact(
+            id: selectedContact.id,
             name: selectedContact.name,
             phoneNumber: selectedContact.whatsappNumber,
-            avatar: null, // My Circle contacts don't have avatars
           ),
         );
       }
@@ -948,11 +948,14 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
         message: 'Saving your trip...',
       );
 
+      // Extract contact IDs from selected contacts
+      final contactIds = currentState.selectedContacts.map((contact) => contact.id).toList();
+      
       // Save trip using the use case
       final saveTripNotifier = ref.read(saveTripProvider.notifier);
       await saveTripNotifier.saveTrip(
         flightOption: widget.args.selectedFlight,
-        contacts: currentState.selectedContacts,
+        contactIds: contactIds,
         userNotifications: currentState.enableNotifications,
         departureCity: widget.args.departureCity,
         arrivalCity: widget.args.arrivalCity,
@@ -987,7 +990,6 @@ class _AddContactsScreenState extends ConsumerState<AddContactsScreen> {
             fromCity: widget.args.departureCity,
             toCity: widget.args.arrivalCity,
             contactNames: state.selectedContacts.map((c) => c.name).toList(),
-            contactAvatars: state.selectedContacts.map((c) => c.avatar ?? '').toList(),
             departureAirportCode: widget.args.departureAirportCode,
             departureImage: widget.args.departureImage,
             departureThumbnail: widget.args.departureThumbnail,

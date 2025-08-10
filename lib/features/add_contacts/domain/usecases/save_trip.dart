@@ -16,7 +16,7 @@ class SaveTrip extends _$SaveTrip {
 
   Future<void> saveTrip({
     required dynamic flightOption,
-    required List<domain.Contact> contacts,
+    required List<String> contactIds,
     required bool userNotifications,
     required String departureCity,
     required String arrivalCity,
@@ -27,7 +27,7 @@ class SaveTrip extends _$SaveTrip {
       // Save trip
       await repository.saveTrip(
         flightOption: flightOption,
-        contacts: contacts,
+        contactIds: contactIds,
         userNotifications: userNotifications,
         departureCity: departureCity,
         arrivalCity: arrivalCity,

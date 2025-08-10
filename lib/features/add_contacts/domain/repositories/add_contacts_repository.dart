@@ -10,7 +10,7 @@ abstract class AddContactsRepository {
   /// Save trip to Firestore
   Future<void> saveTrip({
     required dynamic flightOption,
-    required List<Contact> contacts,
+    required List<String> contactIds,
     required bool userNotifications,
     required String departureCity,
     required String arrivalCity,

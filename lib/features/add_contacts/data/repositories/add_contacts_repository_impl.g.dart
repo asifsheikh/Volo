@@ -7,7 +7,7 @@ part of 'add_contacts_repository_impl.dart';
 // **************************************************************************
 
 String _$addContactsRepositoryImplHash() =>
-    r'6e5dab29e3dc241c639b99ff0dd2f3ffe4893943';
+    r'f6162d91786babee7f9d404ebdbb93b42be2afc1';
 
 /// Repository implementation for add contacts
 ///

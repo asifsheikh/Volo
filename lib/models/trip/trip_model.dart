@@ -4,7 +4,7 @@
 class Trip {
   final String id;
   final TripData tripData;
-  final List<TripContact> contacts;
+  final List<String> contactIds;
   final String status;
   final bool userNotifications;
   final TripMetadata metadata;
@@ -12,7 +12,7 @@ class Trip {
   const Trip({
     required this.id,
     required this.tripData,
-    required this.contacts,
+    required this.contactIds,
     required this.status,
     required this.userNotifications,
     required this.metadata,
@@ -22,8 +22,8 @@ class Trip {
     return Trip(
       id: json['id'] ?? '',
       tripData: TripData.fromJson(json['tripData'] ?? {}),
-      contacts: (json['contacts'] as List<dynamic>?)
-          ?.map((contact) => TripContact.fromJson(contact as Map<String, dynamic>))
+      contactIds: (json['contactIds'] as List<dynamic>?)
+          ?.map((id) => id.toString())
           .toList() ?? [],
       status: json['status'] ?? 'scheduled',
       userNotifications: json['userNotifications'] ?? true,
@@ -36,7 +36,7 @@ class Trip {
     return {
       'id': id,
       'tripData': tripData.toJson(),
-      'contacts': contacts.map((contact) => contact.toJson()).toList(),
+      'contactIds': contactIds,
       'status': status,
       'userNotifications': userNotifications,
       'metadata': metadata.toJson(),
@@ -58,7 +58,7 @@ class Trip {
   Trip copyWith({
     String? id,
     TripData? tripData,
-    List<TripContact>? contacts,
+    List<String>? contactIds,
     String? status,
     bool? userNotifications,
     TripMetadata? metadata,
@@ -66,7 +66,7 @@ class Trip {
     return Trip(
       id: id ?? this.id,
       tripData: tripData ?? this.tripData,
-      contacts: contacts ?? this.contacts,
+      contactIds: contactIds ?? this.contactIds,
       status: status ?? this.status,
       userNotifications: userNotifications ?? this.userNotifications,
       metadata: metadata ?? this.metadata,
@@ -248,59 +248,6 @@ class TripFlight {
       duration: duration ?? this.duration,
       airplane: airplane ?? this.airplane,
       travelClass: travelClass ?? this.travelClass,
-    );
-  }
-}
-
-/// Contact information for trip notifications
-class TripContact {
-  final String name;
-  final String phoneNumber;
-  final String relationship;
-
-  const TripContact({
-    required this.name,
-    required this.phoneNumber,
-    this.relationship = 'family',
-  });
-
-  factory TripContact.fromJson(Map<String, dynamic> json) {
-    return TripContact(
-      name: json['name'] ?? '',
-      phoneNumber: json['phoneNumber'] ?? '',
-      relationship: json['relationship'] ?? 'family',
-    );
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'phoneNumber': phoneNumber,
-      'relationship': relationship,
-    };
-  }
-
-  bool isValid() {
-    return name.isNotEmpty && phoneNumber.isNotEmpty;
-  }
-
-  List<String> getValidationErrors() {
-    final errors = <String>[];
-    if (name.isEmpty) errors.add('Contact name is required');
-    if (phoneNumber.isEmpty) errors.add('Contact phone number is required');
-    return errors;
-  }
-
-  TripContact copyWith({
-    String? name,
-    String? phoneNumber,
-    String? relationship,
-  }) {
-    return TripContact(
-      name: name ?? this.name,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
-      relationship: relationship ?? this.relationship,
     );
   }
 }
