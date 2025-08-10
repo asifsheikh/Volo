@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../services/ai_service.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
+import '../../../../widgets/contact_picker_dialog.dart';
 
 class AddContactScreen extends ConsumerStatefulWidget {
   final String username;
@@ -89,14 +91,75 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
   }
 
   Future<void> _openContactPicker() async {
-    // Placeholder for actual contact picker
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Contact picker coming soon!'),
-        backgroundColor: AppTheme.primary,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+    try {
+      // Request permission to access contacts
+      if (!await FlutterContacts.requestPermission(readonly: true)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('We need access to your contacts to add people to your circle.'),
+            backgroundColor: AppTheme.destructive,
+          ),
+        );
+        return;
+      }
+
+      // Get all contacts with phone numbers
+      final List<Contact> contacts = await FlutterContacts.getContacts(
+        withProperties: true,
+        withPhoto: false,
+      );
+
+      // Filter contacts that have phone numbers
+      final contactsWithPhones = contacts.where((contact) => contact.phones.isNotEmpty).toList();
+
+      if (contactsWithPhones.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('No contacts with phone numbers found in your device.'),
+            backgroundColor: AppTheme.warning,
+          ),
+        );
+        return;
+      }
+
+      // Show contact picker dialog
+      final Contact? selectedContact = await showDialog<Contact>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return ContactPickerDialog(
+            contacts: contactsWithPhones,
+            selectedPhoneNumbers: const [], // No pre-selected contacts for this screen
+          );
+        },
+      );
+
+      if (selectedContact != null) {
+        final phoneNumber = selectedContact.phones.first.number;
+        final contactName = selectedContact.displayName.isNotEmpty 
+            ? selectedContact.displayName 
+            : (selectedContact.name.first.isNotEmpty || selectedContact.name.last.isNotEmpty)
+                ? '${selectedContact.name.first} ${selectedContact.name.last}'.trim()
+                : 'Unknown Contact';
+        
+        // Update the form fields
+        setState(() {
+          _contactNameController.text = contactName;
+          _whatsappNumberController.text = phoneNumber;
+        });
+        
+        // Generate sample message with the new contact name
+        _generateSampleMessage();
+      }
+    } catch (e) {
+      print('Error picking contact: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Unable to access contacts. Please try again.'),
+          backgroundColor: AppTheme.destructive,
+        ),
+      );
+    }
   }
 
   void _handleSubmit() {
