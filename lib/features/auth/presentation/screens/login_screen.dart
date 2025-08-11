@@ -148,33 +148,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top section - Prominent login illustration
+            // Main content - centered
             Expanded(
-              flex: 2,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: Image.asset(
-                      'assets/login.png',
-                      width: double.infinity,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            // Bottom section - Login content
-            Expanded(
-              flex: 3,
               child: Center(
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
+                      // Login illustration
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: Image.asset(
+                            'assets/login.png',
+                            width: double.infinity,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
                       // Title
                       Text(
                         'Welcome to Volo! ✈️',
@@ -271,35 +266,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             // Terms/Privacy at bottom
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0, left: 24.0, right: 24.0),
-              child: Column(
-                children: [
-                  Text.rich(
+              child: Text.rich(
+                TextSpan(
+                  text: 'By continuing, you agree to our ',
+                  style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
+                  children: [
                     TextSpan(
-                      text: 'By continuing, you agree to our ',
-                      style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
-                      children: [
-                        TextSpan(
-                          text: 'Terms',
-                          style: AppTheme.linkStyle,
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              developer.log('Navigate to Terms screen', name: 'LoginScreen');
-                            },
-                        ),
-                        const TextSpan(text: ' and '),
-                        TextSpan(
-                          text: 'Privacy Policy',
-                          style: AppTheme.linkStyle,
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              developer.log('Navigate to Privacy Policy screen', name: 'LoginScreen');
-                            },
-                        ),
-                      ],
+                      text: 'Terms',
+                      style: AppTheme.linkStyle,
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          developer.log('Navigate to Terms screen', name: 'LoginScreen');
+                        },
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+                    const TextSpan(text: ' and '),
+                    TextSpan(
+                      text: 'Privacy Policy',
+                      style: AppTheme.linkStyle,
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          developer.log('Navigate to Privacy Policy screen', name: 'LoginScreen');
+                        },
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
           ],
