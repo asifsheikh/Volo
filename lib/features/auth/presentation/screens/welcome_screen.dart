@@ -37,28 +37,25 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 });
               },
               children: [
-                // First page (matches screenshot)
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Material(
-                        elevation: 4,
+                // First page - Welcome illustration with text
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                      child: ClipRRect(
                         borderRadius: BorderRadius.circular(24),
-                        shadowColor: AppTheme.shadowPrimary,
-                        color: Colors.transparent,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(24),
-                          child: Image.asset(
-                            'assets/app_icon.png',
-                            width: 96,
-                            height: 96,
-                            fit: BoxFit.contain,
-                          ),
+                        child: Image.asset(
+                          'assets/welcome.png',
+                          width: double.infinity,
+                          fit: BoxFit.contain,
                         ),
                       ),
-                      const SizedBox(height: 40),
-                      Text(
+                    ),
+                    const SizedBox(height: 32),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Text(
                         'Volo',
                         style: AppTheme.headlineLarge.copyWith(
                           fontSize: 40,
@@ -67,31 +64,34 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 8),
-                      Container(
-                        width: 64,
-                        height: 2,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Color.fromRGBO(0, 0, 0, 0),
-                              AppTheme.textSecondary,
-                              Color.fromRGBO(0, 0, 0, 0),
-                            ],
-                            stops: const [0.0, 0.5, 1.0],
-                          ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 64,
+                      height: 2,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Color.fromRGBO(0, 0, 0, 0),
+                            AppTheme.textSecondary,
+                            Color.fromRGBO(0, 0, 0, 0),
+                          ],
+                          stops: const [0.0, 0.5, 1.0],
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      Text(
+                    ),
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Text(
                         'Your journey, their peace of mind.',
                         style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
                         textAlign: TextAlign.center,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
                 // Second page (new illustration and text)
                 Column(
