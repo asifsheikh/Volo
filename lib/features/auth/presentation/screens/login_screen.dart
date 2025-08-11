@@ -148,8 +148,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Main content
+            // Top section - Prominent login illustration
             Expanded(
+              flex: 2,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Image.asset(
+                      'assets/login.png',
+                      width: double.infinity,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Bottom section - Login content
+            Expanded(
+              flex: 3,
               child: Center(
                 child: SingleChildScrollView(
                   child: Column(
@@ -157,23 +175,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(height: 16),
-                      // App Icon
-                      Material(
-                        elevation: 2,
-                        borderRadius: BorderRadius.circular(24),
-                        shadowColor: AppTheme.shadowPrimary,
-                        color: Colors.transparent,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(24),
-                                                  child: Image.asset(
-                          'assets/login.png',
-                          width: 72,
-                          height: 72,
-                          fit: BoxFit.contain,
-                        ),
-                        ),
-                      ),
-                      const SizedBox(height: 32),
                       // Title
                       Text(
                         'Welcome to Volo! ✈️',
