@@ -51,45 +51,52 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         
-        // Hero illustration at center
+        // Centered content area with illustration and button
         Expanded(
-          flex: 2,
           child: Center(
-            child: Container(
-              constraints: const BoxConstraints(
-                maxWidth: 300,
-                maxHeight: 300,
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: Image.asset(
-                  'assets/home.png',
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          ),
-        ),
-        
-        // Add Flight button below illustration
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
-          child: SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const AddFlightScreen(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Hero illustration
+                Container(
+                  constraints: const BoxConstraints(
+                    maxWidth: 300,
+                    maxHeight: 300,
                   ),
-                );
-              },
-              icon: const Icon(
-                Icons.flight_takeoff,
-                size: 24,
-              ),
-              label: const Text('Add Your Flight'),
-              style: AppTheme.primaryButton,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Image.asset(
+                      'assets/home.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 32),
+                
+                // Add Flight button
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const AddFlightScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.flight_takeoff,
+                        size: 24,
+                      ),
+                      label: const Text('Add Your Flight'),
+                      style: AppTheme.primaryButton,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
