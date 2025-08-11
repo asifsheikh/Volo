@@ -38,64 +38,80 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
               },
               children: [
                 // First page - Welcome illustration with text
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Welcome illustration
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(24),
-                          child: Image.asset(
-                            'assets/welcome.png',
-                            width: double.infinity,
-                            fit: BoxFit.contain,
+                Column(
+                  children: [
+                    // Top section - Illustration
+                    Expanded(
+                      flex: 1,
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(24),
+                            child: Image.asset(
+                              'assets/welcome.png',
+                              width: double.infinity,
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
-                      // Text content
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Text(
-                          'Volo',
-                          style: AppTheme.headlineLarge.copyWith(
-                            fontSize: 40,
-                            letterSpacing: 1.2,
-                            height: 1.1,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        width: 64,
-                        height: 2,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Color.fromRGBO(0, 0, 0, 0),
-                              AppTheme.textSecondary,
-                              Color.fromRGBO(0, 0, 0, 0),
-                            ],
-                            stops: const [0.0, 0.5, 1.0],
+                    ),
+                    // Center section - Main text (Volo)
+                    Expanded(
+                      flex: 1,
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Text(
+                            'Volo',
+                            style: AppTheme.headlineLarge.copyWith(
+                              fontSize: 40,
+                              letterSpacing: 1.2,
+                              height: 1.1,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Text(
-                          'Your journey, their peace of mind.',
-                          style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
-                          textAlign: TextAlign.center,
+                    ),
+                    // Bottom section - Tagline
+                    Expanded(
+                      flex: 1,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 64,
+                              height: 2,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Color.fromRGBO(0, 0, 0, 0),
+                                    AppTheme.textSecondary,
+                                    Color.fromRGBO(0, 0, 0, 0),
+                                  ],
+                                  stops: const [0.0, 0.5, 1.0],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 24.0),
+                              child: Text(
+                                'Your journey, their peace of mind.',
+                                style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
                 // Second page (new illustration and text)
                 Column(
