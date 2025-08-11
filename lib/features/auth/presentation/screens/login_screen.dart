@@ -150,115 +150,121 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           children: [
             // Main content - centered
             Expanded(
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Login illustration
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(24),
-                          child: Image.asset(
-                            'assets/welcome.png',
-                            width: double.infinity,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Main text (Welcome to Volo) - at center
-                      Text(
-                        'Welcome to Volo! ✈️',
-                        style: AppTheme.headlineLarge,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Enter your phone number to get started',
-                        style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-                      // Phone input
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                children: [
+                  // Full-width illustration at top
+                  Container(
+                    width: double.infinity,
+                    height: 200,
+                    child: Image.asset(
+                      'assets/welcome.png',
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  // Content below illustration
+                  Expanded(
+                    child: Center(
+                      child: SingleChildScrollView(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            IntlPhoneField(
-                              controller: _phoneController,
-                              initialCountryCode: 'IN',
-                              decoration: AppTheme.inputDecoration.copyWith(
-                                labelText: 'Phone number',
-                                errorText: (error != null && _hasAttemptedSubmission && !isLoading) ? error : null,
-                                errorStyle: const TextStyle(color: AppTheme.destructive),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide(
-                                    color: (error != null && _hasAttemptedSubmission && !isLoading)
-                                        ? AppTheme.destructive
-                                        : AppTheme.borderPrimary,
+                            const SizedBox(height: 16),
+                            // Main text (Welcome to Volo) - at center
+                            Text(
+                              'Welcome to Volo! ✈️',
+                              style: AppTheme.headlineLarge,
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Enter your phone number to get started',
+                              style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 24),
+                            // Phone input
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  IntlPhoneField(
+                                    controller: _phoneController,
+                                    initialCountryCode: 'IN',
+                                    decoration: AppTheme.inputDecoration.copyWith(
+                                      labelText: 'Phone number',
+                                      errorText: (error != null && _hasAttemptedSubmission && !isLoading) ? error : null,
+                                      errorStyle: const TextStyle(color: AppTheme.destructive),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide(
+                                          color: (error != null && _hasAttemptedSubmission && !isLoading)
+                                              ? AppTheme.destructive
+                                              : AppTheme.borderPrimary,
+                                        ),
+                                      ),
+                                    ),
+                                    onChanged: (phone) {
+                                      setState(() {
+                                        // Store country code without + sign
+                                        _countryCode = phone.countryCode.replaceAll('+', '');
+                                        if (_phoneController.text.isNotEmpty) {
+                                          // Clear error when user types
+                                          ref.read(authNotifierProvider).clearError();
+                                        }
+                                      });
+                                    },
+                                    onCountryChanged: (country) {
+                                      setState(() {
+                                        // Store country code without + sign
+                                        _countryCode = country.dialCode.replaceAll('+', '');
+                                      });
+                                    },
                                   ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            // Continue Button
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: (isLoading || !_isPhoneNumberValid) ? null : _onContinue,
+                                  style: (isLoading || !_isPhoneNumberValid)
+                                      ? AppTheme.disabledButton
+                                      : AppTheme.primaryButton,
+                                  child: isLoading
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor: AlwaysStoppedAnimation<Color>(AppTheme.textOnPrimary),
+                                          ),
+                                        )
+                                      : const Text('Send OTP'),
                                 ),
                               ),
-                              onChanged: (phone) {
-                                setState(() {
-                                  // Store country code without + sign
-                                  _countryCode = phone.countryCode.replaceAll('+', '');
-                                  if (_phoneController.text.isNotEmpty) {
-                                    // Clear error when user types
-                                    ref.read(authNotifierProvider).clearError();
-                                  }
-                                });
-                              },
-                              onCountryChanged: (country) {
-                                setState(() {
-                                  // Store country code without + sign
-                                  _countryCode = country.dialCode.replaceAll('+', '');
-                                });
-                              },
                             ),
+                            const SizedBox(height: 16),
+                            // Info Text
+                            Text(
+                              "We'll send a verification code to your phone number",
+                              style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 32),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 24),
-                      // Continue Button
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: (isLoading || !_isPhoneNumberValid) ? null : _onContinue,
-                            style: (isLoading || !_isPhoneNumberValid)
-                                ? AppTheme.disabledButton
-                                : AppTheme.primaryButton,
-                            child: isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      valueColor: AlwaysStoppedAnimation<Color>(AppTheme.textOnPrimary),
-                                    ),
-                                  )
-                                : const Text('Send OTP'),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Info Text
-                      Text(
-                        "We'll send a verification code to your phone number",
-                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 32),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
             // Terms/Privacy at bottom
