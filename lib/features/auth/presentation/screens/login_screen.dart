@@ -155,7 +155,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             // Rounded corner illustration
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
               child: Container(
                 width: double.infinity,
                 height: 200, // 3:2 aspect ratio maintained
@@ -181,7 +181,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 8),
                       // Main text (Welcome to Volo) - at center
                       Text(
                         'Welcome to Volo! ✈️',
