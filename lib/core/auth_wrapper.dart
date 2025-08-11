@@ -186,12 +186,12 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
               color: Colors.transparent,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(24),
-                child: Image.asset(
-                  'assets/volo_app_icon.png',
-                  width: 72,
-                  height: 72,
-                  fit: BoxFit.contain,
-                ),
+                                        child: Image.asset(
+                          'assets/app_icon.png',
+                          width: 72,
+                          height: 72,
+                          fit: BoxFit.contain,
+                        ),
               ),
             ),
             const SizedBox(height: 32),

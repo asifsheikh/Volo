@@ -194,7 +194,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(24),
                             child: Image.asset(
-                              'assets/volo_app_icon.png',
+                              'assets/app_icon.png',
                               width: 72,
                               height: 72,
                               fit: BoxFit.contain,
