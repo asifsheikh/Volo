@@ -51,8 +51,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         
+        // Hero illustration with seamless background integration
+        Expanded(
+          flex: 2,
+          child: Center(
+            child: Container(
+              constraints: const BoxConstraints(
+                maxWidth: 300,
+                maxHeight: 300,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: Image.asset(
+                  'assets/home.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
+        ),
+        
         // Main content area with improved visual hierarchy
         Expanded(
+          flex: 3,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
@@ -74,7 +95,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   style: AppTheme.bodyMediumSecondary,
                 ),
                 
-                const SizedBox(height: 56),
+                const SizedBox(height: 48),
                 
                 // Primary CTA Button - Most prominent element
                 SizedBox(
