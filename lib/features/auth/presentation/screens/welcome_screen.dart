@@ -40,7 +40,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 // First page - Welcome illustration with text
                 Stack(
                   children: [
-                    // Full-screen illustration background (extends beyond SafeArea)
+                    // Full-screen illustration background
                     Positioned.fill(
                       child: Image.asset(
                         'assets/login.png',
@@ -64,7 +64,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                                   fontSize: 40,
                                   letterSpacing: 1.2,
                                   height: 1.1,
-                                  color: Colors.black87,
+                                  color: Colors.white,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -79,9 +79,9 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                                   begin: Alignment.centerLeft,
                                   end: Alignment.centerRight,
                                   colors: [
-                                    Color.fromRGBO(0, 0, 0, 0),
-                                    Colors.black87,
-                                    Color.fromRGBO(0, 0, 0, 0),
+                                    Color.fromRGBO(255, 255, 255, 0),
+                                    Colors.white,
+                                    Color.fromRGBO(255, 255, 255, 0),
                                   ],
                                   stops: const [0.0, 0.5, 1.0],
                                 ),
@@ -93,7 +93,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                               padding: EdgeInsets.symmetric(horizontal: 24.0),
                               child: Text(
                                 'Your journey, their peace of mind.',
-                                style: AppTheme.bodyLarge.copyWith(color: Colors.black54),
+                                style: AppTheme.bodyLarge.copyWith(color: Colors.white70),
                                 textAlign: TextAlign.center,
                               ),
                             ),
