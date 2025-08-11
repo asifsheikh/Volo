@@ -48,7 +48,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(24),
                           child: Image.asset(
-                            'assets/welcome.png',
+                            'assets/login.png',
                             width: double.infinity,
                             fit: BoxFit.contain,
                           ),
