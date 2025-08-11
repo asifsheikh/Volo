@@ -156,7 +156,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 8),
                       // Login illustration
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24.0),
