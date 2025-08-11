@@ -34,24 +34,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildHomeContent(homeState) {
     return Column(
       children: [
-        // Header section with greeting and profile
-        Padding(
-          padding: EdgeInsets.only(
-            left: 24.0, 
-            right: 24.0,
-            top: MediaQuery.of(context).padding.top > 0 ? 16.0 : 24.0,
-            bottom: 32.0,
-          ),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Hey, ${homeState.username} 👋',
-              style: AppTheme.headlineLarge.copyWith(fontWeight: FontWeight.w400),
-            ),
-          ),
-        ),
-        
-        // Hero illustration with seamless background integration
+        // Hero illustration at center
         Expanded(
           flex: 2,
           child: Center(
@@ -71,72 +54,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         
-        // Main content area with improved visual hierarchy
-        Expanded(
-          flex: 3,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Main title - Secondary level prominence
-                Text(
-                  'Travel confidently—Volo updates your loved ones automatically',
-                  textAlign: TextAlign.center,
-                  style: AppTheme.headlineMedium,
-                ),
-                
-                const SizedBox(height: 20),
-                
-                // Subtitle - Tertiary level (significantly de-emphasized)
-                Text(
-                  'Add your flight details and Volo will keep your family and friends updated in real time, so you can focus on your journey.',
-                  textAlign: TextAlign.center,
-                  style: AppTheme.bodyMediumSecondary,
-                ),
-                
-                const SizedBox(height: 48),
-                
-                // Primary CTA Button - Most prominent element
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const AddFlightScreen(),
-                        ),
-                      );
-                    },
-                    icon: const Icon(
-                      Icons.flight_takeoff,
-                      size: 24,
-                    ),
-                    label: const Text('Add Your Flight'),
-                    style: AppTheme.primaryButton,
+        // Add Flight button below illustration
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const AddFlightScreen(),
                   ),
-                ),
-                
-                const SizedBox(height: 32),
-                
-                // Secondary link - Very subtle (optional secondary action)
-                GestureDetector(
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('How does Volo work? - Coming soon!'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  },
-                  child: Text(
-                    'How does Volo work?',
-                    style: AppTheme.linkStyle.copyWith(
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                ),
-              ],
+                );
+              },
+              icon: const Icon(
+                Icons.flight_takeoff,
+                size: 24,
+              ),
+              label: const Text('Add Your Flight'),
+              style: AppTheme.primaryButton,
             ),
           ),
         ),
