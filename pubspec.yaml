@@ -67,7 +67,6 @@ flutter:
   assets:
     - assets/app_icon.png
     - assets/home.png
-    - assets/onboarding_illustration3.png
     - assets/onboarding_new.png
     - assets/test.png
     - assets/volo_app_icon.png
