@@ -156,7 +156,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       // Login illustration
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -169,7 +169,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
                       // Title
                       Text(
                         'Welcome to Volo! ✈️',
