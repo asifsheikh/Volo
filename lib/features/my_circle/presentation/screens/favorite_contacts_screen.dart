@@ -29,10 +29,20 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
     _loadContacts();
   }
 
+  @override
+  void dispose() {
+    // Clean up any ongoing operations
+    super.dispose();
+  }
+
   /// Load contacts from Firestore
   Future<void> _loadContacts() async {
     try {
       print('FavoriteContactsScreen: Loading contacts...');
+      
+      // Check if widget is still mounted before updating state
+      if (!mounted) return;
+      
       setState(() {
         _isLoading = true;
         _errorMessage = null;
@@ -41,6 +51,9 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
       final contacts = await MyCircleService.getMyCircleContacts();
       print('FavoriteContactsScreen: Loaded ${contacts.length} contacts');
       
+      // Check if widget is still mounted before updating state
+      if (!mounted) return;
+      
       setState(() {
         _contacts = contacts;
         _isLoading = false;
@@ -48,6 +61,10 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
       print('FavoriteContactsScreen: State updated with ${_contacts.length} contacts');
     } catch (e) {
       print('FavoriteContactsScreen: Error loading contacts: $e');
+      
+      // Check if widget is still mounted before updating state
+      if (!mounted) return;
+      
       setState(() {
         _errorMessage = e.toString();
         _isLoading = false;
@@ -64,7 +81,8 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
     );
     
     // Reload contacts if a new one was added
-    if (result == true) {
+    // Check if widget is still mounted before proceeding
+    if (result == true && mounted) {
       _loadContacts();
     }
   }
@@ -399,7 +417,8 @@ class _FavoriteContactsScreenState extends ConsumerState<FavoriteContactsScreen>
         );
         
         // Reload contacts if changes were made
-        if (result == true) {
+        // Check if widget is still mounted before proceeding
+        if (result == true && mounted) {
           _loadContacts();
         }
       },

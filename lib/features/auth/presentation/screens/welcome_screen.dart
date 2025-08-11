@@ -137,7 +137,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
                           child: Image.asset(
-                            'assets/onboarding_illustration3.png',
+                            'assets/onboarding_new.png',
                             width: 260,
                             fit: BoxFit.contain,
                           ),
