@@ -43,14 +43,16 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // Welcome illustration
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(24),
-                          child: Image.asset(
-                            'assets/login.png',
-                            width: double.infinity,
-                            fit: BoxFit.contain,
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(24),
+                            child: Image.asset(
+                              'assets/login.png',
+                              width: double.infinity,
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
                       ),
