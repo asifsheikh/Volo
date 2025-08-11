@@ -68,6 +68,7 @@ flutter:
     - assets/app_icon.png
     - assets/home.png
     - assets/login.png
+    - assets/welcome.png
     - assets/onboarding_new.png
     - assets/test.png
     - assets/animations/file_searching.json
