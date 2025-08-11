@@ -48,6 +48,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     // Clear any stale errors when the screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(authNotifierProvider).clearError();
+      // Start the initial countdown timer
+      _startResendCountdown();
     });
   }
 
