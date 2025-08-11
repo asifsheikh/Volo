@@ -399,32 +399,6 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                 ),
               ),
             ),
-            // Terms/Privacy at bottom
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0, left: 24.0, right: 24.0),
-              child: Text.rich(
-                TextSpan(
-                  text: 'By continuing, you agree to our ',
-                  style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
-                  children: [
-                    TextSpan(
-                      text: 'Terms',
-                      style: TextStyle(
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                    TextSpan(text: ' and '),
-                    TextSpan(
-                      text: 'Privacy Policy',
-                      style: TextStyle(
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ],
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
           ],
         ),
       ),

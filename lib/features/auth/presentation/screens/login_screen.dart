@@ -263,34 +263,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 32),
-                    // Terms/Privacy at bottom
-                    Text.rich(
-                      TextSpan(
-                        text: 'By continuing, you agree to our ',
-                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
-                        children: [
-                          TextSpan(
-                            text: 'Terms',
-                            style: AppTheme.linkStyle,
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                developer.log('Navigate to Terms screen', name: 'LoginScreen');
-                              },
-                          ),
-                          const TextSpan(text: ' and '),
-                          TextSpan(
-                            text: 'Privacy Policy',
-                            style: AppTheme.linkStyle,
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                developer.log('Navigate to Privacy Policy screen', name: 'LoginScreen');
-                              },
-                          ),
-                        ],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
                   ],
                 ),
               ),
