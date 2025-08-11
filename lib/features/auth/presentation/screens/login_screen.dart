@@ -139,29 +139,40 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Top section - Full-width illustration with top spacing
-            Container(
-              width: double.infinity,
-              height: 200,
-              margin: const EdgeInsets.only(top: 16.0),
-              child: Image.asset(
-                'assets/welcome.png',
+      body: Column(
+        children: [
+          // Top section - Full-width illustration covering notch area
+          Stack(
+            children: [
+              // Full-width illustration at top
+              Container(
                 width: double.infinity,
-                height: double.infinity,
-                fit: BoxFit.cover,
+                height: 200,
+                child: Image.asset(
+                  'assets/welcome.png',
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            // Bottom section - Content
-            Expanded(
+              // Back button overlaid on top
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0, left: 8.0),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // Bottom section - Content
+          Expanded(
+            child: SafeArea(
               child: Center(
                 child: SingleChildScrollView(
                   child: Column(
@@ -261,8 +272,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
             ),
-            // Terms/Privacy at bottom
-            Padding(
+          ),
+          // Terms/Privacy at bottom
+          SafeArea(
+            child: Padding(
               padding: const EdgeInsets.only(bottom: 16.0, left: 24.0, right: 24.0),
               child: Text.rich(
                 TextSpan(
@@ -291,8 +304,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 textAlign: TextAlign.center,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
