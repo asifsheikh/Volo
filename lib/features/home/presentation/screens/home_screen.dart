@@ -72,7 +72,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
                 
                 // Add Flight button
                 Padding(
