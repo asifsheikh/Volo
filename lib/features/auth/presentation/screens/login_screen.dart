@@ -139,167 +139,160 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.background,
-      body: Stack(
-        children: [
-          // Full-screen illustration background
-          Positioned.fill(
-            child: Image.asset(
-              'assets/welcome.png',
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Top section - Full-width illustration with top spacing
+            Container(
               width: double.infinity,
-              height: double.infinity,
-              fit: BoxFit.cover,
+              height: 200,
+              margin: const EdgeInsets.only(top: 16.0),
+              child: Image.asset(
+                'assets/welcome.png',
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          // Content overlay
-          SafeArea(
-            child: Column(
-              children: [
-                // Back button
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0, left: 8.0),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ),
-                ),
-                // Main content - centered
-                Expanded(
-                  child: Center(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: 16),
-                          // Main text (Welcome to Volo) - at center
-                          Text(
-                            'Welcome to Volo! ✈️',
-                            style: AppTheme.headlineLarge.copyWith(color: Colors.white),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Enter your phone number to get started',
-                            style: AppTheme.bodyLarge.copyWith(color: Colors.white70),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 24),
-                          // Phone input
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                IntlPhoneField(
-                                  controller: _phoneController,
-                                  initialCountryCode: 'IN',
-                                  decoration: AppTheme.inputDecoration.copyWith(
-                                    labelText: 'Phone number',
-                                    errorText: (error != null && _hasAttemptedSubmission && !isLoading) ? error : null,
-                                    errorStyle: const TextStyle(color: AppTheme.destructive),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(
-                                        color: (error != null && _hasAttemptedSubmission && !isLoading)
-                                            ? AppTheme.destructive
-                                            : AppTheme.borderPrimary,
-                                      ),
-                                    ),
-                                  ),
-                                  onChanged: (phone) {
-                                    setState(() {
-                                      // Store country code without + sign
-                                      _countryCode = phone.countryCode.replaceAll('+', '');
-                                      if (_phoneController.text.isNotEmpty) {
-                                        // Clear error when user types
-                                        ref.read(authNotifierProvider).clearError();
-                                      }
-                                    });
-                                  },
-                                  onCountryChanged: (country) {
-                                    setState(() {
-                                      // Store country code without + sign
-                                      _countryCode = country.dialCode.replaceAll('+', '');
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          // Continue Button
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: (isLoading || !_isPhoneNumberValid) ? null : _onContinue,
-                                style: (isLoading || !_isPhoneNumberValid)
-                                    ? AppTheme.disabledButton
-                                    : AppTheme.primaryButton,
-                                child: isLoading
-                                    ? const SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(AppTheme.textOnPrimary),
-                                        ),
-                                      )
-                                    : const Text('Send OTP'),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          // Info Text
-                          Text(
-                            "We'll send a verification code to your phone number",
-                            style: AppTheme.bodyMedium.copyWith(color: Colors.white70),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 32),
-                        ],
+            // Bottom section - Content
+            Expanded(
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 24),
+                      // Main text (Welcome to Volo) - at center
+                      Text(
+                        'Welcome to Volo! ✈️',
+                        style: AppTheme.headlineLarge,
+                        textAlign: TextAlign.center,
                       ),
-                    ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Enter your phone number to get started',
+                        style: AppTheme.bodyLarge.copyWith(color: AppTheme.textSecondary),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
+                      // Phone input
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            IntlPhoneField(
+                              controller: _phoneController,
+                              initialCountryCode: 'IN',
+                              decoration: AppTheme.inputDecoration.copyWith(
+                                labelText: 'Phone number',
+                                errorText: (error != null && _hasAttemptedSubmission && !isLoading) ? error : null,
+                                errorStyle: const TextStyle(color: AppTheme.destructive),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: (error != null && _hasAttemptedSubmission && !isLoading)
+                                        ? AppTheme.destructive
+                                        : AppTheme.borderPrimary,
+                                  ),
+                                ),
+                              ),
+                              onChanged: (phone) {
+                                setState(() {
+                                  // Store country code without + sign
+                                  _countryCode = phone.countryCode.replaceAll('+', '');
+                                  if (_phoneController.text.isNotEmpty) {
+                                    // Clear error when user types
+                                    ref.read(authNotifierProvider).clearError();
+                                  }
+                                });
+                              },
+                              onCountryChanged: (country) {
+                                setState(() {
+                                  // Store country code without + sign
+                                  _countryCode = country.dialCode.replaceAll('+', '');
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      // Continue Button
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: (isLoading || !_isPhoneNumberValid) ? null : _onContinue,
+                            style: (isLoading || !_isPhoneNumberValid)
+                                ? AppTheme.disabledButton
+                                : AppTheme.primaryButton,
+                            child: isLoading
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(AppTheme.textOnPrimary),
+                                    ),
+                                  )
+                                : const Text('Send OTP'),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Info Text
+                      Text(
+                        "We'll send a verification code to your phone number",
+                        style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
+                    ],
                   ),
                 ),
-                // Terms/Privacy at bottom
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0, left: 24.0, right: 24.0),
-                  child: Text.rich(
-                    TextSpan(
-                      text: 'By continuing, you agree to our ',
-                      style: AppTheme.bodyMedium.copyWith(color: Colors.white70),
-                      children: [
-                        TextSpan(
-                          text: 'Terms',
-                          style: AppTheme.linkStyle.copyWith(color: Colors.white),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              developer.log('Navigate to Terms screen', name: 'LoginScreen');
-                            },
-                        ),
-                        const TextSpan(text: ' and '),
-                        TextSpan(
-                          text: 'Privacy Policy',
-                          style: AppTheme.linkStyle.copyWith(color: Colors.white),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              developer.log('Navigate to Privacy Policy screen', name: 'LoginScreen');
-                            },
-                        ),
-                      ],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+            // Terms/Privacy at bottom
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0, left: 24.0, right: 24.0),
+              child: Text.rich(
+                TextSpan(
+                  text: 'By continuing, you agree to our ',
+                  style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
+                  children: [
+                    TextSpan(
+                      text: 'Terms',
+                      style: AppTheme.linkStyle,
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          developer.log('Navigate to Terms screen', name: 'LoginScreen');
+                        },
+                    ),
+                    const TextSpan(text: ' and '),
+                    TextSpan(
+                      text: 'Privacy Policy',
+                      style: AppTheme.linkStyle,
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          developer.log('Navigate to Privacy Policy screen', name: 'LoginScreen');
+                        },
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
