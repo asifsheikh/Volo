@@ -34,6 +34,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildHomeContent(homeState) {
     return Column(
       children: [
+        // Header section with greeting
+        Padding(
+          padding: EdgeInsets.only(
+            left: 24.0, 
+            right: 24.0,
+            top: MediaQuery.of(context).padding.top > 0 ? 16.0 : 24.0,
+            bottom: 32.0,
+          ),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Hey, ${homeState.username} 👋',
+              style: AppTheme.headlineLarge.copyWith(fontWeight: FontWeight.w400),
+            ),
+          ),
+        ),
+        
         // Hero illustration at center
         Expanded(
           flex: 2,
