@@ -1,8 +1,5 @@
 import Flutter
 import UIKit
-import Firebase
-import FirebaseAuth
-import FirebaseAppCheck
 import FirebaseMessaging
 import UserNotifications
 
@@ -13,19 +10,6 @@ import UserNotifications
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
 
-    // Configure App Check
-    #if targetEnvironment(simulator)
-      let providerFactory = AppCheckDebugProviderFactory()
-    #else
-      // For production, use AppAttestProviderFactory or DeviceCheckProviderFactory
-      let providerFactory = AppCheckDebugProviderFactory()
-    #endif
-
-    AppCheck.setAppCheckProviderFactory(providerFactory)
-    
-    // Configure Firebase before registering plugins
-    FirebaseApp.configure()
-    
     // Register Flutter plugins
     GeneratedPluginRegistrant.register(with: self)
     
@@ -44,9 +28,6 @@ import UserNotifications
     open url: URL,
     options: [UIApplication.OpenURLOptionsKey: Any] = [:]
   ) -> Bool {
-    if Auth.auth().canHandle(url) {
-      return true
-    }
     return super.application(app, open: url, options: options)
   }
   
@@ -56,10 +37,6 @@ import UserNotifications
     didReceiveRemoteNotification notification: [AnyHashable: Any],
     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
   ) {
-    if Auth.auth().canHandleNotification(notification) {
-      completionHandler(.noData)
-      return
-    }
     super.application(application, didReceiveRemoteNotification: notification, fetchCompletionHandler: completionHandler)
   }
   
@@ -68,9 +45,6 @@ import UserNotifications
     _ application: UIApplication,
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
   ) {
-    // Pass device token to Firebase Auth
-    Auth.auth().setAPNSToken(deviceToken, type: .unknown)
-    
     // Pass device token to Firebase Messaging
     Messaging.messaging().apnsToken = deviceToken
     

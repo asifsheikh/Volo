@@ -34,7 +34,7 @@ class AppTheme {
   // ============================================================================
 
   /// Primary background color used throughout the app
-  static const Color background = Color(0xFFF7F8FA);
+  static const Color background = Colors.white;
   
   /// Card background color
   static const Color cardBackground = Colors.white;

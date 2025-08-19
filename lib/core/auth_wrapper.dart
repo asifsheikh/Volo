@@ -30,12 +30,11 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
   // so we can cancel it when the widget is disposed.
   StreamSubscription<User?>? _authStateSubscription;
 
-  @override
-  void initState() {
-    super.initState();
-    // Start listening to App Check token changes first
-    _waitForAppCheckAndAuthState();
-  }
+                @override
+              void initState() {
+                super.initState();
+                _waitForAppCheckAndAuthState();
+              }
 
   // Dispose of the subscription when the widget is removed
   @override
@@ -186,12 +185,12 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
               color: Colors.transparent,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(24),
-                                        child: Image.asset(
-                          'assets/app_icon.png',
-                          width: 72,
-                          height: 72,
-                          fit: BoxFit.contain,
-                        ),
+                child: Image.asset(
+                  'assets/app_icon.png',
+                  width: 72,
+                  height: 72,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
             const SizedBox(height: 32),
