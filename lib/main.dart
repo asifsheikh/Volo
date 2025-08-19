@@ -19,19 +19,17 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     
-    // Initialize App Check
+    // Initialize Firebase App Check
     await FirebaseAppCheck.instance.activate(
-      webProvider: ReCaptchaV3Provider('your-recaptcha-site-key'),
+      // Use debug provider for development
       androidProvider: AndroidProvider.debug,
-      appleProvider: AppleProvider.appAttest,
+      appleProvider: AppleProvider.debug,
     );
     
     developer.log('Firebase initialized successfully', name: 'VoloApp');
   } catch (e) {
-    developer.log('Firebase initialization failed: $e', name: 'VoloApp');
+    developer.log('Failed to initialize Firebase: $e', name: 'VoloApp');
   }
-  
-  developer.log('App starting...', name: 'VoloApp');
   
   runApp(
     const ProviderScope(

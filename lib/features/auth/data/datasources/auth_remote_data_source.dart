@@ -81,24 +81,30 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final completer = Completer<String>();
       Exception? verificationError;
       
+      developer.log('AuthRemoteDataSource: Starting verifyPhoneNumber for: $phoneNumber', name: 'VoloAuth');
+      
       await _firebaseAuth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) async {
+          developer.log('AuthRemoteDataSource: Auto-verification completed', name: 'VoloAuth');
           // Auto-verification if possible
           await _firebaseAuth.signInWithCredential(credential);
         },
         verificationFailed: (FirebaseAuthException e) {
-          verificationError = Exception('Verification failed: ${e.message}');
+          developer.log('AuthRemoteDataSource: Verification failed - Code: ${e.code}, Message: ${e.message}', name: 'VoloAuth');
+          verificationError = Exception('Verification failed: ${e.message} (Code: ${e.code})');
           if (!completer.isCompleted) {
             completer.completeError(verificationError!);
           }
         },
         codeSent: (String vid, int? resendToken) {
+          developer.log('AuthRemoteDataSource: Code sent successfully - verificationId: $vid', name: 'VoloAuth');
           if (!completer.isCompleted) {
             completer.complete(vid);
           }
         },
         codeAutoRetrievalTimeout: (String vid) {
+          developer.log('AuthRemoteDataSource: Code auto-retrieval timeout - verificationId: $vid', name: 'VoloAuth');
           if (!completer.isCompleted) {
             completer.complete(vid);
           }
@@ -118,6 +124,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
       return result;
     } catch (e) {
+      developer.log('AuthRemoteDataSource: Exception in sendOTP: $e', name: 'VoloAuth');
       throw Exception('Failed to send OTP: ${e.toString()}');
     }
   }
