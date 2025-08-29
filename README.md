@@ -51,39 +51,15 @@ Here's the complete user journey through Volo:
 
 ## App Flow
 
-<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin: 20px 0;">
+| 1. Splash | 2. Flight Search | 3. Flight Results |
+|-----------|------------------|-------------------|
+| ![Splash](assets/screenshots/splash.png) | ![Search](assets/screenshots/search_light_screen.png) | ![Results](assets/screenshots/flight_search_result.png) |
+| Welcome screen | Enter flight details | Browse available flights |
 
-<div style="text-align: center; flex: 1; min-width: 200px;">
-<img src="assets/screenshots/splash.png" alt="Splash" width="200" />
-<p><strong>1. Splash</strong><br/>Welcome screen</p>
-</div>
-
-<div style="text-align: center; flex: 1; min-width: 200px;">
-<img src="assets/screenshots/search_light_screen.png" alt="Search" width="200" />
-<p><strong>2. Flight Search</strong><br/>Enter flight details</p>
-</div>
-
-<div style="text-align: center; flex: 1; min-width: 200px;">
-<img src="assets/screenshots/flight_search_result.png" alt="Results" width="200" />
-<p><strong>3. Flight Results</strong><br/>Browse available flights</p>
-</div>
-
-<div style="text-align: center; flex: 1; min-width: 200px;">
-<img src="assets/screenshots/add_contact_screen.png" alt="Contacts" width="200" />
-<p><strong>4. Add Contacts</strong><br/>Select notification recipients</p>
-</div>
-
-<div style="text-align: center; flex: 1; min-width: 200px;">
-<img src="assets/screenshots/confirmation_screen.png" alt="Confirmation" width="200" />
-<p><strong>5. Information</strong><br/>Confirmation & settings</p>
-</div>
-
-<div style="text-align: center; flex: 1; min-width: 200px;">
-<img src="assets/screenshots/whatsapp_sreen.png" alt="WhatsApp" width="200" />
-<p><strong>6. WhatsApp</strong><br/>Real-time updates</p>
-</div>
-
-</div>
+| 4. Add Contacts | 5. Information | 6. WhatsApp |
+|-----------------|----------------|-------------|
+| ![Contacts](assets/screenshots/add_contact_screen.png) | ![Confirmation](assets/screenshots/confirmation_screen.png) | ![WhatsApp](assets/screenshots/whatsapp_sreen.png) |
+| Select notification recipients | Confirmation & settings | Real-time updates |
 
 ## Technology Stack
 
