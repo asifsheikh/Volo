@@ -68,9 +68,9 @@ class FlightApiService {
       
       // Convert the new format to our existing format
       final flights = responseData['flights'] as List<dynamic>? ?? [];
-      final airports = responseData['airports'] as List<dynamic>? ?? [];
+      final airports = responseData['airports'] as Map<String, dynamic>?;
       
-      developer.log('🟢 API returned ${flights.length} flights and ${airports.length} airports', name: 'VoloFlightAPI');
+      developer.log('🟢 API returned ${flights.length} flights and airports: ${airports != null ? "present" : "missing"}', name: 'VoloFlightAPI');
       
       if (flights.isEmpty) {
         developer.log('⚠️ No flights found in API response', name: 'VoloFlightAPI');
@@ -84,7 +84,7 @@ class FlightApiService {
       final convertedData = {
         'best_flights': flights, // All flights are now in one array
         'other_flights': [], // Empty since we're not separating them
-        'airports': airports,
+        'airports': airports ?? {},
       };
       
       final searchResponse = FlightSearchResponse.fromJson(convertedData);
