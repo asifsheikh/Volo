@@ -19,35 +19,7 @@ When you travel, simply add your flight details to Volo and the app automaticall
 2. **Pick who should be notified** from your contacts
 3. **Volo sends helpful WhatsApp updates** as your journey progresses
 
-## App Screenshots
 
-Here's the complete user journey through Volo:
-
-### 1. Splash Screen
-![Splash Screen](assets/screenshots/splash.png)
-*Welcome to Volo - your personal travel assistant*
-
-### 2. Flight Search Screen
-![Flight Search](assets/screenshots/search_light_screen.png)
-*Search for flights with departure, arrival, and date selection*
-
-### 3. Flight Results Screen
-![Flight Results](assets/screenshots/flight_search_result.png)
-*Browse available flights with airline details and pricing*
-
-### 4. Add Contact Screen
-![Add Contacts](assets/screenshots/add_contact_screen.png)
-*Select who receives your flight updates via WhatsApp*
-
-### 5. Information Screen
-![Confirmation](assets/screenshots/confirmation_screen.png)
-*Confirmation with flight details and notification settings*
-
-### 6. WhatsApp Screen
-![WhatsApp Updates](assets/screenshots/whatsapp_sreen.png)
-*Real-time flight updates sent to your contacts via WhatsApp*
-
----
 
 ## App Flow
 
