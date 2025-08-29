@@ -37,10 +37,6 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
   late Future<FlightSearchResponse> _searchFuture;
 
   Future<FlightSearchResponse> _createSearchFuture() {
-    developer.log(
-      '🔎 Searching flights: \\n+dep=${widget.departureIata} \\n+arr=${widget.arrivalIata} \\n+date=${widget.date} \\n+fn=${widget.flightNumber ?? ''}',
-      name: 'VoloFlightUI',
-    );
     return FlightApiService.searchFlights(
       departureIata: widget.departureIata,
       arrivalIata: widget.arrivalIata,
@@ -109,12 +105,6 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
             if (snapshot.connectionState == ConnectionState.waiting) {
               return _buildSkeletonLoading();
             } else if (snapshot.hasError) {
-              developer.log(
-                '❌ Flight search failed: \\nerror=${snapshot.error}',
-                name: 'VoloFlightUI',
-                error: snapshot.error,
-                stackTrace: snapshot.stackTrace,
-              );
               return _buildNetworkError(snapshot.error);
             } else if (!snapshot.hasData || (snapshot.data!.bestFlights.isEmpty && snapshot.data!.otherFlights.isEmpty)) {
               return _buildNoResultsError();
@@ -295,15 +285,9 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
       );
     }
 
-    developer.log(
-      '⚠️ Showing NetworkErrorWidget: type=${networkError.type}, status=${networkError.statusCode}, message=${networkError.message}',
-      name: 'VoloFlightUI',
-    );
-
     return NetworkErrorWidget(
       error: networkError,
       onRetry: () {
-        developer.log('🔄 Retry tapped. Rebuilding search...', name: 'VoloFlightUI');
         // Create a fresh future so FutureBuilder runs again
         setState(() {
           _searchFuture = _createSearchFuture();

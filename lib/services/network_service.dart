@@ -165,22 +165,12 @@ class NetworkService {
       case 502:
       case 503:
       case 504:
-        developer.log(
-          'NetworkService: Server error ${response.statusCode}. Body snippet: ' +
-              (response.body.length > 400 ? response.body.substring(0, 400) + '…' : response.body),
-          name: 'VoloNetwork',
-        );
         return NetworkError(
           type: NetworkErrorType.serverError,
           message: 'Server error. Please try again later.',
           statusCode: response.statusCode,
         );
       default:
-        developer.log(
-          'NetworkService: HTTP error ${response.statusCode}. Body snippet: ' +
-              (response.body.length > 400 ? response.body.substring(0, 400) + '…' : response.body),
-          name: 'VoloNetwork',
-        );
         return NetworkError(
           type: NetworkErrorType.unknown,
           message: 'An error occurred (${response.statusCode}). Please try again.',
