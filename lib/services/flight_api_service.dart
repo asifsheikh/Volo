@@ -4,7 +4,8 @@ import 'dart:developer' as developer;
 import 'network_service.dart';
 
 class FlightApiService {
-  static const String _baseUrl = 'https://searchflights-3ltmkayg6q-uc.a.run.app';
+  // Point directly to the search endpoint used by the backend
+  static const String _baseUrl = 'https://searchflights-3ltmkayg6q-uc.a.run.app/search';
   
 
 
