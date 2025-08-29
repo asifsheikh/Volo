@@ -122,9 +122,9 @@ class FlightSearchResponse {
       otherFlights: (json['other_flights'] as List<dynamic>?)
           ?.map((flight) => FlightOption.fromJson(flight))
           .toList() ?? [],
-      airports: (json['airports'] as List<dynamic>?)
-          ?.map((airport) => AirportInfo.fromJson(airport))
-          .toList() ?? [],
+      airports: json['airports'] != null 
+          ? [AirportInfo.fromJson(json['airports'] as Map<String, dynamic>)]
+          : [],
     );
   }
 
