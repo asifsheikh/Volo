@@ -9,17 +9,21 @@ import '../../../add_contacts/domain/entities/add_contacts_state.dart' as domain
 import '../../../../theme/app_theme.dart';
 
 class FlightSelectScreen extends StatefulWidget {
-  final Future<FlightSearchResponse> searchFuture;
+  final String departureIata;
+  final String arrivalIata;
   final String departureCity;
   final String arrivalCity;
   final String date;
+  final String? flightNumber;
 
   const FlightSelectScreen({
     Key? key,
-    required this.searchFuture,
+    required this.departureIata,
+    required this.arrivalIata,
     required this.departureCity,
     required this.arrivalCity,
     required this.date,
+    this.flightNumber,
   }) : super(key: key);
 
   @override
@@ -30,6 +34,20 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
   int? _expandedIndex;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  late Future<FlightSearchResponse> _searchFuture;
+
+  Future<FlightSearchResponse> _createSearchFuture() {
+    developer.log(
+      '🔎 Searching flights: \\n+dep=${widget.departureIata} \\n+arr=${widget.arrivalIata} \\n+date=${widget.date} \\n+fn=${widget.flightNumber ?? ''}',
+      name: 'VoloFlightUI',
+    );
+    return FlightApiService.searchFlights(
+      departureIata: widget.departureIata,
+      arrivalIata: widget.arrivalIata,
+      date: widget.date,
+      flightNumber: widget.flightNumber,
+    );
+  }
 
   @override
   void initState() {
@@ -42,6 +60,7 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
     _animationController.repeat(reverse: true);
+    _searchFuture = _createSearchFuture();
   }
 
   @override
@@ -85,7 +104,7 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
       ),
       body: SafeArea(
         child: FutureBuilder<FlightSearchResponse>(
-          future: widget.searchFuture,
+          future: _searchFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return _buildSkeletonLoading();
@@ -285,8 +304,10 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
       error: networkError,
       onRetry: () {
         developer.log('🔄 Retry tapped. Rebuilding search...', name: 'VoloFlightUI');
-        // Retry the search by rebuilding the widget
-        setState(() {});
+        // Create a fresh future so FutureBuilder runs again
+        setState(() {
+          _searchFuture = _createSearchFuture();
+        });
       },
     );
   }

@@ -202,15 +202,12 @@ class _AddFlightScreenState extends ConsumerState<AddFlightScreen> with TickerPr
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => FlightSelectScreen(
-          searchFuture: FlightApiService.searchFlights(
-            departureIata: departureIata,
-            arrivalIata: arrivalIata,
-            date: DateFormat('yyyy-MM-dd').format(_selectedDate!),
-            flightNumber: _flightNumberController.text.isNotEmpty ? _flightNumberController.text : null,
-          ),
+          departureIata: departureIata,
+          arrivalIata: arrivalIata,
           departureCity: _selectedDepartureCity ?? '',
           arrivalCity: _selectedArrivalCity ?? '',
           date: DateFormat('yyyy-MM-dd').format(_selectedDate!),
+          flightNumber: _flightNumberController.text.isNotEmpty ? _flightNumberController.text : null,
         ),
       ),
     );
