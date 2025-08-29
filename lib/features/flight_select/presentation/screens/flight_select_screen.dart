@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 import 'package:intl/intl.dart';
 import '../../../../services/flight_api_service.dart';
 import '../../../../services/network_service.dart';
@@ -89,6 +90,12 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
             if (snapshot.connectionState == ConnectionState.waiting) {
               return _buildSkeletonLoading();
             } else if (snapshot.hasError) {
+              developer.log(
+                '❌ Flight search failed: \\nerror=${snapshot.error}',
+                name: 'VoloFlightUI',
+                error: snapshot.error,
+                stackTrace: snapshot.stackTrace,
+              );
               return _buildNetworkError(snapshot.error);
             } else if (!snapshot.hasData || (snapshot.data!.bestFlights.isEmpty && snapshot.data!.otherFlights.isEmpty)) {
               return _buildNoResultsError();
@@ -269,9 +276,15 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
       );
     }
 
+    developer.log(
+      '⚠️ Showing NetworkErrorWidget: type=${networkError.type}, status=${networkError.statusCode}, message=${networkError.message}',
+      name: 'VoloFlightUI',
+    );
+
     return NetworkErrorWidget(
       error: networkError,
       onRetry: () {
+        developer.log('🔄 Retry tapped. Rebuilding search...', name: 'VoloFlightUI');
         // Retry the search by rebuilding the widget
         setState(() {});
       },
