@@ -53,12 +53,12 @@ Here's the complete user journey through Volo:
 
 | 1. Splash | 2. Flight Search | 3. Flight Results |
 |-----------|------------------|-------------------|
-| ![Splash](assets/screenshots/splash.png) | ![Search](assets/screenshots/search_light_screen.png) | ![Results](assets/screenshots/flight_search_result.png) |
+| ![Splash](./assets/screenshots/splash.png) | ![Search](./assets/screenshots/search_light_screen.png) | ![Results](./assets/screenshots/flight_search_result.png) |
 | Welcome screen | Enter flight details | Browse available flights |
 
 | 4. Add Contacts | 5. Information | 6. WhatsApp |
 |-----------------|----------------|-------------|
-| ![Contacts](assets/screenshots/add_contact_screen.png) | ![Confirmation](assets/screenshots/confirmation_screen.png) | ![WhatsApp](assets/screenshots/whatsapp_sreen.png) |
+| ![Contacts](./assets/screenshots/add_contact_screen.png) | ![Confirmation](./assets/screenshots/confirmation_screen.png) | ![WhatsApp](./assets/screenshots/whatsapp_sreen.png) |
 | Select notification recipients | Confirmation & settings | Real-time updates |
 
 ## Technology Stack
