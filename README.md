@@ -21,27 +21,69 @@ When you travel, simply add your flight details to Volo and the app automaticall
 
 ## App Screenshots
 
-Here's how Volo looks and works:
+Here's the complete user journey through Volo:
 
-### 1. Flight Search & Selection
-![Flight Search](assets/screenshots/1.png)
-*Search for flights with real-time results and airline information*
+### 1. Splash Screen
+![Splash Screen](assets/screenshots/splash.png)
+*Welcome to Volo - your personal travel assistant*
 
-### 2. Flight Details & Booking
-![Flight Details](assets/screenshots/2.png)  
-*View detailed flight information and select your preferred option*
+### 2. Flight Search Screen
+![Flight Search](assets/screenshots/search_light_screen.png)
+*Search for flights with departure, arrival, and date selection*
 
-### 3. Contact Management
-![Add Contacts](assets/screenshots/3.png)
-*Choose who receives your flight updates via WhatsApp*
+### 3. Flight Results Screen
+![Flight Results](assets/screenshots/flight_search_result.png)
+*Browse available flights with airline details and pricing*
 
-### 4. Flight Confirmation
-![Confirmation](assets/screenshots/4.png)
-*Confirmation screen with your selected flight and contacts*
+### 4. Add Contact Screen
+![Add Contacts](assets/screenshots/add_contact_screen.png)
+*Select who receives your flight updates via WhatsApp*
 
-### 5. WhatsApp Integration
-![WhatsApp Updates](assets/screenshots/5.png)
+### 5. Information Screen
+![Confirmation](assets/screenshots/confirmation_screen.png)
+*Confirmation with flight details and notification settings*
+
+### 6. WhatsApp Screen
+![WhatsApp Updates](assets/screenshots/whatsapp_sreen.png)
 *Real-time flight updates sent to your contacts via WhatsApp*
+
+---
+
+## App Flow
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin: 20px 0;">
+
+<div style="text-align: center; flex: 1; min-width: 200px;">
+<img src="assets/screenshots/splash.png" alt="Splash" width="200" />
+<p><strong>1. Splash</strong><br/>Welcome screen</p>
+</div>
+
+<div style="text-align: center; flex: 1; min-width: 200px;">
+<img src="assets/screenshots/search_light_screen.png" alt="Search" width="200" />
+<p><strong>2. Flight Search</strong><br/>Enter flight details</p>
+</div>
+
+<div style="text-align: center; flex: 1; min-width: 200px;">
+<img src="assets/screenshots/flight_search_result.png" alt="Results" width="200" />
+<p><strong>3. Flight Results</strong><br/>Browse available flights</p>
+</div>
+
+<div style="text-align: center; flex: 1; min-width: 200px;">
+<img src="assets/screenshots/add_contact_screen.png" alt="Contacts" width="200" />
+<p><strong>4. Add Contacts</strong><br/>Select notification recipients</p>
+</div>
+
+<div style="text-align: center; flex: 1; min-width: 200px;">
+<img src="assets/screenshots/confirmation_screen.png" alt="Confirmation" width="200" />
+<p><strong>5. Information</strong><br/>Confirmation & settings</p>
+</div>
+
+<div style="text-align: center; flex: 1; min-width: 200px;">
+<img src="assets/screenshots/whatsapp_sreen.png" alt="WhatsApp" width="200" />
+<p><strong>6. WhatsApp</strong><br/>Real-time updates</p>
+</div>
+
+</div>
 
 ## Technology Stack
 
