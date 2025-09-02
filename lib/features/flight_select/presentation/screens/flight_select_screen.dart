@@ -92,9 +92,22 @@ class _FlightSelectScreenState extends State<FlightSelectScreen> with TickerProv
           onPressed: () => Navigator.of(context).pop(),
           splashRadius: 24,
         ),
-        title: Text(
-          'Choose Your Flight',
-          style: AppTheme.headlineMedium.copyWith(fontSize: 22),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Choose Your Flight',
+              style: AppTheme.headlineMedium.copyWith(fontSize: 22),
+            ),
+            Text(
+              '${snapshot.data != null ? [...snapshot.data!.bestFlights, ...snapshot.data!.otherFlights].length : 0} flights found',
+              style: AppTheme.bodySmall.copyWith(
+                color: AppTheme.textSecondary,
+                fontSize: 12,
+              ),
+            ),
+          ],
         ),
         centerTitle: false,
       ),
