@@ -69,8 +69,36 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       return UserModel.fromFirebaseUser(user);
     } catch (e) {
-      throw Exception('Sign in failed: ${e.toString()}');
-    }
+      // Provide user-friendly error messages for OTP verification
+      String userFriendlyMessage;
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'invalid-verification-code':
+            userFriendlyMessage = 'Invalid verification code. Please check and try again.';
+            break;
+          case 'invalid-verification-id':
+            userFriendlyMessage = 'Invalid verification ID. Please request a new code.';
+            break;
+          case 'session-expired':
+            userFriendlyMessage = 'Verification session expired. Please request a new code.';
+            break;
+          case 'credential-already-in-use':
+            userFriendlyMessage = 'This phone number is already registered with another account.';
+            break;
+          case 'user-disabled':
+            userFriendlyMessage = 'This account has been disabled.';
+            break;
+          case 'operation-not-allowed':
+            userFriendlyMessage = 'Phone authentication is not enabled.';
+            break;
+          default:
+            userFriendlyMessage = e.message ?? 'Verification failed. Please try again.';
+        }
+      } else {
+        userFriendlyMessage = 'Sign in failed. Please try again.';
+      }
+      throw Exception(userFriendlyMessage);
+}
   }
 
   @override
@@ -81,30 +109,55 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final completer = Completer<String>();
       Exception? verificationError;
       
-      developer.log('AuthRemoteDataSource: Starting verifyPhoneNumber for: $phoneNumber', name: 'VoloAuth');
-      
       await _firebaseAuth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) async {
-          developer.log('AuthRemoteDataSource: Auto-verification completed', name: 'VoloAuth');
           // Auto-verification if possible
           await _firebaseAuth.signInWithCredential(credential);
         },
         verificationFailed: (FirebaseAuthException e) {
-          developer.log('AuthRemoteDataSource: Verification failed - Code: ${e.code}, Message: ${e.message}', name: 'VoloAuth');
-          verificationError = Exception('Verification failed: ${e.message} (Code: ${e.code})');
+          // Provide user-friendly error messages for common iOS issues
+          String userFriendlyMessage;
+          switch (e.code) {
+            case 'invalid-phone-number':
+              userFriendlyMessage = 'Invalid phone number. Please check and try again.';
+              break;
+            case 'too-many-requests':
+              userFriendlyMessage = 'Too many attempts. Please try again later.';
+              break;
+            case 'quota-exceeded':
+              userFriendlyMessage = 'SMS quota exceeded. Please try again later.';
+              break;
+            case 'app-not-authorized':
+              userFriendlyMessage = 'App not authorized for phone authentication.';
+              break;
+            case 'missing-phone-number':
+              userFriendlyMessage = 'Phone number is required.';
+              break;
+            case 'invalid-verification-code':
+              userFriendlyMessage = 'Invalid verification code. Please try again.';
+              break;
+            case 'invalid-verification-id':
+              userFriendlyMessage = 'Invalid verification ID. Please request a new code.';
+              break;
+            case 'session-expired':
+              userFriendlyMessage = 'Verification session expired. Please request a new code.';
+              break;
+            default:
+              userFriendlyMessage = e.message ?? 'Verification failed. Please try again.';
+          }
+          
+          verificationError = Exception(userFriendlyMessage);
           if (!completer.isCompleted) {
             completer.completeError(verificationError!);
           }
         },
         codeSent: (String vid, int? resendToken) {
-          developer.log('AuthRemoteDataSource: Code sent successfully - verificationId: $vid', name: 'VoloAuth');
           if (!completer.isCompleted) {
             completer.complete(vid);
           }
         },
         codeAutoRetrievalTimeout: (String vid) {
-          developer.log('AuthRemoteDataSource: Code auto-retrieval timeout - verificationId: $vid', name: 'VoloAuth');
           if (!completer.isCompleted) {
             completer.complete(vid);
           }
@@ -122,9 +175,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (result == null || result.isEmpty) {
         throw Exception('Failed to get verification ID');
       }
+      
       return result;
     } catch (e) {
-      developer.log('AuthRemoteDataSource: Exception in sendOTP: $e', name: 'VoloAuth');
       throw Exception('Failed to send OTP: ${e.toString()}');
     }
   }

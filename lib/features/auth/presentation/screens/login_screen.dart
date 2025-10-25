@@ -49,8 +49,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   /// Check if the phone number is valid for enabling the button
   bool get _isPhoneNumberValid {
     final phoneNumber = _phoneController.text.trim();
-    // Basic validation: at least 10 digits for most countries
-    return phoneNumber.length >= 10 && phoneNumber.length <= 15;
+    // More robust validation: check for digits only and reasonable length
+    if (phoneNumber.isEmpty) return false;
+    
+    // Remove any non-digit characters for validation
+    final digitsOnly = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+    
+    // Basic validation: at least 7 digits (minimum for most countries) and max 15
+    return digitsOnly.length >= 7 && digitsOnly.length <= 15;
   }
 
   /// Handles the continue button press and initiates phone authentication
@@ -81,11 +87,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       String formattedCountryCode = _countryCode.trim();
       String formattedNumber = _phoneController.text.trim();
 
-      // Clean up the phone number - remove any + signs
-      if (formattedNumber.startsWith('+')) {
-        formattedNumber = formattedNumber.substring(1);
-      }
-
+      // Clean up the phone number - remove any non-digit characters except +
+      formattedNumber = formattedNumber.replaceAll(RegExp(r'[^\d]'), '');
+      
       // Clean up the country code - remove any + signs
       if (formattedCountryCode.startsWith('+')) {
         formattedCountryCode = formattedCountryCode.substring(1);
@@ -96,20 +100,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         formattedCountryCode = '91'; // Default to India
       }
 
-      String fullPhoneNumber = '+$formattedCountryCode$formattedNumber';
+      // Ensure country code is digits only
+      formattedCountryCode = formattedCountryCode.replaceAll(RegExp(r'[^\d]'), '');
 
-      developer.log('LoginScreen: Sending OTP for phone: $fullPhoneNumber', name: 'LoginScreen');
+      String fullPhoneNumber = '+$formattedCountryCode$formattedNumber';
 
       // Send OTP via Riverpod
       final verificationId = await ref.read(authNotifierProvider).sendOTP(
         phoneNumber: fullPhoneNumber,
       );
 
-      developer.log('LoginScreen: OTP result - verificationId: $verificationId', name: 'LoginScreen');
-
       // If successful, navigate to OTP screen
       if (mounted && verificationId != null) {
-        developer.log('LoginScreen: Navigating to OTP screen', name: 'LoginScreen');
         // Clear any errors before navigation since we're successful
         ref.read(authNotifierProvider).clearError();
         
@@ -121,12 +123,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         );
-      } else {
-        developer.log('LoginScreen: OTP sending failed - verificationId is null', name: 'LoginScreen');
       }
     } catch (e) {
       // Error handling is done via Riverpod state
-      developer.log('Error in _onContinue: $e', name: 'LoginScreen');
     }
   }
 

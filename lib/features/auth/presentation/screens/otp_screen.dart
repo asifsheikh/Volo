@@ -50,6 +50,18 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
       ref.read(authNotifierProvider).clearError();
       // Start the initial countdown timer
       _startResendCountdown();
+      // Listen for auth state changes to handle auto-verification
+      _listenToAuthStateChanges();
+    });
+  }
+
+  /// Listen to Firebase auth state changes for auto-verification
+  void _listenToAuthStateChanges() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user != null && mounted) {
+        // User was auto-verified, handle post-authentication
+        _handlePostAuthentication();
+      }
     });
   }
 
@@ -121,14 +133,17 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
         smsCode: _otp,
       );
 
-      // Clear any errors after successful verification
-      ref.read(authNotifierProvider).clearError();
-
-      // Handle post-authentication routing
-      await _handlePostAuthentication();
+      // Check if verification was successful by checking auth state
+      final authState = ref.read(authStateProvider);
+      
+      if (authState.isAuthenticated) {
+        // Clear any errors after successful verification
+        ref.read(authNotifierProvider).clearError();
+        // Handle post-authentication routing
+        await _handlePostAuthentication();
+      }
     } catch (e) {
       // Error handling is done via Riverpod state
-      print('Error in _onVerify: $e');
     }
   }
 
@@ -197,16 +212,20 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     }
     
     try {
+      // Clear any existing errors before resending
+      ref.read(authNotifierProvider).clearError();
+      
       // Resend OTP via Riverpod
-      await ref.read(authNotifierProvider).sendOTP(
+      final result = await ref.read(authNotifierProvider).sendOTP(
         phoneNumber: widget.phoneNumber,
       );
       
-      // Start countdown timer
-      _startResendCountdown();
+      if (result != null) {
+        // Start countdown timer
+        _startResendCountdown();
+      }
     } catch (e) {
       // Error handling is done via Riverpod state
-      print('Error in _resendOTP: $e');
     }
   }
 

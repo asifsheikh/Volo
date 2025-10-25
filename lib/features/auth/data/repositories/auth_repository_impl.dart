@@ -43,20 +43,14 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, String>> sendOTP({
     required String phoneNumber,
   }) async {
-    developer.log('AuthRepositoryImpl: Starting sendOTP for phone: $phoneNumber', name: 'VoloAuth');
-    
     if (await networkInfo.isConnected) {
-      developer.log('AuthRepositoryImpl: Network is connected', name: 'VoloAuth');
       try {
         final verificationId = await remoteDataSource.sendOTP(phoneNumber: phoneNumber);
-        developer.log('AuthRepositoryImpl: Remote data source returned verificationId: $verificationId', name: 'VoloAuth');
         return Right(verificationId);
       } catch (e) {
-        developer.log('AuthRepositoryImpl: Remote data source error: $e', name: 'VoloAuth');
         return Left(AuthFailure(e.toString()));
       }
     } else {
-      developer.log('AuthRepositoryImpl: No network connection', name: 'VoloAuth');
       return const Left(NetworkFailure('No internet connection'));
     }
   }

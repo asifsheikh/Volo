@@ -94,16 +94,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<String?> sendOTP({required String phoneNumber}) async {
-    developer.log('AuthNotifier: Starting sendOTP for phone: $phoneNumber', name: 'VoloAuth');
     state = state.copyWith(isLoading: true, error: null);
 
     try {
       final result = await _authRepository.sendOTP(phoneNumber: phoneNumber);
-      developer.log('AuthNotifier: Repository result received', name: 'VoloAuth');
 
       return result.fold(
         (failure) {
-          developer.log('AuthNotifier: SendOTP failed - ${failure.message}', name: 'VoloAuth');
           state = state.copyWith(
             isLoading: false,
             error: failure.message ?? 'An error occurred',
@@ -111,7 +108,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
           return null;
         },
         (verificationId) {
-          developer.log('AuthNotifier: SendOTP successful - verificationId: $verificationId', name: 'VoloAuth');
           state = state.copyWith(
             isLoading: false,
             error: null,
@@ -120,7 +116,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
         },
       );
     } catch (e) {
-      developer.log('AuthNotifier: SendOTP exception - $e', name: 'VoloAuth');
       state = state.copyWith(
         isLoading: false,
         error: 'Failed to send OTP: $e',

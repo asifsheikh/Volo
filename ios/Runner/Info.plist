@@ -60,11 +60,15 @@
 	<key>FirebaseAppCheckProviderFactory</key>
 	<string>FirebaseAppCheckDebugProviderFactory</string>
 	
-	<!-- reCAPTCHA Configuration -->
+	<!-- reCAPTCHA Configuration for Firebase Phone Auth -->
 	<key>RecaptchaSiteKey</key>
 	<string>6LfOA04pAAAAAL9ttkwIz40hC63_7IsaU2MgcwVH</string>
 	<key>RecaptchaDomain</key>
 	<string>volo-app-1.firebaseapp.com</string>
+	<key>RecaptchaEnterpriseSiteKey</key>
+	<string>6LfOA04pAAAAAL9ttkwIz40hC63_7IsaU2MgcwVH</string>
+	<key>RecaptchaEnterpriseProjectId</key>
+	<string>volo-app-1</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
