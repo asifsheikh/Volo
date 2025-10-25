@@ -2,8 +2,50 @@ import '../constants/app_constants.dart';
 
 /// Common validation utilities for the app
 class Validators {
-  /// Validate phone number format
-  static String? validatePhone(String? value) {
+  /// Country-specific phone number digit requirements
+  static const Map<String, int> _countryPhoneLengths = {
+    'IN': 10, // India
+    'US': 10, // United States
+    'CA': 10, // Canada
+    'GB': 10, // United Kingdom
+    'AU': 9,  // Australia
+    'DE': 11, // Germany
+    'FR': 10, // France
+    'IT': 10, // Italy
+    'ES': 9,  // Spain
+    'BR': 11, // Brazil
+    'MX': 10, // Mexico
+    'JP': 11, // Japan
+    'KR': 11, // South Korea
+    'CN': 11, // China
+    'RU': 10, // Russia
+    'ZA': 9,  // South Africa
+    'NG': 10, // Nigeria
+    'EG': 10, // Egypt
+    'SA': 9,  // Saudi Arabia
+    'AE': 9,  // UAE
+    'SG': 8,  // Singapore
+    'MY': 10, // Malaysia
+    'TH': 9,  // Thailand
+    'ID': 11, // Indonesia
+    'PH': 10, // Philippines
+    'VN': 9,  // Vietnam
+  };
+
+  /// Get required phone number length for a country code
+  static int getPhoneLengthForCountry(String countryCode) {
+    return _countryPhoneLengths[countryCode.toUpperCase()] ?? 10; // Default to 10 digits
+  }
+
+  /// Check if phone number has correct length for country
+  static bool isPhoneLengthValidForCountry(String phoneNumber, String countryCode) {
+    final digitsOnly = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+    final requiredLength = getPhoneLengthForCountry(countryCode);
+    return digitsOnly.length == requiredLength;
+  }
+
+  /// Validate phone number format with country-specific requirements
+  static String? validatePhone(String? value, {String? countryCode}) {
     if (value == null || value.isEmpty) {
       return AppConstants.requiredFieldMessage;
     }
@@ -11,9 +53,17 @@ class Validators {
     // Remove all non-digit characters
     final digitsOnly = value.replaceAll(RegExp(r'[^\d]'), '');
     
-    // Check if it's a valid phone number (7-15 digits)
-    if (digitsOnly.length < 7 || digitsOnly.length > 15) {
-      return AppConstants.invalidPhoneMessage;
+    // If country code is provided, use country-specific validation
+    if (countryCode != null) {
+      final requiredLength = getPhoneLengthForCountry(countryCode);
+      if (digitsOnly.length != requiredLength) {
+        return 'Phone number must be $requiredLength digits for ${countryCode.toUpperCase()}';
+      }
+    } else {
+      // Fallback to generic validation (7-15 digits)
+      if (digitsOnly.length < 7 || digitsOnly.length > 15) {
+        return AppConstants.invalidPhoneMessage;
+      }
     }
     
     return null;

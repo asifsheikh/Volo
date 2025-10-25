@@ -1,10 +1,10 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'dart:developer' as developer;
 
 import '../../../../theme/app_theme.dart';
+import '../../../../core/utils/validators.dart';
 import '../providers/auth_provider.dart';
 import 'otp_screen.dart';
 
@@ -18,7 +18,7 @@ import 'otp_screen.dart';
 /// - User-friendly error messages and loading states
 /// - Automatic phone number formatting and validation
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -27,9 +27,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   // Controllers and state variables
   final TextEditingController _phoneController = TextEditingController();
-  String _countryCode = '+91'; // Default to India
-  String? _verificationId;
-  bool _hasAttemptedSubmission = false; // Track if user has tried to submit
+  String _countryCode = 'IN'; // Default to India (country code, not dial code)
 
   @override
   void initState() {
@@ -47,16 +45,56 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   /// Check if the phone number is valid for enabling the button
+  /// Uses country-specific validation to ensure correct digit count
   bool get _isPhoneNumberValid {
     final phoneNumber = _phoneController.text.trim();
-    // More robust validation: check for digits only and reasonable length
     if (phoneNumber.isEmpty) return false;
     
-    // Remove any non-digit characters for validation
-    final digitsOnly = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
-    
-    // Basic validation: at least 7 digits (minimum for most countries) and max 15
-    return digitsOnly.length >= 7 && digitsOnly.length <= 15;
+    // Use country-specific validation
+    return Validators.isPhoneLengthValidForCountry(phoneNumber, _countryCode);
+  }
+
+
+  /// Custom input formatter to limit digits based on country
+  List<TextInputFormatter> get _inputFormatters {
+    final maxLength = Validators.getPhoneLengthForCountry(_countryCode);
+    return [
+      FilteringTextInputFormatter.digitsOnly,
+      LengthLimitingTextInputFormatter(maxLength),
+    ];
+  }
+
+  /// Get dial code for a country code
+  String _getDialCodeForCountry(String countryCode) {
+    const dialCodes = {
+      'IN': '+91',
+      'US': '+1',
+      'CA': '+1',
+      'GB': '+44',
+      'AU': '+61',
+      'DE': '+49',
+      'FR': '+33',
+      'IT': '+39',
+      'ES': '+34',
+      'BR': '+55',
+      'MX': '+52',
+      'JP': '+81',
+      'KR': '+82',
+      'CN': '+86',
+      'RU': '+7',
+      'ZA': '+27',
+      'NG': '+234',
+      'EG': '+20',
+      'SA': '+966',
+      'AE': '+971',
+      'SG': '+65',
+      'MY': '+60',
+      'TH': '+66',
+      'ID': '+62',
+      'PH': '+63',
+      'VN': '+84',
+    };
+    return dialCodes[countryCode.toUpperCase()] ?? '+91'; // Default to India
   }
 
   /// Handles the continue button press and initiates phone authentication
@@ -68,14 +106,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   /// 4. Handles all possible outcomes (success, failure, auto-verification)
   /// 5. Shows appropriate user feedback
   Future<void> _onContinue() async {
-    // Set flag that user has attempted submission
-    setState(() {
-      _hasAttemptedSubmission = true;
-    });
-
-    // Validate phone number input
-    if (_phoneController.text.isEmpty) {
-      // Show error via Riverpod state
+    // Validate phone number input using country-specific validation
+    final validationError = Validators.validatePhone(_phoneController.text, countryCode: _countryCode);
+    if (validationError != null) {
+      // Phone number validation failed
       return;
     }
 
@@ -83,27 +117,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       // Clear any existing errors before starting
       ref.read(authNotifierProvider).clearError();
 
-      // Format phone number and country code
-      String formattedCountryCode = _countryCode.trim();
+      // Get the dial code for the selected country
+      // We need to get the actual dial code (like +91, +1, etc.) from the IntlPhoneField
+      // For now, we'll use a simple mapping or get it from the phone field
+      String dialCode = _getDialCodeForCountry(_countryCode);
       String formattedNumber = _phoneController.text.trim();
 
-      // Clean up the phone number - remove any non-digit characters except +
+      // Clean up the phone number - remove any non-digit characters
       formattedNumber = formattedNumber.replaceAll(RegExp(r'[^\d]'), '');
-      
-      // Clean up the country code - remove any + signs
-      if (formattedCountryCode.startsWith('+')) {
-        formattedCountryCode = formattedCountryCode.substring(1);
-      }
 
-      // Ensure we have a valid country code
-      if (formattedCountryCode.isEmpty) {
-        formattedCountryCode = '91'; // Default to India
-      }
-
-      // Ensure country code is digits only
-      formattedCountryCode = formattedCountryCode.replaceAll(RegExp(r'[^\d]'), '');
-
-      String fullPhoneNumber = '+$formattedCountryCode$formattedNumber';
+      String fullPhoneNumber = '$dialCode$formattedNumber';
 
       // Send OTP via Riverpod
       final verificationId = await ref.read(authNotifierProvider).sendOTP(
@@ -134,7 +157,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     // Watch auth state from Riverpod
     final authState = ref.watch(authStateProvider);
     final isLoading = authState.isLoading;
-    final error = authState.error;
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -201,33 +223,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         IntlPhoneField(
                           controller: _phoneController,
                           initialCountryCode: 'IN',
+                          validator: (phone) => null, // Always return null (no validation)
+                          invalidNumberMessage: '', // Empty error message
+                          inputFormatters: _inputFormatters, // Limit input length based on country
                           decoration: AppTheme.inputDecoration.copyWith(
                             labelText: 'Phone number',
-                            errorText: (error != null && _hasAttemptedSubmission && !isLoading) ? error : null,
-                            errorStyle: const TextStyle(color: AppTheme.destructive),
+                            errorText: null, // Never show error text
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: (error != null && _hasAttemptedSubmission && !isLoading)
-                                    ? AppTheme.destructive
-                                    : AppTheme.borderPrimary,
+                              borderSide: const BorderSide(
+                                color: AppTheme.borderPrimary,
                               ),
                             ),
                           ),
                           onChanged: (phone) {
                             setState(() {
-                              // Store country code without + sign
-                              _countryCode = phone.countryCode.replaceAll('+', '');
+                              // Store country code (like 'IN', 'US', etc.)
+                              _countryCode = phone.countryISOCode;
                               if (_phoneController.text.isNotEmpty) {
-                                // Clear error when user types
+                                // Clear auth errors when user types, but keep validation errors
                                 ref.read(authNotifierProvider).clearError();
                               }
                             });
                           },
                           onCountryChanged: (country) {
                             setState(() {
-                              // Store country code without + sign
-                              _countryCode = country.dialCode.replaceAll('+', '');
+                              // Store country code (like 'IN', 'US', etc.)
+                              _countryCode = country.code;
+                              // Clear the phone number when country changes to avoid confusion
+                              _phoneController.clear();
                             });
                           },
                         ),
